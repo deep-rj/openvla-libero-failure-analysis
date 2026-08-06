@@ -1,0 +1,71 @@
+#!/bin/bash
+# =============================================================================
+# setup_env.sh — Physical AI Spine Project (OpenVLA on LIBERO)
+# Re-establishes shell config after a RunPod container restart/redeploy.
+# =============================================================================
+
+# --- Conda ---
+if [ -d "/workspace/miniconda3" ]; then
+    /workspace/miniconda3/bin/conda init bash > /dev/null
+    source ~/.bashrc
+else
+    echo "WARNING: /workspace/miniconda3 not found. Conda env may not exist yet."
+fi
+
+# --- HuggingFace cache on persistent volume ---
+export HF_HOME=/workspace/hf_cache
+if ! grep -q "HF_HOME=/workspace/hf_cache" ~/.bashrc 2>/dev/null; then
+    echo "export HF_HOME=/workspace/hf_cache" >> ~/.bashrc
+fi
+mkdir -p /workspace/hf_cache
+
+# --- MuJoCo headless rendering (GPU-aware backend + libs) ---
+if command -v nvidia-smi &> /dev/null && nvidia-smi &> /dev/null; then
+    export MUJOCO_GL=egl
+else
+    export MUJOCO_GL=osmesa
+    if ! dpkg -s libosmesa6 &> /dev/null; then
+        apt-get update && apt-get install -y libosmesa6 libosmesa6-dev libglfw3 libglew2.0 libgl1-mesa-glx
+        ldconfig
+    fi
+fi
+sed -i '/^export MUJOCO_GL=/d' ~/.bashrc 2>/dev/null
+echo "export MUJOCO_GL=$MUJOCO_GL" >> ~/.bashrc
+echo "MUJOCO_GL set to: $MUJOCO_GL"
+
+# --- Pip numpy constraint (prevents unpinned deps like bddl from silently upgrading numpy) ---
+export PIP_CONSTRAINT=/workspace/constraints.txt
+if ! grep -q "PIP_CONSTRAINT=/workspace/constraints.txt" ~/.bashrc 2>/dev/null; then
+    echo "export PIP_CONSTRAINT=/workspace/constraints.txt" >> ~/.bashrc
+fi
+if [ ! -f /workspace/constraints.txt ]; then
+    echo "numpy==1.26.4" > /workspace/constraints.txt
+fi
+
+# --- VS Code Tunnel (spawn only — login is manual, do NOT auto-answer prompts) ---
+if [ -f "/workspace/code" ]; then
+    if tmux has-session -t vscode-tunnel 2>/dev/null; then
+        echo "VS Code tunnel session already running/waiting."
+    else
+        tmux new-session -d -s vscode-tunnel "cd /workspace && ./code tunnel --accept-server-license-terms"
+        echo "VS Code tunnel session spawned."
+    fi
+    echo ""
+    echo "  >>> ACTION REQUIRED: tmux attach -t vscode-tunnel"
+    echo "  >>> Select GitHub when prompted, then complete the device-code login."
+else
+    echo "WARNING: /workspace/code not found. Run VS Code tunnel setup manually first."
+fi
+
+echo ""
+echo "Setup complete. Verifying..."
+echo "HF_HOME: $HF_HOME"
+which conda && conda --version
+
+echo ""
+echo "Next steps:"
+echo "  1. tmux attach -t vscode-tunnel   (select GitHub, log in)"
+echo "  2. conda activate openvla"
+echo "  3. Verify environment:"
+echo "     python -c \"import torch, flash_attn, numpy; print(torch.__version__, torch.cuda.is_available(), numpy.__version__, flash_attn.__version__)\""
+echo "     Expected: 2.2.0+cu121 True 1.x.x 2.5.5"
