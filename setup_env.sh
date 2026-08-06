@@ -12,6 +12,14 @@ else
     echo "WARNING: /workspace/miniconda3 not found. Conda env may not exist yet."
 fi
 
+# --- Git identity + credential storage on persistent volume ---
+git config --global user.name "Rohan Jha"
+git config --global user.email "22083737+deep-rj@users.noreply.github.com"
+git config --global init.defaultBranch main
+if ! grep -q "credential.helper" ~/.gitconfig 2>/dev/null; then
+    git config --global credential.helper "store --file=/workspace/.git-credentials"
+fi
+
 # --- HuggingFace cache on persistent volume ---
 export HF_HOME=/workspace/hf_cache
 if ! grep -q "HF_HOME=/workspace/hf_cache" ~/.bashrc 2>/dev/null; then
