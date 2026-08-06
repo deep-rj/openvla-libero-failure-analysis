@@ -28,14 +28,22 @@ conda activate openvla
 
 This handles everything environment- and hardware-dependent that needs re-applying on
 every fresh pod: HuggingFace cache location, a pip constraint pinning `numpy` (see
-Troubleshooting), and GPU-aware MuJoCo rendering backend selection (installing system
-rendering libraries only if missing).
+Troubleshooting), GPU-aware MuJoCo rendering backend selection (installing system
+rendering libraries only if missing), and spawning a VS Code Tunnel session for remote
+development.
+
+The tunnel step requires one manual action every time — it does not auto-authenticate:
+
+```bash
+tmux attach -t vscode-tunnel
+# select GitHub when prompted, complete the device-code login, then Ctrl-b d to detach
+```
 
 ### 2. Clone and install dependencies
 
 ```bash
 git clone https://github.com/openvla/openvla.git
-cd openvla && pip install -e .
+pip install -e openvla
 ```
 
 ```bash
@@ -58,9 +66,24 @@ Notes:
 ### Verify
 
 ```bash
+python --version
+# Expected: Python 3.10.20
+```
+
+```bash
 python -c "import torch, flash_attn, numpy; print(torch.__version__, torch.cuda.is_available(), numpy.__version__, flash_attn.__version__)"
 # Expected: 2.2.0+cu121 True 1.26.4 2.5.5   (CUDA True requires a GPU pod)
 ```
+
+### 3. Pull the base checkpoint
+
+```bash
+python scripts/smoke_test.py
+```
+
+Downloads `openvla/openvla-7b` (~15GB, lands in `$HF_HOME`) on first run, then executes
+a single forward pass to confirm the model, GPU, and flash-attn are all wired together
+correctly. Expect ~15GB peak memory and a 7-dim action vector as output.
 
 ---
 
