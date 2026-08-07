@@ -39,6 +39,10 @@ fi
 # --- MuJoCo headless rendering (GPU-aware backend + libs) ---
 if command -v nvidia-smi &> /dev/null && nvidia-smi &> /dev/null; then
     export MUJOCO_GL=egl
+    if ! dpkg -s libegl1 &> /dev/null; then
+        apt-get update && apt-get install -y libegl1 libegl-dev
+        ldconfig
+    fi
 else
     export MUJOCO_GL=osmesa
     if ! dpkg -s libosmesa6 &> /dev/null; then
