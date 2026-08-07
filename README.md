@@ -141,3 +141,20 @@ Diagnose with `ldconfig -p | grep -i osmesa` (empty output confirms missing); fi
 `apt-get install -y libosmesa6 libosmesa6-dev libglfw3 libglew2.0 libgl1-mesa-glx` +
 `ldconfig` to rebuild the shared-library cache. `setup_env.sh` handles this
 automatically, guarded to only run when the libraries aren't already present.
+
+### LIBERO's editable install fails with `ModuleNotFoundError: No module named 'libero'`
+
+`libero/__init__.py` is missing from the LIBERO repo itself — confirmed via `git log
+--all --oneline -- libero/__init__.py` returning no history, not something broken in a
+specific clone. `setup.py` uses `find_packages()`, which requires `__init__.py` to
+discover a package at all, so `pip install -e LIBERO` never registers `libero` even
+though `pip show libero` reports it as installed.
+
+Symptom: `pip show libero` looks fine, but `import libero` raises
+`ModuleNotFoundError`.
+
+Fix:
+```bash
+touch /workspace/LIBERO/libero/__init__.py
+cd /workspace && pip install -e LIBERO --force-reinstall --no-deps
+```
