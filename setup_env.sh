@@ -4,7 +4,7 @@
 # Re-establishes shell config after a RunPod container restart/redeploy.
 # =============================================================================
 
-REPO_DIR="/workspace/libero-eval-harness"
+export REPO_DIR="/workspace/libero-eval-harness"
 
 # --- Conda ---
 if [ -d "/workspace/miniconda3" ]; then
@@ -18,6 +18,7 @@ fi
 git config --global user.name "Rohan Jha"
 git config --global user.email "22083737+deep-rj@users.noreply.github.com"
 git config --global init.defaultBranch main
+git config --global --add safe.directory '*'
 if ! grep -q "credential.helper" ~/.gitconfig 2>/dev/null; then
     git config --global credential.helper "store --file=/workspace/.git-credentials"
 fi
