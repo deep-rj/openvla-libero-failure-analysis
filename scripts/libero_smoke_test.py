@@ -1,5 +1,6 @@
 # %%
 import os
+from typing import cast
 
 import h5py
 import matplotlib.pyplot as plt
@@ -7,7 +8,12 @@ import numpy as np
 from libero.libero import benchmark, get_libero_path
 from libero.libero.envs import OffScreenRenderEnv
 
-REPO_DIR = os.environ["REPO_DIR"]
+REPO_DIR = os.environ.get(
+    "REPO_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
+
+# Set default image resolution to 256 x 256 as openVLA uses 224 x 224
+IMG_RESOLUTION = 256
 
 
 # %%
@@ -17,15 +23,15 @@ def run_single_action(env, visualize=False, flip=True):
     rng = np.random.default_rng()
     random_action = rng.uniform(-1.0, 1.0, 7)
     print(f"Sampled action: {random_action}")
-    obs, reward, done, info = env.step(random_action)
+    obs, _reward, _done, _info = env.step(random_action)
 
     if visualize:
-        fig, axes = plt.subplots(1, 2, figsize=(8, 4))
+        _, axes = plt.subplots(1, 2, figsize=(8, 4))
         if flip:
             # Flip the images upside-down. It seems MuJoCo's off-screen renderer has this behaviour
-            axes[0].imshow(obs["agentview_image"][::-1])
+            axes[0].imshow(obs["agentview_image"][::-1, ::-1])
             axes[0].set_title("agentview")
-            axes[1].imshow(obs["robot0_eye_in_hand_image"][::-1])
+            axes[1].imshow(obs["robot0_eye_in_hand_image"][::-1, ::-1])
             axes[1].set_title("wrist cam")
         else:
             axes[0].imshow(obs["agentview_image"])
@@ -45,6 +51,7 @@ def run_random_sim(env, visualize=False, flip=True, save_path=None):
     rng = np.random.default_rng()
 
     # Run simulation for 30 steps
+    info = {}
     for _ in range(30):
         action = rng.uniform(env.env.action_spec[0], env.env.action_spec[1])
         obs, reward, done, info = env.step(action)
@@ -78,7 +85,7 @@ def run_random_sim(env, visualize=False, flip=True, save_path=None):
             ep.attrs["num_steps"] = len(actions)
 
     if visualize:
-        fig, axes = plt.subplots(2, 6, figsize=(15, 6))
+        _, axes = plt.subplots(2, 6, figsize=(15, 6))
         for i in range(6):
             axes[0, i].imshow(agent_frames[i * 5])  # Sample every 5th frame
             axes[0, i].axis("off")
@@ -103,8 +110,9 @@ def run_random_sim(env, visualize=False, flip=True, save_path=None):
     assert np.all(np.isfinite(rewards)), "non-finite reward encountered"
 
     with h5py.File(save_path, "r") as f:
-        ep = f["episode_0"]
-        assert ep["actions"].shape == (n_steps, env.env.action_dim)
+        ep = cast(h5py.Group, f["episode_0"])
+        actions_ds = cast(h5py.Dataset, ep["actions"])
+        assert actions_ds.shape == (n_steps, env.env.action_dim)
         assert ep.attrs["num_steps"] == n_steps
 
 
@@ -122,8 +130,8 @@ task_bddl_file = os.path.join(
 # %%
 env_args = {
     "bddl_file_name": task_bddl_file,
-    "camera_heights": 128,
-    "camera_widths": 128,
+    "camera_heights": IMG_RESOLUTION,
+    "camera_widths": IMG_RESOLUTION,
 }
 env = OffScreenRenderEnv(**env_args)
 env.seed(0)
@@ -141,6 +149,7 @@ print("Running a sequence of random actions")
 simulation_results_filepath = os.path.join(
     REPO_DIR, "outputs", "libero_smoke_test_results.h5"
 )
+os.makedirs(os.path.dirname(simulation_results_filepath), exist_ok=True)
 run_random_sim(env, save_path=simulation_results_filepath)
 
 # %%

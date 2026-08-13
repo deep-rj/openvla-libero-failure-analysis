@@ -19,7 +19,31 @@ vendored in.
 
 ## Setup
 
-### 1. Infra setup
+### 1. Install Miniconda (if not already installed)
+
+```bash
+curl -fsSL https://repo.anaconda.com/miniconda3/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh
+bash /tmp/miniconda.sh -b -p "$HOME/miniconda3"
+"$HOME/miniconda3/bin/conda" init bash
+source ~/.bashrc
+```
+
+Use the `MacOSX-arm64` / `MacOSX-x86_64` installer instead of `Linux-x86_64` if you're
+on a Mac — see the [Miniconda install docs](https://www.anaconda.com/docs/getting-started/miniconda/install)
+for the full installer matrix. Skip this step if `conda --version` already works.
+
+### 2. Create the conda environment
+
+```bash
+conda create -n openvla python=3.10 -y
+conda activate openvla
+```
+
+`setup_env.sh` and the rest of this guide assume an env named `openvla` — the exact
+Python patch version isn't pinned at creation time, but everything downstream is
+verified against 3.10.20 (see Verify, below).
+
+### 3. Infra setup
 
 ```bash
 source setup_env.sh
@@ -39,7 +63,7 @@ tmux attach -t vscode-tunnel
 # select GitHub when prompted, complete the device-code login, then Ctrl-b d to detach
 ```
 
-### 2. Clone and install dependencies
+### 4. Clone and install dependencies
 
 ```bash
 git clone https://github.com/openvla/openvla.git
@@ -75,7 +99,20 @@ python -c "import torch, flash_attn, numpy; print(torch.__version__, torch.cuda.
 # Expected: 2.2.0+cu121 True 1.26.4 2.5.5   (CUDA True requires a GPU pod)
 ```
 
-### 3. Pull the base checkpoint
+### 5. Validate the LIBERO environment (CPU or GPU)
+
+```bash
+python scripts/libero_smoke_test.py
+```
+
+Loads a LIBERO-10 task and runs a random-action rollout, asserting observation
+shapes/dtypes and the saved HDF5 output are well-formed. Works on CPU-only pods
+(`osmesa` rendering) as well as GPU pods (`egl`) — see MuJoCo headless rendering under
+Troubleshooting if rendering fails. Written as a jupytext percent-format notebook
+(`# %%` cell markers) — run cell-by-cell in an interactive kernel rather than as a
+straight script when iterating on it.
+
+### 6. Validate the OpenVLA checkpoint (GPU only)
 
 ```bash
 python scripts/smoke_test.py
@@ -83,7 +120,9 @@ python scripts/smoke_test.py
 
 Downloads `openvla/openvla-7b` (~15GB, lands in `$HF_HOME`) on first run, then executes
 a single forward pass to confirm the model, GPU, and flash-attn are all wired together
-correctly. Expect ~15GB peak memory and a 7-dim action vector as output.
+correctly. Expect ~15GB peak memory and a 7-dim action vector as output. Requires a GPU
+pod — `flash_attention_2` has no CPU implementation, so this step fails outright on a
+CPU-only machine.
 
 ---
 
