@@ -51,10 +51,9 @@ def run_random_sim(env, visualize=False, flip=True, save_path=None):
     rng = np.random.default_rng()
 
     # Run simulation for 30 steps
-    info = {}
     for _ in range(30):
         action = rng.uniform(env.env.action_spec[0], env.env.action_spec[1])
-        obs, reward, done, info = env.step(action)
+        obs, reward, done, _info = env.step(action)
 
         agent_img = obs["agentview_image"]
         wrist_img = obs["robot0_eye_in_hand_image"]
@@ -81,7 +80,7 @@ def run_random_sim(env, visualize=False, flip=True, save_path=None):
             ep.create_dataset("actions", data=np.array(actions))
             ep.create_dataset("rewards", data=np.array(rewards))
             ep.create_dataset("dones", data=np.array(dones))
-            ep.attrs["success"] = bool(info.get("success", False))
+            ep.attrs["success"] = bool(any(dones))
             ep.attrs["num_steps"] = len(actions)
 
     if visualize:
