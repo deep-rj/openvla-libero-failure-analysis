@@ -45,9 +45,7 @@ NUM_STEPS_WAIT = 10  # steps to let dropped objects settle before acting
 # %%
 @dataclass
 class EvalConfig:
-    pretrained_checkpoint: str = (
-        "openvla/openvla-7b"  # base checkpoint; override with a fine-tuned/LoRA path
-    )
+    pretrained_checkpoint: str = "openvla/openvla-7b-finetuned-libero-10"
     model_family: str = "openvla"
     task_suite_name: str = "libero_10"
     task_id: int = 0
