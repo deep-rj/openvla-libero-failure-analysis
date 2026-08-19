@@ -1,22 +1,41 @@
 # %%
-import csv
+# Thread pinning must be applied before numpy/TF/torch import. Their pools size
+# themselves to core count, which oversubscribes once N env workers exist.
+# Run with PIN_THREADS=1 to A/B against library defaults.
 import os
+
+if os.environ.get("PIN_THREADS") == "1":
+    for _var in (
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+    ):
+        os.environ[_var] = "1"
+
+import csv
 import time
+from collections import defaultdict
+from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import cast
 
 import h5py
 import numpy as np
+import tensorflow as tf
+import torch
 from experiments.robot.libero.libero_utils import (
     get_libero_dummy_action,
     get_libero_image,
     quat2axisangle,
 )
 from experiments.robot.openvla_utils import (
+    DEVICE,
+    crop_and_resize,
     get_processor,
     get_vla,
-    get_vla_action,
 )
+from PIL import Image
 from experiments.robot.robot_utils import (
     get_image_resize_size,
     invert_gripper_action,
@@ -24,6 +43,11 @@ from experiments.robot.robot_utils import (
 )
 from libero.libero import benchmark, get_libero_path
 from libero.libero.envs import OffScreenRenderEnv
+
+if os.environ.get("PIN_THREADS") == "1":
+    tf.config.threading.set_intra_op_parallelism_threads(1)
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+    torch.set_num_threads(1)
 
 REPO_DIR = os.environ.get(
     "REPO_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -58,6 +82,86 @@ class EvalConfig:
     def __post_init__(self):
         if self.unnorm_key is None:
             self.unnorm_key = self.task_suite_name
+
+
+# %%
+class StageTimer:
+    """Accumulates wall time per named stage across a run.
+
+    CUDA work is asynchronous, so a stage that touches the GPU must be timed with
+    `sync=True`; otherwise its cost is attributed to whichever later call happens
+    to synchronize.
+    """
+
+    def __init__(self):
+        self.total = defaultdict(float)
+        self.count = defaultdict(int)
+
+    @contextmanager
+    def stage(self, name, sync=False):
+        sync = sync and torch.cuda.is_available()
+        if sync:
+            torch.cuda.synchronize()
+        t0 = time.perf_counter()
+        yield
+        if sync:
+            torch.cuda.synchronize()
+        self.total[name] += time.perf_counter() - t0
+        self.count[name] += 1
+
+    def report(self, title="Timing breakdown", wall=None, num_steps=None):
+        grand = sum(self.total.values())
+        print(f"\n=== {title} ===")
+        print(f"{'stage':<40}{'calls':>7}{'total s':>10}{'mean ms':>10}{'share':>8}")
+        for name, tot in sorted(self.total.items(), key=lambda kv: -kv[1]):
+            n = self.count[name]
+            print(
+                f"{name:<40}{n:>7}{tot:>10.2f}{tot / n * 1e3:>10.2f}"
+                f"{tot / grand * 100:>7.1f}%"
+            )
+        print("-" * 75)
+        print(f"{'SUM OF TIMED STAGES':<40}{'':>7}{grand:>10.2f}")
+        if num_steps:
+            print(f"per-step (timed stages only): {grand / num_steps * 1e3:.1f} ms")
+        if wall:
+            # Coverage below ~90% means real cost is hiding between the timers.
+            print(f"measured wall time:           {wall:.2f} s")
+            print(f"coverage:                     {grand / wall * 100:.1f}%")
+
+
+# %%
+def get_vla_action_timed(
+    vla, processor, base_vla_name, obs, task_label, unnorm_key, center_crop, timer
+):
+    """Mirror of openvla's `get_vla_action` with per-stage timers.
+
+    Faithful to openvla/experiments/robot/openvla_utils.py:127-169. The vendored
+    version is a single opaque call, which hides the CPU/GPU split being measured.
+    """
+    assert "openvla-v01" not in base_vla_name, "v01 prompt format is not mirrored here"
+
+    with timer.stage("action 1: PIL convert"):
+        image = Image.fromarray(obs["full_image"]).convert("RGB")
+
+    if center_crop:
+        with timer.stage("action 2: center crop (6 TF ops)"):
+            image_t = tf.convert_to_tensor(np.array(image))
+            orig_dtype = image_t.dtype
+            image_t = tf.image.convert_image_dtype(image_t, tf.float32)
+            image_t = crop_and_resize(image_t, 0.9, 1)
+            image_t = tf.clip_by_value(image_t, 0, 1)
+            image_t = tf.image.convert_image_dtype(image_t, orig_dtype, saturate=True)
+            image = Image.fromarray(image_t.numpy()).convert("RGB")
+
+    prompt = f"In: What action should the robot take to {task_label.lower()}?\nOut:"
+
+    with timer.stage("action 3: HF processor (2 tv stacks)"):
+        inputs = processor(prompt, image)
+    with timer.stage("action 4: H2D transfer", sync=True):
+        inputs = inputs.to(DEVICE, dtype=torch.bfloat16)
+    with timer.stage("action 5: GPU generate", sync=True):
+        action = vla.predict_action(**inputs, unnorm_key=unnorm_key, do_sample=False)
+    return action
 
 
 # %%
@@ -109,14 +213,17 @@ def run_trial(
     init_state,
     max_steps,
     resize_size,
+    timer,
 ):
     """Runs one closed-loop rollout and returns its full per-step trajectory.
 
     Frame/state at index i is the observation the model was shown before producing
     actions[i]; reward/done at index i is the result of executing that action.
     """
-    env.reset()
-    obs = env.set_init_state(init_state)
+    with timer.stage("trial: env.reset (hard_reset=True)"):
+        env.reset()
+    with timer.stage("trial: set_init_state"):
+        obs = env.set_init_state(init_state)
 
     agent_frames, wrist_frames, proprio_states = [], [], []
     actions_log, rewards, dones = [], [], []
@@ -125,40 +232,46 @@ def run_trial(
     t = 0
     while t < max_steps + NUM_STEPS_WAIT:
         if t < NUM_STEPS_WAIT:
-            obs, _reward, _done, _info = env.step(
-                get_libero_dummy_action(cfg.model_family)
-            )
+            with timer.stage("settle: env.step (dummy action)"):
+                obs, _reward, _done, _info = env.step(
+                    get_libero_dummy_action(cfg.model_family)
+                )
             t += 1
             continue
 
-        img = get_libero_image(obs, resize_size)
-        # Not fed to the model; recorded for trajectory analysis.
-        proprio_state = np.concatenate(
-            (
-                obs["robot0_eef_pos"],
-                quat2axisangle(obs["robot0_eef_quat"]),
-                obs["robot0_gripper_qpos"],
+        with timer.stage("obs 1: get_libero_image (jpeg+lanczos3)"):
+            img = get_libero_image(obs, resize_size)
+        with timer.stage("obs 2: proprio + frame copies (logging)"):
+            # Not fed to the model; recorded for trajectory analysis.
+            proprio_state = np.concatenate(
+                (
+                    obs["robot0_eef_pos"],
+                    quat2axisangle(obs["robot0_eef_quat"]),
+                    obs["robot0_gripper_qpos"],
+                )
             )
-        )
-        agent_frame = obs["agentview_image"][::-1, ::-1]
-        wrist_frame = obs["robot0_eye_in_hand_image"][::-1, ::-1]
+            agent_frame = obs["agentview_image"][::-1, ::-1]
+            wrist_frame = obs["robot0_eye_in_hand_image"][::-1, ::-1]
 
-        action = get_vla_action(
+        action = get_vla_action_timed(
             vla,
             processor,
             cfg.pretrained_checkpoint,
             {"full_image": img},
             task_description,
             cfg.unnorm_key,
-            center_crop=cfg.center_crop,
+            cfg.center_crop,
+            timer,
         )
-        action = normalize_gripper_action(action, binarize=True)  # [0,1] -> [-1,1]
-        if cfg.model_family == "openvla":
-            action = invert_gripper_action(
-                action
-            )  # align gripper sign with sim convention
+        with timer.stage("action 6: gripper post-process"):
+            action = normalize_gripper_action(action, binarize=True)  # [0,1] -> [-1,1]
+            if cfg.model_family == "openvla":
+                action = invert_gripper_action(
+                    action
+                )  # align gripper sign with sim convention
 
-        obs, reward, done, _info = env.step(action.tolist())
+        with timer.stage("env.step (physics + 2 renders)"):
+            obs, reward, done, _info = env.step(action.tolist())
 
         agent_frames.append(agent_frame)
         wrist_frames.append(wrist_frame)
@@ -186,6 +299,7 @@ def run_trial(
 
 # %%
 cfg = EvalConfig()
+timer = StageTimer()
 
 benchmark_dict = benchmark.get_benchmark_dict()
 task_suite = benchmark_dict[cfg.task_suite_name]()
@@ -220,6 +334,7 @@ MANIFEST_FIELDS = [
 ]
 
 trial_results = []
+run_t0 = time.perf_counter()
 write_header = not os.path.exists(manifest_path)
 with (
     h5py.File(output_path, "w") as f,
@@ -253,21 +368,23 @@ with (
             init_states[init_state_idx],
             max_steps,
             resize_size,
+            timer,
         )
         trial_results.append(result)
         print(f"  success={result['success']} num_steps={result['num_steps']}")
 
         grp = task_grp.create_group(f"trial_{trial_idx}")
-        grp.create_dataset(
-            "agentview_images", data=result["agent_frames"], compression="gzip"
-        )
-        grp.create_dataset(
-            "wrist_images", data=result["wrist_frames"], compression="gzip"
-        )
-        grp.create_dataset("proprio_states", data=result["proprio_states"])
-        grp.create_dataset("actions", data=result["actions"])
-        grp.create_dataset("rewards", data=result["rewards"])
-        grp.create_dataset("dones", data=result["dones"])
+        with timer.stage("io: hdf5 write (gzip)"):
+            grp.create_dataset(
+                "agentview_images", data=result["agent_frames"], compression="gzip"
+            )
+            grp.create_dataset(
+                "wrist_images", data=result["wrist_frames"], compression="gzip"
+            )
+            grp.create_dataset("proprio_states", data=result["proprio_states"])
+            grp.create_dataset("actions", data=result["actions"])
+            grp.create_dataset("rewards", data=result["rewards"])
+            grp.create_dataset("dones", data=result["dones"])
         grp.attrs["success"] = bool(result["success"])
         grp.attrs["num_steps"] = result["num_steps"]
         grp.attrs["init_state_idx"] = init_state_idx
@@ -292,9 +409,16 @@ with (
     f.attrs["num_successes"] = num_successes
     f.attrs["success_rate"] = num_successes / cfg.num_trials
 
+run_wall = time.perf_counter() - run_t0
 env.close()
 print(
     f"Success rate: {num_successes}/{cfg.num_trials} ({num_successes / cfg.num_trials * 100:.1f}%)"
+)
+
+timer.report(
+    title="Per-stage timing",
+    wall=run_wall,
+    num_steps=sum(r["num_steps"] for r in trial_results),
 )
 
 # %%
