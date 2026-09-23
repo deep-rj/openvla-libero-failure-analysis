@@ -233,3 +233,6 @@ drills/
 *.mp4
 *.png
 *.npz
+
+# Claude Code per-machine settings
+.claude/settings.local.json

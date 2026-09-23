@@ -70,6 +70,14 @@ tmux attach -t vscode-tunnel
 # select GitHub when prompted, complete the device-code login, then Ctrl-b d to detach
 ```
 
+**Claude Code on a pod:** the `SessionStart` hook rewrites and pushes `STATUS.md`, which
+conflicts with the same hook running on another machine. Disable hooks for the pod's clone
+once; the file is gitignored and lives on the persistent volume:
+
+```bash
+echo '{"disableAllHooks": true}' > .claude/settings.local.json
+```
+
 ### 4. Clone and install dependencies
 
 ```bash
