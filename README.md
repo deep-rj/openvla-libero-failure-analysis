@@ -23,7 +23,7 @@ vendored in.
 
 ```bash
 CONDA_DIR=/workspace/miniconda3   # on a pod; use "$HOME/miniconda3" locally
-curl -fsSL https://repo.anaconda.com/miniconda3/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh
+curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh
 bash /tmp/miniconda.sh -b -p "$CONDA_DIR"
 "$CONDA_DIR/bin/conda" init bash
 source ~/.bashrc
