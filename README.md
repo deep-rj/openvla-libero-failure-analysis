@@ -61,7 +61,8 @@ This handles everything environment- and hardware-dependent that needs re-applyi
 every fresh pod: HuggingFace cache location, a pip constraint pinning `numpy` (see
 Troubleshooting), GPU-aware MuJoCo rendering backend selection (installing system
 rendering libraries only if missing), and spawning a VS Code Tunnel session for remote
-development.
+development (downloading the standalone VS Code CLI to `/workspace/code` first if it is
+missing).
 
 The tunnel step requires one manual action every time — it does not auto-authenticate:
 

@@ -63,7 +63,12 @@ sed -i '/^export PIP_CONSTRAINT=/d' ~/.bashrc 2>/dev/null
 echo "export PIP_CONSTRAINT=$PIP_CONSTRAINT" >> ~/.bashrc
 
 # --- VS Code Tunnel (spawn only — login is manual, do NOT auto-answer prompts) ---
-if [ -f "/workspace/code" ]; then
+if [ ! -x "/workspace/code" ]; then
+    curl -fsSL 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' -o /tmp/vscode_cli.tar.gz \
+        && tar -xzf /tmp/vscode_cli.tar.gz -C /workspace
+    rm -f /tmp/vscode_cli.tar.gz
+fi
+if [ -x "/workspace/code" ]; then
     if tmux has-session -t vscode-tunnel 2>/dev/null; then
         echo "VS Code tunnel session already running/waiting."
     else
@@ -74,7 +79,7 @@ if [ -f "/workspace/code" ]; then
     echo "  >>> ACTION REQUIRED: tmux attach -t vscode-tunnel"
     echo "  >>> Select GitHub when prompted, then complete the device-code login."
 else
-    echo "WARNING: /workspace/code not found. Run VS Code tunnel setup manually first."
+    echo "WARNING: could not install the VS Code CLI at /workspace/code; skipping tunnel."
 fi
 
 source ~/.bashrc
