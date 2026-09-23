@@ -1,4 +1,4 @@
-# libero-eval-harness
+# libero-eval-harness-workspace
 
 Language-conditioned VLA agent (OpenVLA + LoRA) evaluated on LIBERO-Long, with an eval
 harness, failure taxonomy, and robustness study on top.
@@ -139,8 +139,8 @@ Fixed via a pip constraints file rather than editing the vendored requirements f
 directly, so it applies to every future install in the env, not just this one:
 
 ```bash
-echo "numpy==1.26.4" > /workspace/constraints.txt
-export PIP_CONSTRAINT=/workspace/constraints.txt   # already set by setup_env.sh
+echo "numpy==1.26.4" >> "$REPO_DIR/constraints.txt"
+export PIP_CONSTRAINT="$REPO_DIR/constraints.txt"   # already set by setup_env.sh
 ```
 
 If numpy has already drifted in an existing env: `pip install numpy==1.26.4 --force-reinstall`.

@@ -4,7 +4,9 @@
 # Re-establishes shell config after a RunPod container restart/redeploy.
 # =============================================================================
 
-export REPO_DIR="/workspace/libero-eval-harness"
+# Derived from this file's location so a clone under any directory name works.
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+export REPO_DIR
 
 # --- Conda ---
 if [ -d "/workspace/miniconda3" ]; then
@@ -57,9 +59,8 @@ echo "MUJOCO_GL set to: $MUJOCO_GL"
 
 # --- Pip numpy constraint (prevents unpinned deps like bddl from silently upgrading numpy) ---
 export PIP_CONSTRAINT="$REPO_DIR/constraints.txt"
-if ! grep -q "PIP_CONSTRAINT=$REPO_DIR/constraints.txt" ~/.bashrc 2>/dev/null; then
-    echo "export PIP_CONSTRAINT=$REPO_DIR/constraints.txt" >> ~/.bashrc
-fi
+sed -i '/^export PIP_CONSTRAINT=/d' ~/.bashrc 2>/dev/null
+echo "export PIP_CONSTRAINT=$PIP_CONSTRAINT" >> ~/.bashrc
 
 # --- VS Code Tunnel (spawn only — login is manual, do NOT auto-answer prompts) ---
 if [ -f "/workspace/code" ]; then
