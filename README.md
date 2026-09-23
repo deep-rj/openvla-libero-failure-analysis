@@ -22,15 +22,22 @@ vendored in.
 ### 1. Install Miniconda (if not already installed)
 
 ```bash
+CONDA_DIR=/workspace/miniconda3   # on a pod; use "$HOME/miniconda3" locally
 curl -fsSL https://repo.anaconda.com/miniconda3/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh
-bash /tmp/miniconda.sh -b -p "$HOME/miniconda3"
-"$HOME/miniconda3/bin/conda" init bash
+bash /tmp/miniconda.sh -b -p "$CONDA_DIR"
+"$CONDA_DIR/bin/conda" init bash
 source ~/.bashrc
 ```
 
+On a pod, Miniconda **must** go under `/workspace`: `$HOME` is container storage and is
+wiped on every teardown, taking the `openvla` env with it. `setup_env.sh` expects
+`/workspace/miniconda3` and re-runs `conda init` on each fresh container, because the
+init block it writes lives in the (non-persistent) `~/.bashrc`.
+
 Use the `MacOSX-arm64` / `MacOSX-x86_64` installer instead of `Linux-x86_64` if you're
 on a Mac — see the [Miniconda install docs](https://www.anaconda.com/docs/getting-started/miniconda/install)
-for the full installer matrix. Skip this step if `conda --version` already works.
+for the full installer matrix. Skip this step if `conda --version` already works — or,
+on a pod, if `/workspace/miniconda3/bin/conda` exists (then just `source setup_env.sh`).
 
 ### 2. Create the conda environment
 
@@ -46,7 +53,7 @@ verified against 3.10.20 (see Verify, below).
 ### 3. Infra setup
 
 ```bash
-source setup_env.sh
+source setup_env.sh   # must be sourced, not run with `bash`, to affect the current shell
 conda activate openvla
 ```
 
