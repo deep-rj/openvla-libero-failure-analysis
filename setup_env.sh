@@ -1,43 +1,20 @@
 #!/bin/bash
 # =============================================================================
 # setup_env.sh — Physical AI Spine Project (OpenVLA on LIBERO)
-# Re-establishes shell config after a RunPod container restart/redeploy.
+# Repo-level pod setup after a RunPod container restart/redeploy: persistent
+# cache paths, MuJoCo rendering libs, the openvla env's vars, and the VS Code
+# tunnel. Shell and git config are machine setup and not handled here.
 # =============================================================================
 
 # Derived from this file's location so a clone under any directory name works.
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 export REPO_DIR
+CONDA_BIN=/workspace/miniconda3/bin/conda
 
-# --- Conda ---
-if [ -d "/workspace/miniconda3" ]; then
-    /workspace/miniconda3/bin/conda init bash > /dev/null
-    source ~/.bashrc
-else
-    echo "WARNING: /workspace/miniconda3 not found. Conda env may not exist yet."
-fi
-
-# --- Git identity + credential storage on persistent volume ---
-git config --global user.name "Rohan Jha"
-git config --global user.email "22083737+deep-rj@users.noreply.github.com"
-git config --global init.defaultBranch main
-git config --global --add safe.directory '*'
-if ! grep -q "credential.helper" ~/.gitconfig 2>/dev/null; then
-    git config --global credential.helper "store --file=/workspace/.git-credentials"
-fi
-
-# --- HuggingFace cache on persistent volume ---
+# --- HuggingFace cache + LIBERO config on persistent volume ---
 export HF_HOME=/workspace/hf_cache
-if ! grep -q "HF_HOME=/workspace/hf_cache" ~/.bashrc 2>/dev/null; then
-    echo "export HF_HOME=/workspace/hf_cache" >> ~/.bashrc
-fi
-mkdir -p /workspace/hf_cache
-
-# --- LIBERO config on persistent volume ---
-mkdir -p /workspace/.libero
 export LIBERO_CONFIG_PATH=/workspace/.libero
-if ! grep -q "LIBERO_CONFIG_PATH=/workspace/.libero" ~/.bashrc 2>/dev/null; then
-    echo "export LIBERO_CONFIG_PATH=/workspace/.libero" >> ~/.bashrc
-fi
+mkdir -p "$HF_HOME" "$LIBERO_CONFIG_PATH"
 
 # --- MuJoCo headless rendering (GPU-aware backend + libs) ---
 if command -v nvidia-smi &> /dev/null && nvidia-smi &> /dev/null; then
@@ -53,14 +30,22 @@ else
         ldconfig
     fi
 fi
-sed -i '/^export MUJOCO_GL=/d' ~/.bashrc 2>/dev/null
-echo "export MUJOCO_GL=$MUJOCO_GL" >> ~/.bashrc
 echo "MUJOCO_GL set to: $MUJOCO_GL"
 
 # --- Pip numpy constraint (prevents unpinned deps like bddl from silently upgrading numpy) ---
 export PIP_CONSTRAINT="$REPO_DIR/constraints.txt"
-sed -i '/^export PIP_CONSTRAINT=/d' ~/.bashrc 2>/dev/null
-echo "export PIP_CONSTRAINT=$PIP_CONSTRAINT" >> ~/.bashrc
+
+# --- Persist the above as openvla env vars, applied on `conda activate openvla` ---
+if [ -x "$CONDA_BIN" ] && "$CONDA_BIN" env list | grep -q '^openvla '; then
+    "$CONDA_BIN" env config vars set -n openvla \
+        HF_HOME="$HF_HOME" \
+        LIBERO_CONFIG_PATH="$LIBERO_CONFIG_PATH" \
+        MUJOCO_GL="$MUJOCO_GL" \
+        PIP_CONSTRAINT="$PIP_CONSTRAINT" > /dev/null
+    echo "openvla env vars set."
+else
+    echo "NOTE: conda env 'openvla' not found; re-run after creating it to persist env vars."
+fi
 
 # --- VS Code Tunnel (spawn only — login is manual, do NOT auto-answer prompts) ---
 if [ ! -x "/workspace/code" ]; then
@@ -82,11 +67,10 @@ else
     echo "WARNING: could not install the VS Code CLI at /workspace/code; skipping tunnel."
 fi
 
-source ~/.bashrc
 echo ""
 echo "Setup complete. Verifying..."
-echo "HF_HOME: $HF_HOME"
-which conda && conda --version
+command -v conda > /dev/null && conda --version || echo "WARNING: conda not on PATH (machine setup incomplete)"
+[ -x "$CONDA_BIN" ] && "$CONDA_BIN" env config vars list -n openvla 2>/dev/null
 
 echo ""
 echo "Next steps:"

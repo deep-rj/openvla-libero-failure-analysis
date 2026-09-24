@@ -19,20 +19,22 @@ vendored in.
 
 ## Setup
 
+Machine-level shell and git config (conda hooked into new shells, git credentials) is
+assumed to be in place; this repo's setup doesn't touch `~/.bashrc` or `~/.gitconfig`.
+
 ### 1. Install Miniconda (if not already installed)
 
 ```bash
 CONDA_DIR=/workspace/miniconda3   # on a pod; use "$HOME/miniconda3" locally
 curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh
 bash /tmp/miniconda.sh -b -p "$CONDA_DIR"
-"$CONDA_DIR/bin/conda" init bash
-source ~/.bashrc
+eval "$("$CONDA_DIR/bin/conda" shell.bash hook)"   # current shell only
 ```
 
 On a pod, Miniconda **must** go under `/workspace`: `$HOME` is container storage and is
 wiped on every teardown, taking the `openvla` env with it. `setup_env.sh` expects
-`/workspace/miniconda3` and re-runs `conda init` on each fresh container, because the
-init block it writes lives in the (non-persistent) `~/.bashrc`.
+`/workspace/miniconda3`. Hooking conda into new shells is part of machine setup, not
+this repo.
 
 Use the `MacOSX-arm64` / `MacOSX-x86_64` installer instead of `Linux-x86_64` if you're
 on a Mac — see the [Miniconda install docs](https://www.anaconda.com/docs/getting-started/miniconda/install)
@@ -58,11 +60,12 @@ conda activate openvla
 ```
 
 This handles everything environment- and hardware-dependent that needs re-applying on
-every fresh pod: HuggingFace cache location, a pip constraint pinning `numpy` (see
-Troubleshooting), GPU-aware MuJoCo rendering backend selection (installing system
-rendering libraries only if missing), and spawning a VS Code Tunnel session for remote
-development (downloading the standalone VS Code CLI to `/workspace/code` first if it is
-missing).
+every fresh pod. It stores `HF_HOME` and `LIBERO_CONFIG_PATH` (both on `/workspace`), a
+pip constraint pinning `numpy` (see Troubleshooting), and a GPU-aware MuJoCo rendering
+backend as `openvla` env vars (`conda env config vars`), applied on every
+`conda activate openvla`. It also installs system rendering libraries if missing, and
+spawns a VS Code Tunnel session for remote development (downloading the standalone VS
+Code CLI to `/workspace/code` first if it is missing).
 
 The tunnel step requires one manual action every time — it does not auto-authenticate:
 
@@ -156,7 +159,7 @@ directly, so it applies to every future install in the env, not just this one:
 
 ```bash
 echo "numpy==1.26.4" >> "$REPO_DIR/constraints.txt"
-export PIP_CONSTRAINT="$REPO_DIR/constraints.txt"   # already set by setup_env.sh
+export PIP_CONSTRAINT="$REPO_DIR/constraints.txt"   # set as an openvla env var by setup_env.sh
 ```
 
 If numpy has already drifted in an existing env: `pip install numpy==1.26.4 --force-reinstall`.
@@ -184,7 +187,7 @@ MuJoCo needs an explicit backend on a pod with no display:
 - `osmesa` — software rendering, CPU-only.
 - `egl` — GPU-accelerated, headless. Preferred whenever a GPU is present.
 
-`setup_env.sh` auto-detects via `nvidia-smi` and sets this on every restart, since this
+`setup_env.sh` auto-detects via `nvidia-smi` and sets it as an `openvla` env var on every restart, since this
 project moves between GPU and CPU-only pods and a value baked in once would go stale.
 
 `osmesa` requires system libraries not installable via pip. The symptom of them being
