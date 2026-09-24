@@ -75,12 +75,15 @@ tmux attach -t vscode-tunnel
 ```
 
 **Claude Code on a pod:** the `SessionStart` hook rewrites and pushes `STATUS.md`, which
-conflicts with the same hook running on another machine. Disable hooks for the pod's clone
-once; the file is gitignored and lives on the persistent volume:
+conflicts with the same hook running on another machine. Skip it for the pod's clone once;
+the file is gitignored and lives on the persistent volume:
 
 ```bash
-echo '{"disableAllHooks": true}' > .claude/settings.local.json
+echo '{"env": {"SKIP_STATUS_BACKFILL": "1"}}' > .claude/settings.local.json
 ```
+
+Don't use `disableAllHooks` for this: it also disables user-level hooks and the custom
+status line.
 
 ### 4. Clone and install dependencies
 
