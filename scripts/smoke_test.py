@@ -5,12 +5,15 @@ import torch
 from PIL import Image
 from transformers import AutoModelForVision2Seq, AutoProcessor
 
+CHECKPOINT = "openvla/openvla-7b-finetuned-libero-10"
+UNNORM_KEY = "libero_10"
+
 torch.cuda.reset_peak_memory_stats()
 print("Loading processor and model...")
 t0 = time.time()
-processor = AutoProcessor.from_pretrained("openvla/openvla-7b", trust_remote_code=True)
+processor = AutoProcessor.from_pretrained(CHECKPOINT, trust_remote_code=True)
 vla = AutoModelForVision2Seq.from_pretrained(
-    "openvla/openvla-7b",
+    CHECKPOINT,
     attn_implementation="flash_attention_2",
     torch_dtype=torch.bfloat16,
     low_cpu_mem_usage=True,
@@ -28,7 +31,7 @@ torch.cuda.reset_peak_memory_stats()
 inputs = processor(prompt, dummy_image).to("cuda:0", dtype=torch.bfloat16)
 
 t0 = time.time()
-action = vla.predict_action(**inputs, unnorm_key="bridge_orig", do_sample=False)
+action = vla.predict_action(**inputs, unnorm_key=UNNORM_KEY, do_sample=False)
 inference_time = time.time() - t0
 
 inference_peak = torch.cuda.max_memory_allocated() / 1e9
@@ -40,7 +43,7 @@ print(f"Peak memory during inference: {inference_peak:.2f} GB")
 
 # Add a second call right after the first, reusing the same inputs
 t0 = time.time()
-action2 = vla.predict_action(**inputs, unnorm_key="bridge_orig", do_sample=False)
+action2 = vla.predict_action(**inputs, unnorm_key=UNNORM_KEY, do_sample=False)
 
 inference_peak = torch.cuda.max_memory_allocated() / 1e9
 

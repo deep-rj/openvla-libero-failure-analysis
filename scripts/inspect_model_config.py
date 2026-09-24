@@ -1,9 +1,10 @@
 import json
 
-d = json.load(
-    open(
-        "/workspace/hf_cache/hub/models--openvla--openvla-7b/snapshots/47a0ec7fc4ec123775a391911046cf33cf9ed83f/config.json"
-    )
-)
+from huggingface_hub import hf_hub_download
+
+CHECKPOINT = "openvla/openvla-7b-finetuned-libero-10"
+
+with open(hf_hub_download(CHECKPOINT, "config.json")) as f:
+    d = json.load(f)
 # print(list(d.keys()))
 print(list(d["text_config"].keys()))
