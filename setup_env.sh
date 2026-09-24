@@ -1,8 +1,8 @@
 #!/bin/bash
 # =============================================================================
 # setup_env.sh — Physical AI Spine Project (OpenVLA on LIBERO)
-# Repo-level pod setup after a RunPod container restart/redeploy: persistent
-# cache paths, MuJoCo rendering libs, the openvla env's vars, and the VS Code
+# Repo-level pod setup after a RunPod container restart/redeploy: LIBERO config
+# path, MuJoCo rendering libs, the openvla env's vars, and the VS Code
 # tunnel. Shell and git config are machine setup and not handled here.
 # =============================================================================
 
@@ -11,10 +11,9 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 export REPO_DIR
 CONDA_BIN=/workspace/miniconda3/bin/conda
 
-# --- HuggingFace cache + LIBERO config on persistent volume ---
-export HF_HOME=/workspace/hf_cache
+# --- LIBERO config on persistent volume ---
 export LIBERO_CONFIG_PATH=/workspace/.libero
-mkdir -p "$HF_HOME" "$LIBERO_CONFIG_PATH"
+mkdir -p "$LIBERO_CONFIG_PATH"
 
 # --- MuJoCo headless rendering (GPU-aware backend + libs) ---
 if command -v nvidia-smi &> /dev/null && nvidia-smi &> /dev/null; then
@@ -38,7 +37,6 @@ export PIP_CONSTRAINT="$REPO_DIR/constraints.txt"
 # --- Persist the above as openvla env vars, applied on `conda activate openvla` ---
 if [ -x "$CONDA_BIN" ] && "$CONDA_BIN" env list | grep -q '^openvla '; then
     "$CONDA_BIN" env config vars set -n openvla \
-        HF_HOME="$HF_HOME" \
         LIBERO_CONFIG_PATH="$LIBERO_CONFIG_PATH" \
         MUJOCO_GL="$MUJOCO_GL" \
         PIP_CONSTRAINT="$PIP_CONSTRAINT" > /dev/null

@@ -19,8 +19,9 @@ vendored in.
 
 ## Setup
 
-Machine-level shell and git config (conda hooked into new shells, git credentials) is
-assumed to be in place; this repo's setup doesn't touch `~/.bashrc` or `~/.gitconfig`.
+Machine-level shell and git config (conda hooked into new shells, git credentials, the
+Hugging Face cache persisted on `/workspace`) is assumed to be in place; this repo's
+setup doesn't touch `~/.bashrc` or `~/.gitconfig`.
 
 ### 1. Install Miniconda (if not already installed)
 
@@ -60,7 +61,7 @@ conda activate openvla
 ```
 
 This handles everything environment- and hardware-dependent that needs re-applying on
-every fresh pod. It stores `HF_HOME` and `LIBERO_CONFIG_PATH` (both on `/workspace`), a
+every fresh pod. It stores `LIBERO_CONFIG_PATH` (on `/workspace`), a
 pip constraint pinning `numpy` (see Troubleshooting), and a GPU-aware MuJoCo rendering
 backend as `openvla` env vars (`conda env config vars`), applied on every
 `conda activate openvla`. It also installs system rendering libraries if missing, and
