@@ -122,6 +122,9 @@ timed "create env" create_env
 ENV_PREFIX="$(env_prefix)"
 export PATH="$ENV_PREFIX/bin:$PATH"
 export PIP_CONSTRAINT="$REPO_DIR/constraints.txt"
+# Same local cache paths as setup_env.sh, overriding RunPod images' /workspace defaults.
+export HF_HOME="$HOME/.cache/huggingface"
+export PIP_CACHE_DIR="$HOME/.cache/pip"
 
 timed "install deps" install_deps
 timed "seed LIBERO config" seed_libero_config

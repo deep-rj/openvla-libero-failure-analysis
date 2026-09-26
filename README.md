@@ -204,6 +204,18 @@ rebuild the shared-library cache (package names as on Ubuntu 22.04; older releas
 `libglew2.0` and `libgl1-mesa-glx`). `setup_env.sh` handles this automatically, guarded to
 only run when the libraries aren't already present.
 
+### `PermissionError` from `transformers` under `/workspace/.cache/huggingface`
+
+RunPod images set `HF_HOME=/workspace/.cache/huggingface/` and
+`PIP_CACHE_DIR=/workspace/.cache/pip`. With a global volume mounted at `/workspace`,
+both caches land on object storage, which rejects `chmod`. Hub downloads only warn
+("Could not set the permissions"). Loading the checkpoint fails, because `transformers`
+chmods the remote-code modules it copies into `$HF_HOME/modules`.
+
+`setup_env.sh` and `provision.sh` set both caches under `~/.cache` instead. The
+`openvla` env var overrides the image's value on activate. Check with `echo $HF_HOME`
+inside the env.
+
 ### LIBERO's editable install fails with `ModuleNotFoundError: No module named 'libero'`
 
 `libero/__init__.py` is missing from the LIBERO repo itself — confirmed via `git log

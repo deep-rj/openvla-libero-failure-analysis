@@ -46,12 +46,19 @@ export PIP_CONSTRAINT="$REPO_DIR/constraints.txt"
 
 export HF_HUB_ENABLE_HF_TRANSFER=1
 
+# --- Caches on local disk; RunPod images point them at /workspace, which may be object storage ---
+# transformers chmods its remote-code module cache, which object storage rejects.
+export HF_HOME="$HOME/.cache/huggingface"
+export PIP_CACHE_DIR="$HOME/.cache/pip"
+
 # --- Persist the above as openvla env vars, applied on `conda activate openvla` ---
 if [ -x "$CONDA_BIN" ] && "$CONDA_BIN" env list | grep -q '^openvla '; then
     "$CONDA_BIN" env config vars set -n openvla \
         MUJOCO_GL="$MUJOCO_GL" \
         PIP_CONSTRAINT="$PIP_CONSTRAINT" \
-        HF_HUB_ENABLE_HF_TRANSFER="$HF_HUB_ENABLE_HF_TRANSFER" > /dev/null
+        HF_HUB_ENABLE_HF_TRANSFER="$HF_HUB_ENABLE_HF_TRANSFER" \
+        HF_HOME="$HF_HOME" \
+        PIP_CACHE_DIR="$PIP_CACHE_DIR" > /dev/null
     echo "openvla env vars set."
 else
     echo "NOTE: conda env 'openvla' not found; run provision.sh, then re-source this file."
