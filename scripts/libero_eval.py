@@ -14,8 +14,11 @@ if os.environ.get("PIN_THREADS") == "1":
         os.environ[_var] = "1"
 
 import csv
+import hashlib
+import inspect
 import json
 import subprocess
+import sys
 import time
 from collections import defaultdict
 from contextlib import contextmanager, nullcontext
@@ -42,10 +45,9 @@ from experiments.robot.robot_utils import (
     invert_gripper_action,
     normalize_gripper_action,
 )
-from PIL import Image
-
 from libero.libero import benchmark, get_libero_path
 from libero.libero.envs import OffScreenRenderEnv
+from PIL import Image
 
 if os.environ.get("PIN_THREADS") == "1":
     tf.config.threading.set_intra_op_parallelism_threads(1)
@@ -468,6 +470,49 @@ def run_trial(
     }
 
 
+def git_state(path):
+    """HEAD SHA of the checkout containing path, and whether tracked files differ from it."""
+
+    def git(*args):
+        return subprocess.run(  # noqa: S603
+            ["git", "-C", path, *args],  # noqa: S607
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+
+    try:
+        return {
+            "sha": git("rev-parse", "HEAD"),
+            "dirty": bool(git("status", "--porcelain", "--untracked-files=no")),
+        }
+    except (OSError, subprocess.CalledProcessError):
+        return {"sha": None, "dirty": None}
+
+
+def code_versions():
+    """Versions of all code a rollout executes: this repo, the imported siblings, the pip env."""
+    freeze = subprocess.run(
+        [sys.executable, "-m", "pip", "freeze", "--exclude-editable"],
+        capture_output=True,
+        text=True,
+    ).stdout
+    freeze_lines = sorted(freeze.lower().splitlines())
+    versions = {
+        "harness": git_state(REPO_DIR),
+        # Located via the imported modules, so these record what actually ran.
+        "openvla": git_state(os.path.dirname(inspect.getfile(get_vla))),
+        "LIBERO": git_state(os.path.dirname(inspect.getfile(benchmark))),
+        "pip_freeze_sha256": hashlib.sha256("\n".join(freeze_lines).encode()).hexdigest()
+        if freeze_lines
+        else None,
+    }
+    print("\n=== Code versions ===")
+    for key, value in versions.items():
+        print(f"{key:<28}{value}")
+    return versions
+
+
 # %%
 cfg = EvalConfig.from_env()
 timer = StageTimer()
@@ -481,6 +526,7 @@ resize_size = get_image_resize_size(cfg)
 # %%
 policy = POLICIES[cfg.policy](cfg)
 environment = environment_banner(cfg)
+versions = code_versions()
 
 # %%
 env, task_description = build_env(task_suite, cfg.task_id, cfg.hard_reset)
@@ -531,6 +577,7 @@ with (
     f.attrs["unnorm_key"] = cfg.unnorm_key
     f.attrs["num_trials"] = cfg.num_trials
     f.attrs["policy"] = cfg.policy
+    f.attrs["code_versions"] = json.dumps(versions)
 
     task_grp = f.create_group(f"task_{cfg.task_id}")
 
@@ -606,7 +653,13 @@ timing = timer.report(
 )
 with open(profile_path, "w") as pf:
     json.dump(
-        {"run_id": run_id, "config": asdict(cfg), "environment": environment, "timing": timing},
+        {
+            "run_id": run_id,
+            "config": asdict(cfg),
+            "environment": environment,
+            "code_versions": versions,
+            "timing": timing,
+        },
         pf,
         indent=2,
     )
