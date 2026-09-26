@@ -40,8 +40,11 @@ volume (object storage) at the end of each eval run.
   - Container disk **≥ 60GB**: about 8.5GB of env plus the 15GB checkpoint plus outputs.
   - A global volume attached, with `OUTPUTS_ARCHIVE_DIR` set to a directory on it.
     It's safe to leave unset, but then outputs aren't archived.
-- **GPU:** pre-Blackwell (compute capability < 10). torch 2.2.0+cu121 has no kernels for
-  sm_100/sm_120. `provision.sh` checks this first and stops.
+- **GPU:** RTX 4090 only, so numerics stay comparable across runs (see
+  `plan_parallel_eval_harness.md`, Pod configuration). Filter listings on vCPU as well,
+  about 32 for 8 env workers. Whatever the GPU, it must be pre-Blackwell (compute
+  capability < 10): torch 2.2.0+cu121 has no kernels for sm_100/sm_120, and
+  `provision.sh` checks this first and stops.
 
 Keep git repos, the conda env, and the HF cache **off** the global volume. It's object
 storage: it can't set permission bits, symlinks and file locks are unreliable, and git
