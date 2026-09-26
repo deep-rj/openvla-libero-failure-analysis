@@ -236,6 +236,36 @@ def instrument_env_substages(env, timer):
         setattr(inner, attr, timed)
 
 
+def _read_tokens(path):
+    try:
+        with open(path) as f:
+            return f.read().split()
+    except OSError:
+        return None
+
+
+def cgroup_limits():
+    """Container CPU and memory limits; os.cpu_count() and /proc/meminfo report the host's."""
+    cpu_limit = None
+    cpu_max = _read_tokens("/sys/fs/cgroup/cpu.max")  # cgroup v2: "<quota|max> <period>"
+    if cpu_max and cpu_max[0] != "max":
+        cpu_limit = int(cpu_max[0]) / int(cpu_max[1])
+    elif cpu_max is None:  # cgroup v1: quota of -1 means unlimited
+        quota = _read_tokens("/sys/fs/cgroup/cpu/cpu.cfs_quota_us")
+        period = _read_tokens("/sys/fs/cgroup/cpu/cpu.cfs_period_us")
+        if quota and period and int(quota[0]) > 0:
+            cpu_limit = int(quota[0]) / int(period[0])
+
+    memory = _read_tokens("/sys/fs/cgroup/memory.max") or _read_tokens(
+        "/sys/fs/cgroup/memory/memory.limit_in_bytes"
+    )
+    # v1 reports "unlimited" as a near-2**63 byte count.
+    memory_gb = (
+        int(memory[0]) / 1e9 if memory and memory[0].isdigit() and int(memory[0]) < 2**60 else None
+    )
+    return {"cgroup_cpu_limit": cpu_limit, "cgroup_memory_limit_gb": memory_gb}
+
+
 def environment_banner(cfg):
     """Collects the runtime facts a timing table can't be interpreted without."""
     # Runs a real TF op, so call it after the model is loaded: TF reserves most
@@ -247,6 +277,7 @@ def environment_banner(cfg):
         "MUJOCO_GL": os.environ.get("MUJOCO_GL"),
         "cpu_count": os.cpu_count(),
         "cpus_usable": len(os.sched_getaffinity(0)),
+        **cgroup_limits(),
         "PIN_THREADS": os.environ.get("PIN_THREADS", "0"),
         **{
             var: os.environ.get(var)
