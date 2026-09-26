@@ -15,6 +15,7 @@ if os.environ.get("PIN_THREADS") == "1":
 
 import csv
 import json
+import subprocess
 import time
 from collections import defaultdict
 from contextlib import contextmanager, nullcontext
@@ -644,5 +645,13 @@ with h5py.File(output_path, "r") as f:
 
         rewards = cast(h5py.Dataset, grp["rewards"])[:]
         assert np.all(np.isfinite(rewards)), f"trial {trial_idx}: non-finite reward encountered"
+
+# %%
+# Raw outputs live on pod-local disk; a failed copy leaves them there rather than failing the run.
+archive = subprocess.run(  # noqa: S603
+    ["bash", os.path.join(REPO_DIR, "scripts", "archive_outputs.sh")]  # noqa: S607
+)
+if archive.returncode != 0:
+    print("WARNING: outputs not archived; copy outputs/ off this machine before teardown.")
 
 print("Eval script completed successfully!")

@@ -1,19 +1,19 @@
 #!/bin/bash
 # =============================================================================
 # setup_env.sh — Physical AI Spine Project (OpenVLA on LIBERO)
-# Repo-level pod setup after a RunPod container restart/redeploy: LIBERO config
-# path, MuJoCo rendering libs, the openvla env's vars, and the VS Code
-# tunnel. Shell and git config are machine setup and not handled here.
+# Per-shell pod setup, run after provision.sh: MuJoCo rendering libs, the
+# openvla env's vars, and the VS Code tunnel. Shell and git config are machine
+# setup and not handled here.
 # =============================================================================
 
 # Derived from this file's location so a clone under any directory name works.
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 export REPO_DIR
-CONDA_BIN=/workspace/miniconda3/bin/conda
 
-# --- LIBERO config on persistent volume ---
-export LIBERO_CONFIG_PATH=/workspace/.libero
-mkdir -p "$LIBERO_CONFIG_PATH"
+# Same search order as the machine's shell rc.
+CONDA_BIN="${CONDA_EXE:-}"
+[ -x "$CONDA_BIN" ] || CONDA_BIN="$HOME/miniforge3/bin/conda"
+[ -x "$CONDA_BIN" ] || CONDA_BIN="$HOME/miniconda3/bin/conda"
 
 # --- MuJoCo headless rendering (GPU-aware backend + libs) ---
 if command -v nvidia-smi &> /dev/null && nvidia-smi &> /dev/null; then
@@ -31,38 +31,52 @@ else
 fi
 echo "MUJOCO_GL set to: $MUJOCO_GL"
 
+# --- opencv-python system libs (the non-headless wheel links glib, libSM and libGL) ---
+# Checked by soname: Ubuntu 24.04 renamed the glib package to libglib2.0-0t64.
+for _lib in libgthread-2.0.so.0 libSM.so.6 libGL.so.1; do
+    if ! ldconfig -p | grep -q "$_lib"; then
+        apt-get update && apt-get install -y libglib2.0-0 libsm6 libice6 libgl1
+        break
+    fi
+done
+unset _lib
+
 # --- Pip numpy constraint (prevents unpinned deps like bddl from silently upgrading numpy) ---
 export PIP_CONSTRAINT="$REPO_DIR/constraints.txt"
+
+export HF_HUB_ENABLE_HF_TRANSFER=1
 
 # --- Persist the above as openvla env vars, applied on `conda activate openvla` ---
 if [ -x "$CONDA_BIN" ] && "$CONDA_BIN" env list | grep -q '^openvla '; then
     "$CONDA_BIN" env config vars set -n openvla \
-        LIBERO_CONFIG_PATH="$LIBERO_CONFIG_PATH" \
         MUJOCO_GL="$MUJOCO_GL" \
-        PIP_CONSTRAINT="$PIP_CONSTRAINT" > /dev/null
+        PIP_CONSTRAINT="$PIP_CONSTRAINT" \
+        HF_HUB_ENABLE_HF_TRANSFER="$HF_HUB_ENABLE_HF_TRANSFER" > /dev/null
     echo "openvla env vars set."
 else
-    echo "NOTE: conda env 'openvla' not found; re-run after creating it to persist env vars."
+    echo "NOTE: conda env 'openvla' not found; run provision.sh, then re-source this file."
 fi
 
 # --- VS Code Tunnel (spawn only — login is manual, do NOT auto-answer prompts) ---
-if [ ! -x "/workspace/code" ]; then
+VSCODE_CLI="$HOME/.local/bin/code"
+if [ ! -x "$VSCODE_CLI" ]; then
+    mkdir -p "$(dirname "$VSCODE_CLI")"
     curl -fsSL 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' -o /tmp/vscode_cli.tar.gz \
-        && tar -xzf /tmp/vscode_cli.tar.gz -C /workspace
+        && tar -xzf /tmp/vscode_cli.tar.gz -C "$(dirname "$VSCODE_CLI")"
     rm -f /tmp/vscode_cli.tar.gz
 fi
-if [ -x "/workspace/code" ]; then
+if [ -x "$VSCODE_CLI" ]; then
     if tmux has-session -t vscode-tunnel 2>/dev/null; then
         echo "VS Code tunnel session already running/waiting."
     else
-    tmux new-session -d -s vscode-tunnel "cd /workspace && ./code tunnel --accept-server-license-terms --extensions-dir /workspace/.vscode-server/extensions --server-data-dir /workspace/.vscode-server/data"
+        tmux new-session -d -s vscode-tunnel "\"$VSCODE_CLI\" tunnel --accept-server-license-terms"
         echo "VS Code tunnel session spawned."
     fi
     echo ""
     echo "  >>> ACTION REQUIRED: tmux attach -t vscode-tunnel"
     echo "  >>> Select GitHub when prompted, then complete the device-code login."
 else
-    echo "WARNING: could not install the VS Code CLI at /workspace/code; skipping tunnel."
+    echo "WARNING: could not install the VS Code CLI at $VSCODE_CLI; skipping tunnel."
 fi
 
 echo ""
