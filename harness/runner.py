@@ -69,6 +69,21 @@ def _config_json(cfg: RunConfig, environment: dict) -> str:
     return json.dumps({"config": config, "environment": environment}, indent=2)
 
 
+class ActionRecorder:
+    """Env proxy that records the actions its `step` actually receives."""
+
+    def __init__(self, env):
+        self._env = env
+        self.sent: list[np.ndarray] = []
+
+    def step(self, action):
+        self.sent.append(np.array(action, dtype=np.float64))
+        return self._env.step(action)
+
+    def __getattr__(self, name):
+        return getattr(self._env, name)
+
+
 def run(cfg: RunConfig, policy_factory=None) -> list[dict]:
     """Runs every episode not already in the manifest; returns the new manifest rows."""
     from libero.libero import benchmark
@@ -87,7 +102,7 @@ def run(cfg: RunConfig, policy_factory=None) -> list[dict]:
     active_policy, provenance = (policy_factory or default_policy_factory)(cfg)
     suite = benchmark.get_benchmark_dict()[cfg.suite]()
     max_steps = cfg.max_steps or MAX_STEPS_BY_SUITE[cfg.suite]
-    logged = cfg.mode == "logged"
+    logged = cfg.mode in ("logged", "parity")
     rows = []
     for task_id in cfg.tasks:
         specs = [EpisodeSpec(cfg.suite, task_id, i, cfg.seed) for i in cfg.init_states]
@@ -95,11 +110,13 @@ def run(cfg: RunConfig, policy_factory=None) -> list[dict]:
         if not todo:
             continue
         env, task = build_env(suite, task_id, cfg.camera_size, cfg.seed)
+        recorder = ActionRecorder(env)
         try:
             init_states = suite.get_task_init_states(task_id)
             for spec in todo:
+                recorder.sent.clear()
                 result = run_episode(
-                    env,
+                    recorder,
                     active_policy,
                     task.language,
                     init_states[spec.init_state_idx],
@@ -108,8 +125,8 @@ def run(cfg: RunConfig, policy_factory=None) -> list[dict]:
                     record_frames=cfg.video and logged,
                 )
                 row = _write_outputs(
-                    out, cfg, spec, task.language, env, result, active_policy, provenance,
-                    max_steps, environment,
+                    out, cfg, spec, task.language, recorder, result, active_policy, provenance,
+                    max_steps, environment, np.stack(recorder.sent),
                 )  # fmt: skip
                 manifest.append_row(manifest_path, row)
                 rows.append(row)
@@ -122,10 +139,17 @@ def run(cfg: RunConfig, policy_factory=None) -> list[dict]:
 
 
 def _write_outputs(
-    out, cfg, spec, task_label, env, result, active_policy, provenance, max_steps, environment
+    out, cfg, spec, task_label, env, result, active_policy, provenance, max_steps, environment, sent
 ):
     episode_file = video_file = ""
-    if cfg.mode == "logged":
+    (out / "actions").mkdir(exist_ok=True)
+    np.save(out / "actions" / f"{spec.episode_id}.npy", sent)
+    if cfg.mode == "parity":
+        (out / "parity").mkdir(exist_ok=True)
+        (out / "parity" / f"{spec.episode_id}.json").write_text(
+            json.dumps({"mismatched_steps": result.parity_mismatches})
+        )
+    if cfg.mode != "reference":
         meta = metadata.episode_metadata(
             spec=spec,
             task_label=task_label,
@@ -149,9 +173,6 @@ def _write_outputs(
             video.write_video(
                 out / video_file, result.agent_frames, result.wrist_frames, result.is_wait_steps
             )
-    else:
-        (out / "actions").mkdir(exist_ok=True)
-        np.save(out / "actions" / f"{spec.episode_id}.npy", result.executed_actions)
 
     return {
         "episode_id": spec.episode_id,

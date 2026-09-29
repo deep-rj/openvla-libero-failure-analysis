@@ -1,7 +1,7 @@
 import numpy as np
 from harness.schema import ModelOutput, StepRecord, WorldState
 
-from harness import decode
+from harness import decode, policy
 
 Q01 = np.array([-0.63, -0.77, -0.76, -0.097, -0.148, -0.274, 0.0])
 Q99 = np.array([0.77, 0.846, 0.9375, 0.139, 0.159, 0.324, 1.0])
@@ -61,3 +61,29 @@ def make_step(rng, step_idx, *, wait=False, **world_kwargs):
 
 def make_episode(rng, n_wait=10, n_act=20, **world_kwargs):
     return [make_step(rng, i, wait=i < n_wait, **world_kwargs) for i in range(n_wait + n_act)]
+
+
+class PureFakePolicy:
+    """Actions are a pure function of the image, so predict and reference can be compared."""
+
+    action_stats = policy.LIBERO_10_ACTION_STATS
+
+    def _output(self, img):
+        rng = np.random.default_rng(int(img.sum()))
+        logits = rng.normal(scale=4, size=(7, policy.HEAD_WIDTH)).astype(np.float32)
+        return policy.summarize_logits(logits, logits.argmax(-1), 0.0)
+
+    def predict(self, img, task_label):
+        return self._output(img)
+
+    def reference_action(self, img, task_label):
+        stats = self.action_stats
+        tokens = self._output(img).chosen_token_id
+        return decode.decode_action(
+            tokens, stats["q01"], stats["q99"], stats["mask"]
+        ).unnormalized_action
+
+
+class DriftedPolicy(PureFakePolicy):
+    def reference_action(self, img, task_label):
+        return super().reference_action(img, task_label) + 1e-9

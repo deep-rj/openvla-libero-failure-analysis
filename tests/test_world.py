@@ -7,6 +7,8 @@ from envs import build_env
 
 from harness import world
 
+pytestmark = pytest.mark.env
+
 SUBSTEP_TOL = 5e-3
 
 

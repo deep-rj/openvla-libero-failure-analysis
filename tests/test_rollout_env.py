@@ -8,6 +8,8 @@ from envs import build_env
 
 from harness import checks, policy, rollout, schema, video
 
+pytestmark = pytest.mark.env
+
 TASK_ID = 9  # microwave: has an articulated fixture joint
 MAX_STEPS = 6
 

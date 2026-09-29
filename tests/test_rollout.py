@@ -1,6 +1,8 @@
 import numpy as np
 import pytest
 
+from factories import DriftedPolicy, PureFakePolicy
+
 from harness import checks, policy, rollout, schema
 from harness.schema import WorldState
 
@@ -109,7 +111,8 @@ def test_state_and_action_are_logged_before_the_step_that_they_precede():
     env = FakeEnv()
     result = _run(env)
     assert [s.world.sim_state[0] for s in result.steps] == [float(k) for k in range(15)]
-    assert all(np.array_equal(s.executed_action, a) for s, a in zip(result.steps, env.sent, strict=True))
+    pairs = zip(result.steps, env.sent, strict=True)
+    assert all(np.array_equal(s.executed_action, a) for s, a in pairs)
 
 
 def test_reference_mode_sends_the_same_actions_and_logs_nothing():
@@ -138,3 +141,32 @@ def test_frames_are_not_kept_unless_requested():
 def test_an_unknown_mode_is_rejected():
     with pytest.raises(ValueError, match="mode"):
         _run(FakeEnv(), mode="fast")
+
+
+def _run_parity(policy_obj):
+    return rollout.run_episode(
+        FakeEnv(),
+        policy_obj,
+        LABEL,
+        INIT_STATE,
+        max_steps=4,
+        image_fn=lambda obs: obs["agentview_image"],
+        mode="parity",
+        layout=object(),
+        world_reader=_fake_world,
+    )
+
+
+def test_parity_mode_finds_no_mismatch_when_the_two_paths_agree():
+    result = _run_parity(PureFakePolicy())
+    assert result.parity_mismatches == []
+    assert len(result.steps) == rollout.NUM_STEPS_WAIT + 4
+
+
+def test_parity_mode_lists_every_policy_step_where_the_vendored_action_differs():
+    result = _run_parity(DriftedPolicy())
+    assert result.parity_mismatches == [10, 11, 12, 13]
+
+
+def test_other_modes_report_no_parity_result():
+    assert _run(FakeEnv()).parity_mismatches is None

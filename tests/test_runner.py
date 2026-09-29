@@ -7,6 +7,8 @@ pytest.importorskip("libero.libero")
 
 from harness import checks, manifest, metadata, policy, rollout, runner, schema
 
+pytestmark = pytest.mark.env
+
 TASK = 9
 
 
@@ -98,3 +100,28 @@ def test_allow_dirty_overrides_the_refusal(tmp_path, monkeypatch):
         policy_factory=_stub_factory,
     )
     assert len(rows) == 1
+
+
+def test_every_mode_saves_the_actions_the_env_received(tmp_path):
+    rows = runner.run(_cfg(tmp_path, init_states=[0], video=False), policy_factory=_stub_factory)
+    episode_id = rows[0]["episode_id"]
+    arrays, _ = schema.read_episode(tmp_path / "episodes" / f"{episode_id}.h5")
+    received = np.load(tmp_path / "actions" / f"{episode_id}.npy")
+    assert np.array_equal(received, arrays["executed_action"])
+
+
+def test_parity_mode_writes_the_mismatched_steps_per_episode(tmp_path):
+    from factories import DriftedPolicy, PureFakePolicy
+
+    for name, factory_policy, expected in (
+        ("same", PureFakePolicy(), []),
+        ("drift", DriftedPolicy(), [10, 11, 12, 13]),
+    ):
+        out = tmp_path / name
+        runner.run(
+            _cfg(out, mode="parity", init_states=[0], video=False),
+            policy_factory=lambda cfg, p=factory_policy: (p, {}),
+        )
+        result = json.loads((out / "parity" / "libero_10-t09-i000-s0-none.json").read_text())
+        assert result["mismatched_steps"] == expected
+        assert (out / "episodes" / "libero_10-t09-i000-s0-none.h5").exists()
