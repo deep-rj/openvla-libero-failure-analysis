@@ -86,6 +86,18 @@ tree unless `--allow-dirty` is passed.
 - [ ] `episode_id` deterministic, so sharded pods cannot collide; per-pod manifest.
 - [ ] Archive to the global volume; push per-episode summary CSVs.
 
+After the baseline (all local, on the pulled or archived run directory):
+
+```bash
+python scripts/summarize_run.py <run>                 # success rate with n and Wilson interval, s/episode
+python scripts/pilot_report.py <run> --stage-a <stage_a>/stage_a_report.json   # pooled stats only
+python scripts/select_labeling.py <run> --n 20 --seed 0  # blind draw + empty label CSV
+```
+
+Blinding: the pilot report is pooled statistics only and is safe to produce first. Do not plot
+per-episode logits, entropy or confidence until `labeling/labels_template.csv` has been filled
+in and committed.
+
 ## Do not, on the pod
 
 - Add schema fields, or run the baseline without a go.
