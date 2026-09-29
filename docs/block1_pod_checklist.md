@@ -8,7 +8,8 @@ items are in `docs/block1_findings.md`.
 ## Before the pod
 
 - [ ] Working tree clean and committed; the recorded git SHA must not be dirty.
-- [ ] Unit tests pass locally: decode path, schema, wait-step alignment, hash
+- [ ] `pytest -m "not env"` passes (fast), then `pytest -m env` (slow, builds real envs; run
+      it alone, the laptop has ~8 GB RAM). Unit tests cover: decode path, schema, wait-step alignment, hash
       comparison, static restore (T4), obs-vs-`qpos` cross-check. All run on the stub
       and osmesa, no GPU.
 - [ ] `StageTimer` is off for any run whose timing is reported.
@@ -41,6 +42,14 @@ Expected sha256 of the hub files at revision `47a0ec7fc4ec123775a391911046cf33cf
 
 ## Stage A (unattended)
 
+```bash
+python scripts/run_stage_a.py --out outputs/stage_a --policy openvla --parity
+```
+
+Loads the checkpoint once and reuses it for every run. `--parity` adds a run that computes
+both the logged and the vendored action at every step (twice the inference cost) and
+lists any policy step where they differ. Writes `stage_a_report.md` and `.json`.
+
 Tasks 0, 7, 3, 9 with 2 episodes each, plus one forced-truncation episode
 (`EVAL_MAX_STEPS` ≈ 60). Order: T1, T2, T3, T5, then the cost report.
 
@@ -61,9 +70,17 @@ Tasks 0, 7, 3, 9 with 2 episodes each, plus one forced-truncation episode
 - [ ] `bash scripts/archive_outputs.sh`; confirm the files are on the global volume
       before teardown. Push the report and any summary CSV; raw traces stay gitignored.
 
-T4 (static restore and the obs-vs-`qpos` check) runs locally on the pulled Stage A files.
+T4 (static restore and the obs-vs-`qpos` check) runs locally on the pulled Stage A files:
+`python scripts/check_restore.py <run>/logged/episodes/<id>.h5` (try one fixture episode, task 3 or 9).
 
 ## Baseline (fresh pod, only after a go)
+
+```bash
+python scripts/run_eval.py --policy openvla --tasks 0:10 --init-states 0:25 --out outputs/baseline
+```
+
+Resumable: rerunning skips episodes already in `manifest.csv`. Refuses to run from a dirty
+tree unless `--allow-dirty` is passed.
 
 - [ ] 10 tasks × init states 0–24, logger and video on, one pass.
 - [ ] `episode_id` deterministic, so sharded pods cannot collide; per-pod manifest.
