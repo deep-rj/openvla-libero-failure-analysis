@@ -75,3 +75,18 @@ pinned commits. Checked on the laptop (CPU, no checkpoint weights). Items marked
   the schema is final.
 - Real-checkpoint confirmations (**pod**): no default logits processors, `lm_head`
   width, executed remote-code class.
+
+## Observation timing (found while testing the world-state reader)
+
+- robosuite obs (EEF pose, `{name}_pos`/`{name}_quat`) come from kinematics computed at the
+  start of the last physics substep, so they lag `qpos` by one substep. The model timestep
+  is 0.002 s and a 20 Hz control step is 25 substeps. After `sim.forward()` on the same env,
+  the recomputed EEF site position differs from the obs by about 0.4–0.5 mm on a moving arm,
+  matching the difference seen after restoring the state in a fresh env.
+- `sim_state` and `fixture_joint_qpos` are read from `qpos` and are current; the obs-derived
+  poses are up to one substep older. Restoring a state and running `forward()` therefore
+  reproduces `sim_state` and joint positions exactly, and obs-derived poses to within
+  v·2 ms (T4 uses 5 mm).
+- `sim.forward()` also renormalizes free-joint quaternions in the state (change of 2e-16),
+  so the logging path must not call it; T2 compares actions bitwise.
+- Free-joint `qpos` stores quaternions as wxyz; obs expose xyzw.
