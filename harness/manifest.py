@@ -47,3 +47,18 @@ def completed_episode_ids(path) -> set[str]:
         return set()
     with open(path, newline="") as f:
         return {row["episode_id"] for row in csv.DictReader(f)}
+
+
+_INT_FIELDS = ("task_id", "init_state_idx", "seed", "num_steps")
+
+
+def read_rows(path) -> list[dict]:
+    """Reads the manifest back with typed values."""
+    with open(path, newline="") as f:
+        rows = list(csv.DictReader(f))
+    for row in rows:
+        for name in _INT_FIELDS:
+            row[name] = int(row[name])
+        row["success"] = row["success"] == "True"
+        row["seconds_per_step"] = float(row["seconds_per_step"])
+    return rows

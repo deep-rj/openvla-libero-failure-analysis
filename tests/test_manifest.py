@@ -58,3 +58,17 @@ def test_completed_episode_ids_are_read_back_for_resuming(tmp_path):
     assert manifest.completed_episode_ids(path) == set()
     manifest.append_row(path, ROW)
     assert manifest.completed_episode_ids(path) == {ROW["episode_id"]}
+
+
+def test_rows_are_read_back_with_typed_values(tmp_path):
+    path = tmp_path / "manifest.csv"
+    manifest.append_row(path, ROW)
+    manifest.append_row(path, {**ROW, "episode_id": "b", "success": False, "video_file": ""})
+
+    rows = manifest.read_rows(path)
+    assert rows[0]["success"] is True
+    assert rows[1]["success"] is False
+    assert rows[0]["task_id"] == 0
+    assert rows[0]["num_steps"] == 279
+    assert rows[0]["seconds_per_step"] == 0.27
+    assert rows[1]["video_file"] == ""
