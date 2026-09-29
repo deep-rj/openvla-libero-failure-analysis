@@ -21,8 +21,12 @@ pinned commits. Checked on the laptop (CPU, no checkpoint weights). Items marked
   `openvla/openvla-7b` remote code, and with `trust_remote_code=True` transformers
   prefers it over the locally registered classes. The hub's `modeling_prismatic.py` and
   `configuration_prismatic.py` (revision `47a0ec7f`) are byte-identical to the sibling
-  repo's. The hub revision is unpinned. **pod**: confirm which class runs via
-  `type(vla).__module__`.
+  repo's. The hub revision is unpinned.
+- Verified without weights: after the same Auto-class registrations as `get_vla`,
+  `AutoConfig.from_pretrained(..., trust_remote_code=True)` returns the hub's
+  `OpenVLAConfig` (`transformers_modules.openvla.openvla-7b.47a0ec7f...`), so
+  `has_remote_code = True` and `has_local_code = False`, and `from_pretrained` takes the
+  remote-code branch. The loaded model class is the hub's, not the sibling's.
 
 ## 2.2 Slice indices
 
