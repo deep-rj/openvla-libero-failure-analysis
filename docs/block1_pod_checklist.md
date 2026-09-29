@@ -1,0 +1,76 @@
+# Block 1 — pod checklist
+
+Everything a coding agent must implement, run or validate on the pod. `block1_spec.md`
+is the source of truth for the schema, tests and blinding rules; this file only lists
+what needs a GPU, the real checkpoint, or the pod environment. Findings behind these
+items are in `docs/block1_findings.md`.
+
+## Before the pod
+
+- [ ] Working tree clean and committed; the recorded git SHA must not be dirty.
+- [ ] Unit tests pass locally: decode path, schema, wait-step alignment, hash
+      comparison, static restore (T4), obs-vs-`qpos` cross-check. All run on the stub
+      and osmesa, no GPU.
+- [ ] `StageTimer` is off for any run whose timing is reported.
+
+## Pod setup (RTX 4090 only)
+
+- [ ] `bash provision.sh && source setup_env.sh && conda activate openvla`; the
+      VS Code Tunnel login is manual.
+- [ ] `python --version` is 3.10.20 and `torch.cuda.is_available()` is True.
+
+## Load-time guards (first thing the run does; hard-fail on any mismatch)
+
+Expected sha256 of the hub files at revision `47a0ec7fc4ec123775a391911046cf33cf9ed83f`
+(computed from downloaded copies; the pod's executed files must reproduce them):
+
+| File | sha256 |
+|---|---|
+| `modeling_prismatic.py` | `9ce241c5ca09a4bed73654d0ca509baaff0fc5887d0bdd62e360ca8254f7794a` |
+| `configuration_prismatic.py` | `68cc5ae34f1b46af3168d8d479cb81bb776965653453fd904aa8eefb6c8f9f68` |
+| `processing_prismatic.py` | `06563586bbc73d36501a14a231a3174904ede830d33174d0c625ece8e931ef1e` |
+
+- [ ] Hash the files behind `type(vla)`, `type(vla.config)` and `type(processor)`;
+      `type(vla).__module__` starts with `transformers_modules`.
+- [ ] `vla.norm_stats[unnorm_key]` (q01, q99, mask) equals `config.json` `norm_stats`.
+- [ ] `lm_head.out_features == 32064`; generation config has no non-default processors.
+- [ ] On one real step: `out.scores` and `out.logits` are bitwise equal, and
+      `argmax(logits)` equals the generated token at every position.
+- [ ] Record the resolved hub commits (code repo, checkpoint), GPU type and library
+      versions in episode metadata.
+
+## Stage A (unattended)
+
+Tasks 0, 7, 3, 9 with 2 episodes each, plus one forced-truncation episode
+(`EVAL_MAX_STEPS` ≈ 60). Order: T1, T2, T3, T5, then the cost report.
+
+- [ ] T1: two logger-off episodes, same seed. Report bitwise equality; on divergence
+      give the first divergent step and the top-2 margin from the logger-on run, then stop.
+- [ ] T2: logger-on vs logger-off actions, bitwise (or within the T1 tolerance).
+- [ ] T3, every step: `chosen_token_id == argmax_full_id`; `clipped_flag` rule;
+      decode matches vendored `predict_action`; `executed_action` equals what
+      `env.step` received.
+- [ ] T5: first non-wait `step_idx` equals the wait count (10); model fields are
+      sentinel on wait steps; the forced-truncation episode ends without `done`.
+- [ ] Every episode file is written atomically; fixture tasks 3 and 9 have non-empty
+      `fixture_joint_qpos`, and the joints move in the logged trace.
+- [ ] Videos exist for every episode, frame count equals step count, overlay shows
+      `step_idx` only.
+- [ ] Cost report: measured s/step (un-instrumented), projected GPU-hours and dollars
+      for the 250-episode baseline, bytes per episode (flag if far from ~2 MB).
+- [ ] `bash scripts/archive_outputs.sh`; confirm the files are on the global volume
+      before teardown. Push the report and any summary CSV; raw traces stay gitignored.
+
+T4 (static restore and the obs-vs-`qpos` check) runs locally on the pulled Stage A files.
+
+## Baseline (fresh pod, only after a go)
+
+- [ ] 10 tasks × init states 0–24, logger and video on, one pass.
+- [ ] `episode_id` deterministic, so sharded pods cannot collide; per-pod manifest.
+- [ ] Archive to the global volume; push per-episode summary CSVs.
+
+## Do not, on the pod
+
+- Add schema fields, or run the baseline without a go.
+- Plot or summarize model outputs per episode (blinding); the pilot report is pooled only.
+- Patch the `openvla` or `LIBERO` siblings.
