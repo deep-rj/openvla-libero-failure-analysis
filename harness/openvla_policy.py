@@ -22,7 +22,7 @@ from experiments.robot.openvla_utils import (
 from PIL import Image
 
 from harness import guards
-from harness.policy import summarize_logits
+from harness.policy import build_prompt, summarize_logits
 from harness.schema import ModelOutput
 
 # Appended to the prompt when absent, as `predict_action` does.
@@ -44,10 +44,6 @@ def hub_commit_from_module(module_name: str) -> str | None:
     return match.group(1) if match else None
 
 
-def _prompt(task_label: str) -> str:
-    return f"In: What action should the robot take to {task_label.lower()}?\nOut:"
-
-
 def build_inputs(processor, img, task_label, center_crop, device=DEVICE):
     """Mirrors the preprocessing half of `get_vla_action`."""
     image = Image.fromarray(img).convert("RGB")
@@ -59,7 +55,7 @@ def build_inputs(processor, img, task_label, center_crop, device=DEVICE):
         tensor = tf.clip_by_value(tensor, 0, 1)
         tensor = tf.image.convert_image_dtype(tensor, orig_dtype, saturate=True)
         image = Image.fromarray(tensor.numpy()).convert("RGB")
-    return processor(_prompt(task_label), image).to(device, dtype=torch.bfloat16)
+    return processor(build_prompt(task_label), image).to(device, dtype=torch.bfloat16)
 
 
 class OpenVLAPolicy:

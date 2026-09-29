@@ -3,8 +3,7 @@ import pytest
 
 pytest.importorskip("libero.libero")
 
-from libero.libero import benchmark, get_libero_path
-from libero.libero.envs import OffScreenRenderEnv
+from envs import build_env
 
 from harness import world
 
@@ -12,12 +11,7 @@ SUBSTEP_TOL = 5e-3
 
 
 def _build(task_id):
-    suite = benchmark.get_benchmark_dict()["libero_10"]()
-    task = suite.get_task(task_id)
-    bddl = f"{get_libero_path('bddl_files')}/{task.problem_folder}/{task.bddl_file}"
-    env = OffScreenRenderEnv(bddl_file_name=bddl, camera_heights=64, camera_widths=64)
-    env.reset()
-    obs = env.set_init_state(suite.get_task_init_states(task_id)[0])
+    env, obs, _, _ = build_env(task_id)
     return env, obs
 
 

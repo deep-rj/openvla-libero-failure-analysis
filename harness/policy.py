@@ -4,6 +4,7 @@ from typing import Protocol
 
 import numpy as np
 
+from harness import decode
 from harness.decode import ACTION_SLICE_START, N_ACTION_BINS, VOCAB_SIZE
 from harness.schema import N_DIMS, ModelOutput
 
@@ -21,6 +22,10 @@ LIBERO_10_ACTION_STATS = {
     ),
     "mask": np.array([True] * 6 + [False]),
 }  # fmt: skip
+
+
+def build_prompt(task_label: str) -> str:
+    return f"In: What action should the robot take to {task_label.lower()}?\nOut:"
 
 
 class Policy(Protocol):
@@ -73,3 +78,11 @@ class StubPolicy:
             )
             logits[dim, rng.choice(outside)] = 100.0
         return summarize_logits(logits, chosen=logits.argmax(axis=-1), latency_ms=0.0)
+
+    def reference_action(self, img, task_label) -> np.ndarray:
+        """The unlogged path: same greedy tokens, decoded to an unnormalized action."""
+        stats = self.action_stats
+        tokens = self.predict(img, task_label).chosen_token_id
+        return decode.decode_action(
+            tokens, stats["q01"], stats["q99"], stats["mask"]
+        ).unnormalized_action

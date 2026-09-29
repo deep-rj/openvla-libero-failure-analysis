@@ -102,3 +102,13 @@ def test_stub_actions_stats_match_the_libero_layout():
     stats = policy.StubPolicy(seed=0).action_stats
     assert stats["mask"].tolist() == [True] * 6 + [False]
     assert all(np.asarray(stats[k]).shape == (7,) for k in ("q01", "q99"))
+
+
+def test_stub_reference_action_is_the_decoded_greedy_action_of_the_same_seed():
+    stats = policy.LIBERO_10_ACTION_STATS
+    logged = policy.StubPolicy(seed=5, out_of_slice_rate=0.3).predict(None, "task")
+    expected = decode.decode_action(
+        logged.chosen_token_id, stats["q01"], stats["q99"], stats["mask"]
+    ).unnormalized_action
+    reference = policy.StubPolicy(seed=5, out_of_slice_rate=0.3).reference_action(None, "task")
+    assert np.array_equal(reference, expected)
