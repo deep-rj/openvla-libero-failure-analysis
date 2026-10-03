@@ -90,3 +90,33 @@ pinned commits. Checked on the laptop (CPU, no checkpoint weights). Items marked
 - `sim.forward()` also renormalizes free-joint quaternions in the state (change of 2e-16),
   so the logging path must not call it; T2 compares actions bitwise.
 - Free-joint `qpos` stores quaternions as wxyz; obs expose xyzw.
+
+## Stage A results (RTX 4090, 2026-10-02)
+
+Run: `scripts/run_stage_a.py --policy openvla --parity` at harness `2326ab0`, clean tree.
+
+- **Checks.** T1 (two logger-off episodes) and T2 (logger on vs off) are bitwise identical.
+  T3, T5 and the 30-step parity run against the vendored `predict_action` report no
+  violations. The forced-truncation episode ended at 60 steps without success. The
+  load-time guards (executed hub-file hashes, norm stats, `lm_head` width, generation
+  config) passed on the real model, so the pinned hashes are correct.
+- **Cost.** 0.276 s per policy step, 444 policy steps per episode (8 episodes), 3.2 MB per
+  episode including video. The 250-episode baseline projects to 8.5 GPU-hours, about $6.4
+  at $0.75/h. The `generate` call alone has a median of 239 ms (p90 240 ms).
+- **Real episode.** Task 0, init state 0: success in 279 policy steps (289 steps with the
+  10 wait steps), the same as the 2026-09-25 profiling run. The metadata records the
+  checkpoint commit `80970322…`, hub code commit `47a0ec7f…`, the hub model class module and
+  the 4090. The video has one frame per step at 20 fps, upright, with a step-index overlay
+  that reads `WAIT` on settle steps. T4 (static restore) passed at a mid-episode step and at
+  a wait step.
+- **Token 31744 is used, not untrained.** It is the token for values at the upper edge:
+  the gripper-open value (decoded 0.996) accounts for 141 of 279 gripper steps, and z for 16
+  steps. Token 31745 received no mass on the gripper. Both decode to bin 254, so entropy
+  merges them. `clipped_flag` is true for 31744 by definition, so about 8% of dimension-steps
+  in this episode are flagged without being anomalous; the pilot report's
+  `chosen_edge_fraction` is expected to be about 0.5 for the gripper.
+- **Not yet checked on a real episode.** The fixture-task paths (`fixture_joint_qpos` on tasks
+  3 and 9, and T4 with articulated joints) were exercised only with the stub on CPU.
+- **Host.** The pod's main thread was pinned at 100% CPU while the GPU sat at about 60%
+  utilization (a 10.2-CPU cgroup quota on an AMD EPYC 7K62). Throttling counters were not
+  collected; see STATUS.md.

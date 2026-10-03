@@ -57,9 +57,10 @@ def summarize_logits(logits: np.ndarray, chosen: np.ndarray, latency_ms: float) 
 class StubPolicy:
     """Seeded synthetic logits with greedy decoding.
 
-    Token 31744 (the untrained edge of the action slice) is never emitted. With
-    `out_of_slice_rate` > 0, some positions instead put their mass on a text or padding
-    token, so the clipping paths are exercised.
+    The stub never emits token 31744, which the real model uses for values at the upper
+    edge (gripper open, saturated dimensions). With `out_of_slice_rate` > 0, some
+    positions instead put their mass on a text or padding token, so the clipping paths
+    are exercised.
     """
 
     def __init__(self, seed: int = 0, out_of_slice_rate: float = 0.0):
