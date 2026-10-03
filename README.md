@@ -218,16 +218,14 @@ inside the env.
 
 ### LIBERO's editable install fails with `ModuleNotFoundError: No module named 'libero'`
 
-`libero/__init__.py` is missing from the LIBERO repo itself — confirmed via `git log
---all --oneline -- libero/__init__.py` returning no history, not something broken in a
-specific clone. `setup.py` uses `find_packages()`, which requires `__init__.py` to
-discover a package at all, so `pip install -e LIBERO` never registers `libero` even
-though `pip show libero` reports it as installed.
+`provision.sh` handles this on fresh setups. It applies only to manual installs and envs
+built before that fix.
 
-Symptom: `pip show libero` looks fine, but `import libero` raises
+`libero/__init__.py` is missing upstream, so `find_packages()` in LIBERO's `setup.py`
+never registers `libero`. `pip show libero` looks fine, but `import libero` raises
 `ModuleNotFoundError`.
 
-`provision.sh` creates the file before installing. If the install was already done without it:
+Fix:
 ```bash
 touch ../LIBERO/libero/__init__.py   # from this repo's root
 pip install -e ../LIBERO --force-reinstall --no-deps
