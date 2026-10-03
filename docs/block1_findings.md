@@ -115,8 +115,12 @@ Run: `scripts/run_stage_a.py --policy openvla --parity` at harness `2326ab0`, cl
   merges them. `clipped_flag` is true for 31744 by definition, so about 8% of dimension-steps
   in this episode are flagged without being anomalous; the pilot report's
   `chosen_edge_fraction` is expected to be about 0.5 for the gripper.
-- **Not yet checked on a real episode.** The fixture-task paths (`fixture_joint_qpos` on tasks
-  3 and 9, and T4 with articulated joints) were exercised only with the stub on CPU.
+- **Fixture task on a real episode.** Task 3, init state 0 (cabinet, three slide joints):
+  520 policy steps without success. `fixture_joint_qpos` has shape (530, 3) and records the
+  articulation: the bottom drawer goes from -0.146 to -0.030 (0.119 of travel) and the middle
+  drawer moves 0.002, while the top drawer stays at 0. Static fixture poses are in the
+  metadata. The video has 530 frames for 530 steps. T4 passed at the default mid-episode step
+  and at step 260, where the drawer joint is mid-travel. Task 9 was not pulled.
 - **Host.** The pod's main thread was pinned at 100% CPU while the GPU sat at about 60%
   utilization (a 10.2-CPU cgroup quota on an AMD EPYC 7K62). Throttling counters were not
   collected; see STATUS.md.
