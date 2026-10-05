@@ -125,6 +125,22 @@ before tearing down a pod if anything else wrote there. Files are written locall
 copied afterwards, rather than written straight to the volume, because object storage
 handles HDF5's incremental writes and file locks, and appends to the manifest, badly.
 
+#### Pulling outputs locally
+
+A global volume has no S3 API and can't be read off-pod, so pulling needs a running pod
+with the volume attached (the cheapest one will do; no GPU work). Start it with SSH over
+exposed TCP (public IP), then from the laptop:
+
+```bash
+bash scripts/pull_outputs.sh -H <ip> -p <port> --list                # run dirs and sizes
+bash scripts/pull_outputs.sh -H <ip> -p <port> <run> --dry-run       # preview
+bash scripts/pull_outputs.sh -H <ip> -p <port> <run> --no-video --only '*.json' --only '*.h5'
+```
+
+Files land in `outputs/<run>/`; reruns skip what's already there. `PULL_HOST`, `PULL_PORT`
+and `REMOTE_ROOT` (default `/workspace/libero-eval-harness-workspace/outputs`, the archive root on the volume) replace the flags. The pod needs `rsync`
+(`apt-get install -y rsync`). Terminate the pod afterwards.
+
 ### Regenerating `requirements-lock.txt`
 
 The lock is the verified GPU env's `pip freeze --exclude-editable`, with `flash-attn`
