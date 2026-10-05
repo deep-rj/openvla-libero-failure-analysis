@@ -87,3 +87,43 @@ class PureFakePolicy:
 class DriftedPolicy(PureFakePolicy):
     def reference_action(self, img, task_label):
         return super().reference_action(img, task_label) + 1e-9
+
+
+def episode_id(task, init, seed=0):
+    return f"libero_10-t{task:02d}-i{init:03d}-s{seed}-none"
+
+
+def write_run(run_dir, episodes, *, config=None, git_sha="abc123", environment=None):
+    """Writes a finished run directory. Each episode: task, init, seed, success, steps."""
+    import json
+    from pathlib import Path
+
+    from harness import manifest, schema
+
+    run_dir = Path(run_dir)
+    for sub in ("episodes", "videos", "actions"):
+        (run_dir / sub).mkdir(parents=True, exist_ok=True)
+    cfg = {"suite": "libero_10", "seed": 0, "policy": "openvla", "video": True}
+    cfg.update(config or {})
+    (run_dir / "run_config.json").write_text(
+        json.dumps({"config": cfg, "environment": environment or {"gpu": "4090"}})
+    )
+    for ep in episodes:
+        seed = ep.get("seed", 0)
+        eid = episode_id(ep["task"], ep["init"], seed)
+        steps = ep["steps"]
+        schema.write_episode(run_dir / f"episodes/{eid}.h5", steps, {})
+        (run_dir / f"videos/{eid}.mp4").write_bytes(b"video:" + eid.encode())
+        np.save(run_dir / f"actions/{eid}.npy", np.stack([s.executed_action for s in steps]))
+        manifest.append_row(
+            run_dir / "manifest.csv",
+            {
+                "episode_id": eid, "task_suite": "libero_10", "task_id": ep["task"],
+                "task_instruction": "t", "init_state_idx": ep["init"], "seed": seed,
+                "success": ep.get("success", False), "num_steps": len(steps),
+                "terminated_by": "max_steps", "episode_file": f"episodes/{eid}.h5",
+                "video_file": f"videos/{eid}.mp4", "git_sha": git_sha,
+                "seconds_per_step": 0.25,
+            },
+        )  # fmt: skip
+    return run_dir

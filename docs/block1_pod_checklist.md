@@ -88,6 +88,60 @@ tree unless `--allow-dirty` is passed.
 - [ ] `episode_id` deterministic, so sharded pods cannot collide; per-pod manifest.
 - [ ] Archive to the global volume; push per-episode summary CSVs.
 
+### Sharded baseline (several pods)
+
+Shard by init state so every pod runs a mix of tasks. Five chunks of 50 episodes (~100 min
+each); a pod can take several by widening the range (`--init-states 0:10`). Deploy pods as GPUs
+appear, give each an unclaimed chunk, and keep the ledger below current.
+
+| chunk | `--init-states` | pod | archived | pulled |
+|---|---|---|---|---|
+| 1 | `0:5` | | | |
+| 2 | `5:10` | | | |
+| 3 | `10:15` | | | |
+| 4 | `15:20` | | | |
+| 5 | `20:25` | | | |
+
+Per pod (same commit on every pod; confirm `git rev-parse --short HEAD` matches):
+
+```bash
+python scripts/run_eval.py --policy openvla --tasks 0:10 --init-states 0:5 --out outputs/baseline_i00-04
+bash scripts/archive_outputs.sh outputs/baseline_i00-04
+```
+
+Locally, after pulling each snapshot:
+
+```bash
+python scripts/merge_runs.py <shard>... --out outputs/baseline --tasks 0:10 --init-states 0:25
+```
+
+The merge refuses duplicate episodes, shards with different run settings, and shards from
+different commits (`--allow-mixed-commits` overrides the last). It lists any missing
+(task, init state) pairs, which become the next chunk. Sources are only read; the merged
+directory records each shard's environment in `merged_from.json`.
+
+Cross-pod determinism, free from the baseline: the shard covering init states 0 and 1 reruns
+the eight Stage A episodes on a different host.
+
+```bash
+python scripts/compare_runs.py <stage_a>/logged outputs/baseline
+```
+
+Report the result either way: bitwise agreement, or the first divergent action, logit and state
+step per episode. A divergence changes how reproducibility is worded; it does not invalidate
+the baseline as a statistical result.
+
+Seed-1 sample (queue on any free pod; not a gate): ten episodes, init state 0 of every task.
+
+```bash
+python scripts/run_eval.py --policy openvla --seed 1 --tasks 0:10 --init-states 0:1 --out outputs/seed1_i00
+bash scripts/archive_outputs.sh outputs/seed1_i00
+python scripts/compare_runs.py outputs/baseline outputs/seed1_i00   # matched by task and init state
+```
+
+Outcome flips and first-divergence steps against seed 0 give the seed-to-seed noise floor
+(`docs/block1_findings.md`, "The env seed is not inert").
+
 After the baseline (all local, on the pulled or archived run directory):
 
 ```bash
