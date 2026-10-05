@@ -1,7 +1,9 @@
 # Block 1 — pod checklist
 
-Everything a coding agent must implement, run or validate on the pod. `block1_spec.md`
-is the source of truth for the schema, tests and blinding rules; this file only lists
+Everything a coding agent must implement, run or validate on the pod.
+`docs/archive/block1_spec.md` is the source of truth for the tests; the schema is in
+`docs/block1_schema.md` and the labeling and blinding rules in `docs/labeling_protocol.md`.
+This file only lists
 what needs a GPU, the real checkpoint, or the pod environment. Findings behind these
 items are in `docs/block1_findings.md`.
 

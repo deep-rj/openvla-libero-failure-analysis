@@ -41,7 +41,7 @@ volume (object storage) at the end of each eval run.
   - A global volume attached, with `OUTPUTS_ARCHIVE_DIR` set to a directory on it.
     It's safe to leave unset, but then outputs aren't archived.
 - **GPU:** RTX 4090 only, so numerics stay comparable across runs (see
-  `plan_parallel_eval_harness.md`, Pod configuration). Filter listings on vCPU as well,
+  `docs/archive/plan_parallel_eval_harness.md`, Pod configuration). Filter listings on vCPU as well,
   about 32 for 8 env workers. Whatever the GPU, it must be pre-Blackwell (compute
   capability < 10): torch 2.2.0+cu121 has no kernels for sm_100/sm_120, and
   `provision.sh` checks this first and stops.
