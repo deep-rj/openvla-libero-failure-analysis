@@ -120,8 +120,10 @@ which is the `unnorm_key` the scripts use.
 
 `scripts/libero_eval.py` writes raw traces (`.h5`), profiles, and the manifest CSV to
 `outputs/` on local disk. At the end of the run it calls `scripts/archive_outputs.sh`,
-which copies `outputs/` to `$OUTPUTS_ARCHIVE_DIR/<pod id>/`. Run the script by hand
-before tearing down a pod if anything else wrote there. Files are written locally and
+which copies `outputs/` to a new snapshot `$OUTPUTS_ARCHIVE_DIR/<UTC time>-<git sha>-<pod id>/`
+and verifies the `MANIFEST.sha256` it writes there. Snapshots are never overwritten. Run
+`bash scripts/archive_outputs.sh [run_dir]` by hand before tearing down a pod if anything else
+wrote there (the Stage A and baseline drivers don't call it). Files are written locally and
 copied afterwards, rather than written straight to the volume, because object storage
 handles HDF5's incremental writes and file locks, and appends to the manifest, badly.
 
