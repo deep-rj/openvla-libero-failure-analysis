@@ -14,19 +14,24 @@ from harness import manifest
 
 LABEL_COLUMNS = [
     "episode_id",
-    "milestone",
+    "k_completed",
+    "phase",
     "mechanism",
     "mechanism_notes",
     "first_error_step",
     "no_return_step",
     "no_onset",
+    "wrong_object",
+    "regression",
+    "stalled",
+    "no_reattempt",
     "notes",
 ]
 
 
 def select_failed_episodes(rows: list[dict], n: int, seed: int) -> list[str]:
     """Draws up to `n` failed episodes, spread as evenly across tasks as failures allow."""
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # noqa: S311
     queues = defaultdict(list)
     for row in sorted(rows, key=lambda r: r["episode_id"]):
         if not row["success"]:

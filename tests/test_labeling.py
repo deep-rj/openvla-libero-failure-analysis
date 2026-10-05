@@ -81,12 +81,17 @@ def test_the_template_has_the_agreed_columns_and_only_episode_ids_filled(tmp_pat
     assert list(rows[0]) == labeling.LABEL_COLUMNS
     assert labeling.LABEL_COLUMNS == [
         "episode_id",
-        "milestone",
+        "k_completed",
+        "phase",
         "mechanism",
         "mechanism_notes",
         "first_error_step",
         "no_return_step",
         "no_onset",
+        "wrong_object",
+        "regression",
+        "stalled",
+        "no_reattempt",
         "notes",
     ]
     assert [r["episode_id"] for r in rows] == ["a", "b"]

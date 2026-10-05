@@ -124,3 +124,26 @@ Run: `scripts/run_stage_a.py --policy openvla --parity` at harness `2326ab0`, cl
 - **Host.** The pod's main thread was pinned at 100% CPU while the GPU sat at about 60%
   utilization (a 10.2-CPU cgroup quota on an AMD EPYC 7K62). Throttling counters were not
   collected; see STATUS.md.
+
+## The env seed is not inert (laptop replay, 2026-10-05)
+
+`env.seed(s)` calls `np.random.seed(s)` (LIBERO `bddl_base_domain.py`). The rollout resets the
+env and then calls `set_init_state`, so the reset-time randomness was assumed to be
+overwritten. Replaying fixed actions in a fresh env per seed (CPU, osmesa) shows otherwise.
+
+- **Same seed reproduces.** Repeated seed-0 and seed-1 envs built in different orders give
+  bitwise-identical `sim_state` trajectories. This matches T1, which tested only same-seed
+  reproducibility and says nothing about changing the seed.
+- **Different seeds differ from step 0.** With 30 random actions on task 0, about 100 of 123
+  `sim_state` columns differ by up to about 6e-14 after the first step.
+- **The difference amplifies.** Replaying the Stage A actions open-loop (256-pixel cameras),
+  task 0 init 0 ends with state differences of order 1 for seed 1 versus 0, but about 4e-5
+  for seed 2; task 3 init 0 reaches order 1 for both seeds. Frames differ in 200–211 of 290
+  frames on task 0 and in every one of 531 frames on task 3, including the first frame.
+- **Not established.** The channel through which the seed enters is unidentified. Open-loop
+  replay exaggerates divergence, and the closed-loop effect on success rate is unmeasured.
+
+Consequence: the baseline is pinned to seed 0 and is reproducible, but its spread covers
+sampling over init states only, not seed-to-seed variation. A seed-1 rerun of the baseline
+episodes, counting outcome flips, would measure that noise floor; any Block 5 effect smaller
+than it cannot be attributed to the perturbation. Not run.
