@@ -20,7 +20,7 @@ CONDA_BIN="${CONDA_EXE:-}"
 [ -x "$CONDA_BIN" ] || CONDA_BIN="$HOME/miniforge3/bin/conda"
 [ -x "$CONDA_BIN" ] || CONDA_BIN="$HOME/miniconda3/bin/conda"
 if [ ! -x "$CONDA_BIN" ]; then
-  echo "ERROR: conda not found; install Miniforge first (dotfiles INSTALL_CONDA)." >&2
+  echo "ERROR: conda not found; install Miniforge first (https://github.com/conda-forge/miniforge#install)." >&2
   exit 1
 fi
 

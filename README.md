@@ -32,10 +32,8 @@ volume (object storage) at the end of each eval run.
 
 ### Prerequisites
 
-- **Machine setup:** the dotfiles `runpod-ephemeral` profile, which installs Miniforge
-  into `~/miniforge3`, hooks conda into new shells, and supplies git and Claude Code
-  credentials from RunPod secrets. Without it, install
-  [Miniforge](https://github.com/conda-forge/miniforge#install) yourself.
+- **Machine setup:** [Miniforge](https://github.com/conda-forge/miniforge#install) in
+  `~/miniforge3` with conda hooked into new shells, plus git credentials.
 - **Pod template:**
   - Container disk **≥ 60GB**: about 8.5GB of env plus the 15GB checkpoint plus outputs.
   - A global volume attached, with `OUTPUTS_ARCHIVE_DIR` set to a directory on it.
@@ -49,6 +47,13 @@ volume (object storage) at the end of each eval run.
 Keep git repos, the conda env, and the HF cache **off** the global volume. It's object
 storage: it can't set permission bits, symlinks and file locks are unreliable, and git
 fails on it.
+
+### Local development
+
+Everything except real OpenVLA inference runs on CPU: the stub policy, predicates, tests, and
+LIBERO under `osmesa`. `provision.sh` installs the lock's `torch==2.2.0+cu121`, so don't run it
+over an existing local CPU env; it would replace that torch build. Keep `~/.condarc` free of
+`channels: [defaults]`, which overrides Miniforge's conda-forge default.
 
 ### Every pod
 
