@@ -147,3 +147,80 @@ Consequence: the baseline is pinned to seed 0 and is reproducible, but its sprea
 sampling over init states only, not seed-to-seed variation. A seed-1 rerun of the baseline
 episodes, counting outcome flips, would measure that noise floor; any Block 5 effect smaller
 than it cannot be attributed to the perturbation. Not run.
+
+## Baseline pod hosts (2026-10-05)
+
+Five RTX 4090 pods from the same template ran the sharded baseline at harness `adbd165`. Pods
+are ephemeral, so a later pod may land on any of these host types. The run metadata records
+only the GPU name; the rest below was read off each pod by hand (`lscpu`, the cgroup quota,
+`nvidia-smi`). Chunk-to-pod mapping assumes the pods were listed in chunk order.
+
+| Chunk | CPU | CPU quota | Driver | s/step |
+|---|---|---|---|---|
+| i00-04 | AMD EPYC 7K62 (48-core) | 10.2 CPUs | 570.195.03 | pending |
+| i05-09 | AMD EPYC 7K62 (48-core) | 10.2 CPUs | 580.159.04 | pending |
+| i10-14 | AMD EPYC 7642 (48-core) | 10.2 CPUs | 595.91.07 | pending |
+| i15-19 | AMD EPYC 75F3 (32-core) | 13.6 CPUs | 570.195.03 | pending |
+| i20-24 | AMD EPYC 7402 (24-core) | 7.65 CPUs | 595.91.07 | pending |
+
+The 7.65 figure assumes the default 100 ms cgroup period; that pod's quota was read from the
+v1 file, which holds the quota only. The Stage A pod was an EPYC 7K62 with a 10.2-CPU quota; its
+driver version was not recorded.
+
+**Speed and throttling (partial, mid-run).** On matched 520-step episodes the Zen 3 pod (EPYC
+75F3, 13.6 CPUs) ran at 0.245–0.255 s/step, against 0.278–0.298 on the Zen 2 pods (7.65 and
+10.2 CPUs) and 0.273–0.274 on Stage A. The 7.65-CPU pod was not slower than the 10.2-CPU pods.
+The cgroup counters read 60 s apart agree: 11 of 600 periods throttled on a 10.2-CPU pod
+(1.8%; 1.7% since start) and 4 of 600 on the 7.65-CPU pod (0.7%; 0.5% since start). Throttling
+is rare, so the quota is not what limits the step time; per-core speed is the likelier limit.
+n is small, the pods differ in CPU generation and quota together, and all samples are from
+tasks 0–2.
+
+**Pod 4 lost its GPU mid-run.** The chunk-4 pod (EPYC 75F3, driver 570.195.03) stopped writing
+episodes at 00:33:34 UTC, 41 episodes into its 50. `nvidia-smi` reported "Failed to initialize
+NVML: Unknown Error", a fresh `torch.cuda.is_available()` returned False, and the run process
+stayed alive without a traceback until it was killed, about 27 minutes later. The cause could not
+be determined from inside the container. The 41 completed episodes were archived (pod id
+`mpvz0f3nbm11b8`); the nine missing ones (task 8 init states 16–19, task 9 init states 15–19)
+are rerun as separate shards. The job had no stall watchdog.
+
+## Baseline results (2026-10-05)
+
+250 episodes (10 tasks × init states 0–24), seed 0, logger and video on, harness `adbd165`, five
+RTX 4090 pods. The merged run is `outputs/baseline` (gitignored): four 50-episode chunks, pod 4's
+partial chunk (41 episodes) and two rerun shards (4 + 5 episodes). `merge_runs.py` reported 0 of
+250 missing.
+
+- **Success rate:** 130/250 = 52.0%, Wilson 95% interval 45.8% to 58.1%. Terminated by success
+  130, by the step cap 120. The interval covers sampling over init states only (seed pinned).
+- **Throughput:** 110.3 s per episode, 0.277 s per policy step (the Stage A value), 399 mean policy
+  steps. About 7.7 GPU-hours for the 250 episodes, against 8.5 projected from Stage A's 444 steps.
+- **Per task (n = 25 each):**
+
+| Task | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Successes | 13 | 19 | 14 | 10 | 8 | 18 | 15 | 10 | 8 | 15 |
+
+- **Pooled pilot report** (99,634 non-wait steps; `scripts/pilot_report.py`): argmax on a text or
+  padding token is 0.0000 in every dimension and out-of-slice mass peaks at 0.0037 (dim 4). The
+  gripper's exp(H) is at most 1.05 in 92% of steps (q95 1.21) and it chose token 31744 in 57%.
+  Dims 0–2 have a median exp(H) of 1.3–1.7 and q95 of 4.4–6.3. Top-2 margins of at most 1 ulp
+  occur in 5.8–7.7% of steps on dims 0–2 and 2.7–4.1% on dims 3–5; 51–58% of steps on dims 0–2
+  are within 16 ulps. On dim 0 at the 1-ulp cutoff, 38% of near ties are 10 or more bins apart.
+- **Cross-host determinism.** Stage A against the baseline shard that reran its eight episodes:
+  8 of 8 identical in actions, logits and simulator state. Stage A against a rerun of four of them
+  on an EPYC 7402 pod (different driver): 4 of 4 identical. Every CPU in that comparison is Zen 2;
+  the one Zen 3 pod (EPYC 75F3) lost its GPU, and its 41 episodes have not been checked against
+  another generation.
+- **Seed 1 against seed 0** (init state 0 of every task; one pod, EPYC 7642):
+
+| Task | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Outcome, seed 0 → seed 1 | T→T | T→T | T→F | F→T | F→F | T→F | F→F | F→T | T→F | T→T |
+| First logit divergence (step) | 79 | 76 | 10 | 10 | none | 10 | none | 60 | 10 | 10 |
+
+  Five of ten outcomes flipped and eight of ten trajectories diverged; tasks 4 and 6 are bitwise
+  identical across seeds over their full 530 steps. Net successes were 6 and 5. The first
+  simulator-state difference appears at step 1, 11 or 16, and the logits differ from the first
+  policy step (step 10) in four episodes. n = 10, so a 5/10 flip rate has a wide interval; the
+  entry channel of the seed is still unidentified.
