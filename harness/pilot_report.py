@@ -47,6 +47,17 @@ def _top2(values):
     return pick(first), pick(second), first, second
 
 
+def merged_bin_logits(slice_logits) -> np.ndarray:
+    """Per-bin logits [..., 255] in float32; bin i is token 31999 - i."""
+    reversed_tokens = np.asarray(slice_logits, dtype=np.float32)[..., ::-1]
+    bins = reversed_tokens[..., :N_BINS].copy()
+    # The last two slice tokens both decode to bin 254.
+    bins[..., N_BINS - 1] = np.logaddexp(
+        reversed_tokens[..., N_BINS - 1], reversed_tokens[..., N_BINS]
+    )
+    return bins
+
+
 def derive_step_metrics(slice_logits, lse_full, argmax_full_id, chosen_token_id) -> dict:
     """Per-step, per-dimension quantities from logged logits, computed in float32."""
     x = np.asarray(slice_logits, dtype=np.float32)
@@ -54,12 +65,7 @@ def derive_step_metrics(slice_logits, lse_full, argmax_full_id, chosen_token_id)
     lse_slice = peak[..., 0] + np.log(np.exp(x - peak).sum(axis=-1))
     share_of_full_head = np.exp(np.minimum(lse_slice - np.asarray(lse_full, np.float32), 0.0))
 
-    # Bin i is token 31999 - i; the last two slice tokens both decode to bin 254.
-    reversed_tokens = x[..., ::-1]
-    bins = reversed_tokens[..., :N_BINS].copy()
-    bins[..., N_BINS - 1] = np.logaddexp(
-        reversed_tokens[..., N_BINS - 1], reversed_tokens[..., N_BINS]
-    )
+    bins = merged_bin_logits(x)
     weights = np.exp(bins - bins.max(axis=-1, keepdims=True))
     p = weights / weights.sum(axis=-1, keepdims=True)
     entropy = -np.where(p > 0, p * np.log(np.where(p > 0, p, 1.0)), 0.0).sum(axis=-1)
