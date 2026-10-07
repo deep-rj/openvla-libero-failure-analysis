@@ -224,3 +224,86 @@ partial chunk (41 episodes) and two rerun shards (4 + 5 episodes). `merge_runs.p
   simulator-state difference appears at step 1, 11 or 16, and the logits differ from the first
   policy step (step 10) in four episodes. n = 10, so a 5/10 flip rate has a wide interval; the
   entry channel of the seed is still unidentified.
+
+## Pilot report gate (2026-10-06)
+
+**What the gate controls.** It gates the label draw. The labels feed both the taxonomy and the
+detector, so they are needed whether or not the detector premise holds; that premise is tested
+later by the separability gate, on an outcome split that blinding forbids before the labels are
+committed. This gate can therefore only test necessary conditions, and it is an
+instrument-validity check: no-go requires an internal inconsistency or an impossible value.
+A surprising but consistent reading is a finding, not a reason to stop.
+
+**Error costs.** Labels come from video and world state, not from logged model outputs.
+- False go, derived-metric bug: fix and recompute from the logged HDF5; no GPU, no labels lost.
+- False go, capture bug: rerun the baseline (~7.7 GPU-h, ~$6, a few hours across pods);
+  labels survive because T2 shows logging does not change actions.
+- False go, action-path bug: the baseline is wrong and the ~5–6 h of labels are lost.
+- False no-go: about a day chasing a non-bug, plus the risk of altering a correct metric until
+  it looks plausible. The bar for go is low.
+
+Kill conditions were written after the pilot report had been read, not before.
+
+### Kill conditions (`scripts/instrument_checks.py outputs/baseline`, 250 episodes, 99,634 steps)
+
+| # | Premise | Kill condition | Result |
+|---|---|---|---|
+| 1 | The chosen token is the decoded token | T3: `chosen ≠ argmax_full`, decode mismatch, or executed ≠ sent | 0 violations, all 250 episodes (Stage A covered 9) |
+| 2 | The slice holds the probability mass | `lse_slice − lse_full > 1e-5` | 0; max excess 3.7e-6 |
+| 3 | Logits are the model's bf16 values, stored losslessly as fp16 | Any logged slice logit not exactly bf16 (fp16 subnormals excluded) | 0 of ~178M logits |
+| 4 | Entropy is computed correctly | exp(H) outside [1, 255] | 0; max 30.6 (dim 0), 2.32 (gripper) |
+| 5 | Entropy and margins come from one distribution | exp(H) < 1 + e^(−δ) for a bin margin of δ nats | 0 |
+| 6 | The edge-bin merge is correct | Token margin ≠ bin margin where both edge tokens are > ln 2 below the second token | 0; covers 98.7–99.3% of steps on dims 0–5, 5.8% on the gripper |
+| 7 | Determinism and logger non-interference (T1, T2) | Any differing action | Stage A only; Zen 2 hosts only |
+| 8 | Wait-step alignment (T5) | First non-wait step ≠ 10, or model output on a wait step | 0 violations, all 250 episodes |
+
+Tolerances (1e-5 absolute on lse, 1e-5 relative on exp(H)) sit above fp32/fp64 summation error
+and below any physical effect.
+
+### Findings from the checks
+
+- **The out-of-slice clamp hides only rounding.** `pilot_report.py` clamps
+  `lse_slice − lse_full` at 0, so an impossible positive value would read as zero mass. It is
+  positive on 51–69% of steps per dimension, at most 3.7e-6: float summation order, not capture.
+- **bf16-valued logits are verified, not assumed.** Every stored logit is bf16-exact, so the
+  margins in ulps measure the model's own output grid.
+- **The gripper has exactly two modes.** Chosen bins are 254 (57.3%, open) and 127 (42.7%,
+  close); exp(H) never exceeds 2.32. Every gripper near tie is open versus close.
+- **No action is the modal action on every motion dimension.** The bin containing raw action 0
+  takes 33–43% of steps on dims 0–2 and 47–68% on dims 3–5.
+- **No hard lattice in chosen bins.** All 255 bins are used on dims 0–2, 4 and 5 (249 on dim 3).
+  Bin-to-bin counts deviate from their neighbours' mean by a median 27–45%, several times
+  independent-sampling noise, but consecutive steps are correlated, so that comparison
+  overstates it. Whether a soft comb explains the 2–9-bin near ties is unresolved.
+- **Far near ties are often stop-versus-move.** Among ≤1-ulp ties at ≥10 bins apart, the raw-0
+  bin is one of the top two in 24–37% on dims 0–2 and 44–48% on dims 3–5.
+- **Bin width in env units** ((q99 − q01)/255, times the OSC scale of 0.05 m or 0.5 rad per
+  unit; setpoint per 50 ms step): 0.28, 0.32, 0.33 mm on dims 0–2; 0.46, 0.60, 1.2 mrad on
+  dims 3–5. Ten bins is ≈3 mm per step on dim 0.
+
+### Predictions for the separability gate
+
+Each statistic is per episode, failed (n = 120) against successful (n = 130), tested by the
+AUROC 95% CI.
+
+- **P1. Gripper near ties at contact separate.** Gripper steps with bin margin ≤ 4 ulps while
+  the EEF is within 5 cm of the task's target object, per step in that window, are higher in
+  failures. Thresholds fixed 2026-10-06, before any outcome split. Falsified if the CI includes 0.5. Requires time-aligned model output, so it runs
+  only after the label CSV is committed. At ≤ 1 ulp there are ~2 gripper ties per episode,
+  too few for power; ≤ 4 ulps gives ~6.4.
+- **P2. Rotation is concentrated on no rotation.** Recorded as an observation, not a test: its
+  draft 50% threshold was not fixed before the check ran. Observed 68.1%, 54.7% and 47.1% on dims
+  3–5, against 32.8–43.4% on translation, so the concentration is strongest on rotation but not
+  specific to it.
+- **P3. Rotation entropy does not separate.** Mean exp(H) over dims 3–5. Falsified if the CI
+  excludes 0.5.
+- **P4. Gripper saturation does not separate on average.** Fraction of gripper steps with
+  exp(H) > 1.05. Falsified if the CI excludes 0.5.
+
+Parked: out-of-slice emission as a failure signature is absent under clean conditions (argmax
+never leaves the slice); whether it appears under perturbation is a Block 3 question. A
+physical-unit distance class may be added as an exploratory cut beside the pre-registered
+adjacent / 2–9 / ≥10 classes, never in place of them.
+
+**Decision: go** (2026-10-06). Every kill condition passes. Row 7 rests on Stage A and on Zen 2
+hosts only.
