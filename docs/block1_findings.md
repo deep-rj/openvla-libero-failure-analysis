@@ -263,8 +263,10 @@ and below any physical effect.
 ### Findings from the checks
 
 - **The out-of-slice clamp hides only rounding.** `pilot_report.py` clamps
-  `lse_slice − lse_full` at 0, so an impossible positive value would read as zero mass. It is
-  positive on 51–69% of steps per dimension, at most 3.7e-6: float summation order, not capture.
+  `lse_slice − lse_full` at 0 for the mass, so an impossible positive value reads as zero mass;
+  the report now counts steps above 1e-5 in a separate column. The difference is positive on
+  51–69% of steps per dimension, at most 3.7e-6: float summation order, not capture. Mass below
+  ~5e-6 (including the p95 of ~1.6e-6) is at this rounding floor.
 - **bf16-valued logits are verified, not assumed.** Every stored logit is bf16-exact, so the
   margins in ulps measure the model's own output grid.
 - **The gripper has exactly two modes.** Chosen bins are 254 (57.3%, open) and 127 (42.7%,

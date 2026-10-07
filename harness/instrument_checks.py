@@ -11,10 +11,9 @@ from pathlib import Path
 import numpy as np
 
 from harness import checks, decode, manifest, schema
-from harness.pilot_report import derive_step_metrics, merged_bin_logits
+from harness.pilot_report import LSE_TOL, derive_step_metrics, lse_excess, merged_bin_logits
 from harness.rollout import NUM_STEPS_WAIT
 
-LSE_TOL = 1e-5
 EXP_H_RTOL = 1e-5
 _N_EXAMPLES = 20
 _EDGE_TOKENS = (0, 1)  # slice indices of tokens 31744 and 31745
@@ -28,14 +27,6 @@ def non_bf16(slice_logits) -> np.ndarray:
     x = np.asarray(slice_logits, dtype=np.float16)
     bits = x.astype(np.float32).view(np.uint32)
     return ((bits & 0xFFFF) != 0) & (np.abs(x) >= np.finfo(np.float16).tiny)
-
-
-def lse_excess(slice_logits, lse_full) -> np.ndarray:
-    """log-sum-exp over the slice minus over the full head; positive is impossible."""
-    x = np.asarray(slice_logits, dtype=np.float64)
-    peak = x.max(axis=-1, keepdims=True)
-    lse_slice = peak[..., 0] + np.log(np.exp(x - peak).sum(axis=-1))
-    return lse_slice - np.asarray(lse_full, dtype=np.float64)
 
 
 def bin_margin_nats(slice_logits) -> np.ndarray:
