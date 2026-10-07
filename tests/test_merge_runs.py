@@ -114,3 +114,11 @@ def test_downstream_tools_read_the_merged_run(tmp_path):
     merge_runs.merge_runs([a, b], tmp_path / "merged")
     report = pilot_report.build_report(tmp_path / "merged")
     assert report["n_episodes"] == 4 and report["suite_success"]["successes"] == 2
+
+
+def test_the_merged_run_carries_its_summary(tmp_path):
+    a, b = _shards(tmp_path)
+    report = merge_runs.merge_runs([a, b], tmp_path / "merged")
+    written = json.loads((tmp_path / "merged" / "summary.json").read_text())
+    assert written["n"] == 4 and written["successes"] == 2
+    assert json.loads(json.dumps(report["summary"])) == written
