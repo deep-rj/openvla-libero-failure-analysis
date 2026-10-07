@@ -63,6 +63,14 @@ def test_completed_episodes_are_skipped_on_a_rerun(tmp_path):
     assert len(manifest.completed_episode_ids(tmp_path / "manifest.csv")) == 2
 
 
+def test_a_run_summarizes_its_whole_manifest_including_resumed_episodes(tmp_path):
+    runner.run(_cfg(tmp_path, init_states=[0]), policy_factory=_stub_factory)
+    runner.run(_cfg(tmp_path), policy_factory=_stub_factory)
+    written = json.loads((tmp_path / "summary.json").read_text())
+    assert written["n"] == 2
+    assert (tmp_path / "summary.md").exists()
+
+
 def test_reference_mode_saves_actions_and_no_trace(tmp_path):
     rows = runner.run(
         _cfg(tmp_path, mode="reference", init_states=[0], video=False),

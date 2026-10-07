@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 
-from harness import manifest, metadata, schema, video
+from harness import manifest, metadata, schema, summary, video
 from harness import policy as policy_lib
 from harness.rollout import MAX_STEPS_BY_SUITE, EpisodeSpec, run_episode
 from harness.world import scene_layout
@@ -85,7 +85,10 @@ class ActionRecorder:
 
 
 def run(cfg: RunConfig, policy_factory=None) -> list[dict]:
-    """Runs every episode not already in the manifest; returns the new manifest rows."""
+    """Runs every episode not already in the manifest, then summarizes the whole manifest.
+
+    Returns only the new manifest rows.
+    """
     from libero.libero import benchmark
 
     siblings = {name: REPO_DIR.parent / dirname for name, dirname in _SIBLINGS.items()}
@@ -135,6 +138,8 @@ def run(cfg: RunConfig, policy_factory=None) -> list[dict]:
                 )
         finally:
             env.close()
+    if manifest_path.exists():
+        summary.write_outputs(out)
     return rows
 
 
