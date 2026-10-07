@@ -17,6 +17,8 @@ from harness.decode import ACTION_SLICE_START, N_BINS, VOCAB_SIZE
 # Fixed before any data was seen.
 EXP_H_CUTOFFS = (1.05, 1.5, 2.0)
 MARGIN_ULP_CUTOFFS = (1, 4, 16)
+# Above fp32/fp64 summation error; a larger slice lse means lse_full is from another pass.
+LSE_TOL = 1e-5
 QUANTILES = (5, 25, 50, 75, 95)
 DISTANCE_CLASSES = ("adjacent", "2-9", ">=10")
 _ANOMALY_KEYS = ("t1", "t2", "t3", "t5", "t3_parity", "truncation")
@@ -25,6 +27,7 @@ _METRIC_KEYS = (
     "argmax_padding",
     "chosen_edge",
     "oos_mass",
+    "slice_exceeds_full",
     "exp_h",
     "token_margin_ulps",
     "bin_margin_ulps",
@@ -47,19 +50,32 @@ def _top2(values):
     return pick(first), pick(second), first, second
 
 
-def derive_step_metrics(slice_logits, lse_full, argmax_full_id, chosen_token_id) -> dict:
-    """Per-step, per-dimension quantities from logged logits, computed in float32."""
-    x = np.asarray(slice_logits, dtype=np.float32)
+def lse_excess(slice_logits, lse_full) -> np.ndarray:
+    """log-sum-exp over the slice minus over the full head, in float64; positive is impossible."""
+    x = np.asarray(slice_logits, dtype=np.float64)
     peak = x.max(axis=-1, keepdims=True)
     lse_slice = peak[..., 0] + np.log(np.exp(x - peak).sum(axis=-1))
-    share_of_full_head = np.exp(np.minimum(lse_slice - np.asarray(lse_full, np.float32), 0.0))
+    return lse_slice - np.asarray(lse_full, dtype=np.float64)
 
-    # Bin i is token 31999 - i; the last two slice tokens both decode to bin 254.
-    reversed_tokens = x[..., ::-1]
+
+def merged_bin_logits(slice_logits) -> np.ndarray:
+    """Per-bin logits [..., 255] in float32; bin i is token 31999 - i."""
+    reversed_tokens = np.asarray(slice_logits, dtype=np.float32)[..., ::-1]
     bins = reversed_tokens[..., :N_BINS].copy()
+    # The last two slice tokens both decode to bin 254.
     bins[..., N_BINS - 1] = np.logaddexp(
         reversed_tokens[..., N_BINS - 1], reversed_tokens[..., N_BINS]
     )
+    return bins
+
+
+def derive_step_metrics(slice_logits, lse_full, argmax_full_id, chosen_token_id) -> dict:
+    """Per-step, per-dimension quantities from logged logits, computed in float32."""
+    x = np.asarray(slice_logits, dtype=np.float32)
+    excess = lse_excess(x, lse_full)
+    share_of_full_head = np.exp(np.minimum(excess, 0.0))
+
+    bins = merged_bin_logits(x)
     weights = np.exp(bins - bins.max(axis=-1, keepdims=True))
     p = weights / weights.sum(axis=-1, keepdims=True)
     entropy = -np.where(p > 0, p * np.log(np.where(p > 0, p, 1.0)), 0.0).sum(axis=-1)
@@ -72,6 +88,7 @@ def derive_step_metrics(slice_logits, lse_full, argmax_full_id, chosen_token_id)
         "argmax_padding": argmax >= VOCAB_SIZE,
         "chosen_edge": np.asarray(chosen_token_id) == ACTION_SLICE_START,
         "oos_mass": 1.0 - share_of_full_head,
+        "slice_exceeds_full": excess > LSE_TOL,
         "exp_h": np.exp(entropy),
         "token_margin_ulps": (tok1 - tok2) / bf16_ulp(tok1),
         "bin_margin_ulps": (bin1 - bin2) / bf16_ulp(bin1),
@@ -113,7 +130,11 @@ def _per_dim(m: dict, d: int) -> dict:
             "padding_fraction": float(m["argmax_padding"][:, d].mean()),
             "chosen_edge_fraction": float(m["chosen_edge"][:, d].mean()),
         },
-        "oos_mass": {**_distribution(m["oos_mass"][:, d]), "max": float(m["oos_mass"][:, d].max())},
+        "oos_mass": {
+            **_distribution(m["oos_mass"][:, d]),
+            "max": float(m["oos_mass"][:, d].max()),
+            "slice_exceeds_full_steps": int(m["slice_exceeds_full"][:, d].sum()),
+        },
         "exp_h": _distribution(m["exp_h"][:, d], EXP_H_CUTOFFS),
         "token_margin_ulps": _distribution(m["token_margin_ulps"][:, d], MARGIN_ULP_CUTOFFS),
         "bin_margin_ulps": _distribution(m["bin_margin_ulps"][:, d], MARGIN_ULP_CUTOFFS),
@@ -194,15 +215,16 @@ def render_markdown(report: dict) -> str:
         "",
         "## Out-of-slice premise check",
         "",
-        "| dim | argmax text | argmax padding | chose 31744 | mass median | mass p95 | mass max |",
-        "|---|---|---|---|---|---|---|",
+        "| dim | argmax text | argmax padding | chose 31744 | mass median | mass p95 | mass max "
+        "| slice lse > full |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for d, s in report["pooled"]["per_dim"].items():
         o, m = s["argmax_outside_slice"], s["oos_mass"]
         lines.append(
             f"| {d} | {o['text_fraction']:.4f} | {o['padding_fraction']:.4f} "
             f"| {o['chosen_edge_fraction']:.4f} | {m['quantiles']['50']:.4g} "
-            f"| {m['quantiles']['95']:.4g} | {m['max']:.4g} |"
+            f"| {m['quantiles']['95']:.4g} | {m['max']:.4g} | {m['slice_exceeds_full_steps']} |"
         )
     lines += ["", "## Effective bins exp(H)", ""]
     header = "| dim | q5 | q25 | q50 | q75 | q95 | " + " | ".join(

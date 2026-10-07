@@ -101,6 +101,7 @@ def test_summary_reports_quantiles_cutoff_fractions_and_the_bin_distance_crossta
         "argmax_padding": np.zeros((n, 7), bool),
         "chosen_edge": np.zeros((n, 7), bool),
         "oos_mass": rng.uniform(0, 0.1, (n, 7)),
+        "slice_exceeds_full": np.zeros((n, 7), bool),
         "exp_h": np.tile(np.linspace(1.0, 3.0, n)[:, None], (1, 7)),
         "token_margin_ulps": np.tile(np.linspace(0, 40, n)[:, None], (1, 7)),
         "bin_margin_ulps": np.tile(np.linspace(0, 40, n)[:, None], (1, 7)),
@@ -207,3 +208,20 @@ def test_only_the_requested_episodes_are_pooled(tmp_path):
     report = pr.build_report(tmp_path, episode_ids={"a"})
     assert report["n_episodes"] == 1
     assert report["n_steps_pooled"] == 20
+
+
+def test_a_slice_lse_above_the_full_head_is_flagged_rather_than_clamped_away():
+    x = _slice({0: {10: 3.0}}, base=0.0)
+    lse_slice = np.log(np.exp(x.astype(np.float64)).sum(-1))
+    m = _metrics(x, lse_full=(lse_slice - 0.01).astype(np.float32))
+    assert m["oos_mass"] == pytest.approx(np.zeros((1, 7)), abs=1e-6)
+    assert m["slice_exceeds_full"].all()
+    assert not _metrics(x)["slice_exceeds_full"].any()
+
+
+def test_the_report_counts_steps_where_the_slice_exceeds_the_full_head():
+    m = _metrics(np.concatenate([_slice({0: {10: 3.0}}, base=0.0)] * 2))
+    m["slice_exceeds_full"][1, 0] = True
+    s = pr.summarize_pooled(m)["per_dim"]
+    assert s[0]["oos_mass"]["slice_exceeds_full_steps"] == 1
+    assert s[1]["oos_mass"]["slice_exceeds_full_steps"] == 0
