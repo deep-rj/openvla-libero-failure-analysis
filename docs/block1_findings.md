@@ -189,7 +189,7 @@ are rerun as separate shards. The job had no stall watchdog.
 250 episodes (10 tasks × init states 0–24), seed 0, logger and video on, harness `adbd165`, five
 RTX 4090 pods. The merged run is `outputs/baseline` (gitignored): four 50-episode chunks, pod 4's
 partial chunk (41 episodes) and two rerun shards (4 + 5 episodes). `merge_runs.py` reported 0 of
-250 missing.
+250 missing. Its summary files are committed in `docs/results/baseline/`.
 
 - **Success rate:** 130/250 = 52.0%, Wilson 95% interval 45.8% to 58.1%. Terminated by success
   130, by the step cap 120. The interval covers sampling over init states only (seed pinned).

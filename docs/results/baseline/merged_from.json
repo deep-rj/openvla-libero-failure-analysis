@@ -1,0 +1,690 @@
+{
+  "shards": [
+    {
+      "dir": "outputs/20261006T005712Z-adbd165-yohj5wxbp2jxj2",
+      "config": {
+        "out_dir": "outputs/baseline_i00-04",
+        "tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "init_states": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "suite": "libero_10",
+        "seed": 0,
+        "policy": "openvla",
+        "mode": "logged",
+        "max_steps": null,
+        "video": true,
+        "allow_dirty": false,
+        "camera_size": 256,
+        "checkpoint": "openvla/openvla-7b-finetuned-libero-10",
+        "unnorm_key": "libero_10",
+        "center_crop": true
+      },
+      "environment": {
+        "git": {
+          "harness": {
+            "sha": "adbd165e7cdb9de6b6d3528b590cc0cd1ecb0d2f",
+            "dirty": false
+          },
+          "openvla": {
+            "sha": "c8f03f48af692657d3060c19588038c7220e9af9",
+            "dirty": false
+          },
+          "LIBERO": {
+            "sha": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+            "dirty": false
+          }
+        },
+        "versions": {
+          "torch": "2.2.0+cu121",
+          "transformers": "4.40.1",
+          "numpy": "1.26.4",
+          "mujoco": "2.3.7",
+          "robosuite": "1.4.1",
+          "h5py": "3.16.0",
+          "imageio": "2.37.4",
+          "tensorflow": "2.15.0"
+        },
+        "gpu": "NVIDIA GeForce RTX 4090"
+      },
+      "episode_ids": [
+        "libero_10-t00-i000-s0-none",
+        "libero_10-t00-i001-s0-none",
+        "libero_10-t00-i002-s0-none",
+        "libero_10-t00-i003-s0-none",
+        "libero_10-t00-i004-s0-none",
+        "libero_10-t01-i000-s0-none",
+        "libero_10-t01-i001-s0-none",
+        "libero_10-t01-i002-s0-none",
+        "libero_10-t01-i003-s0-none",
+        "libero_10-t01-i004-s0-none",
+        "libero_10-t02-i000-s0-none",
+        "libero_10-t02-i001-s0-none",
+        "libero_10-t02-i002-s0-none",
+        "libero_10-t02-i003-s0-none",
+        "libero_10-t02-i004-s0-none",
+        "libero_10-t03-i000-s0-none",
+        "libero_10-t03-i001-s0-none",
+        "libero_10-t03-i002-s0-none",
+        "libero_10-t03-i003-s0-none",
+        "libero_10-t03-i004-s0-none",
+        "libero_10-t04-i000-s0-none",
+        "libero_10-t04-i001-s0-none",
+        "libero_10-t04-i002-s0-none",
+        "libero_10-t04-i003-s0-none",
+        "libero_10-t04-i004-s0-none",
+        "libero_10-t05-i000-s0-none",
+        "libero_10-t05-i001-s0-none",
+        "libero_10-t05-i002-s0-none",
+        "libero_10-t05-i003-s0-none",
+        "libero_10-t05-i004-s0-none",
+        "libero_10-t06-i000-s0-none",
+        "libero_10-t06-i001-s0-none",
+        "libero_10-t06-i002-s0-none",
+        "libero_10-t06-i003-s0-none",
+        "libero_10-t06-i004-s0-none",
+        "libero_10-t07-i000-s0-none",
+        "libero_10-t07-i001-s0-none",
+        "libero_10-t07-i002-s0-none",
+        "libero_10-t07-i003-s0-none",
+        "libero_10-t07-i004-s0-none",
+        "libero_10-t08-i000-s0-none",
+        "libero_10-t08-i001-s0-none",
+        "libero_10-t08-i002-s0-none",
+        "libero_10-t08-i003-s0-none",
+        "libero_10-t08-i004-s0-none",
+        "libero_10-t09-i000-s0-none",
+        "libero_10-t09-i001-s0-none",
+        "libero_10-t09-i002-s0-none",
+        "libero_10-t09-i003-s0-none",
+        "libero_10-t09-i004-s0-none"
+      ]
+    },
+    {
+      "dir": "outputs/20261006T005938Z-adbd165-f81vyfo30r8fuh",
+      "config": {
+        "out_dir": "outputs/baseline_i05-09",
+        "tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "init_states": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "suite": "libero_10",
+        "seed": 0,
+        "policy": "openvla",
+        "mode": "logged",
+        "max_steps": null,
+        "video": true,
+        "allow_dirty": false,
+        "camera_size": 256,
+        "checkpoint": "openvla/openvla-7b-finetuned-libero-10",
+        "unnorm_key": "libero_10",
+        "center_crop": true
+      },
+      "environment": {
+        "git": {
+          "harness": {
+            "sha": "adbd165e7cdb9de6b6d3528b590cc0cd1ecb0d2f",
+            "dirty": false
+          },
+          "openvla": {
+            "sha": "c8f03f48af692657d3060c19588038c7220e9af9",
+            "dirty": false
+          },
+          "LIBERO": {
+            "sha": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+            "dirty": false
+          }
+        },
+        "versions": {
+          "torch": "2.2.0+cu121",
+          "transformers": "4.40.1",
+          "numpy": "1.26.4",
+          "mujoco": "2.3.7",
+          "robosuite": "1.4.1",
+          "h5py": "3.16.0",
+          "imageio": "2.37.4",
+          "tensorflow": "2.15.0"
+        },
+        "gpu": "NVIDIA GeForce RTX 4090"
+      },
+      "episode_ids": [
+        "libero_10-t00-i005-s0-none",
+        "libero_10-t00-i006-s0-none",
+        "libero_10-t00-i007-s0-none",
+        "libero_10-t00-i008-s0-none",
+        "libero_10-t00-i009-s0-none",
+        "libero_10-t01-i005-s0-none",
+        "libero_10-t01-i006-s0-none",
+        "libero_10-t01-i007-s0-none",
+        "libero_10-t01-i008-s0-none",
+        "libero_10-t01-i009-s0-none",
+        "libero_10-t02-i005-s0-none",
+        "libero_10-t02-i006-s0-none",
+        "libero_10-t02-i007-s0-none",
+        "libero_10-t02-i008-s0-none",
+        "libero_10-t02-i009-s0-none",
+        "libero_10-t03-i005-s0-none",
+        "libero_10-t03-i006-s0-none",
+        "libero_10-t03-i007-s0-none",
+        "libero_10-t03-i008-s0-none",
+        "libero_10-t03-i009-s0-none",
+        "libero_10-t04-i005-s0-none",
+        "libero_10-t04-i006-s0-none",
+        "libero_10-t04-i007-s0-none",
+        "libero_10-t04-i008-s0-none",
+        "libero_10-t04-i009-s0-none",
+        "libero_10-t05-i005-s0-none",
+        "libero_10-t05-i006-s0-none",
+        "libero_10-t05-i007-s0-none",
+        "libero_10-t05-i008-s0-none",
+        "libero_10-t05-i009-s0-none",
+        "libero_10-t06-i005-s0-none",
+        "libero_10-t06-i006-s0-none",
+        "libero_10-t06-i007-s0-none",
+        "libero_10-t06-i008-s0-none",
+        "libero_10-t06-i009-s0-none",
+        "libero_10-t07-i005-s0-none",
+        "libero_10-t07-i006-s0-none",
+        "libero_10-t07-i007-s0-none",
+        "libero_10-t07-i008-s0-none",
+        "libero_10-t07-i009-s0-none",
+        "libero_10-t08-i005-s0-none",
+        "libero_10-t08-i006-s0-none",
+        "libero_10-t08-i007-s0-none",
+        "libero_10-t08-i008-s0-none",
+        "libero_10-t08-i009-s0-none",
+        "libero_10-t09-i005-s0-none",
+        "libero_10-t09-i006-s0-none",
+        "libero_10-t09-i007-s0-none",
+        "libero_10-t09-i008-s0-none",
+        "libero_10-t09-i009-s0-none"
+      ]
+    },
+    {
+      "dir": "outputs/20261006T010053Z-adbd165-tzn40lpp4jlnck",
+      "config": {
+        "out_dir": "outputs/baseline_i10-14",
+        "tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "init_states": [
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "suite": "libero_10",
+        "seed": 0,
+        "policy": "openvla",
+        "mode": "logged",
+        "max_steps": null,
+        "video": true,
+        "allow_dirty": false,
+        "camera_size": 256,
+        "checkpoint": "openvla/openvla-7b-finetuned-libero-10",
+        "unnorm_key": "libero_10",
+        "center_crop": true
+      },
+      "environment": {
+        "git": {
+          "harness": {
+            "sha": "adbd165e7cdb9de6b6d3528b590cc0cd1ecb0d2f",
+            "dirty": false
+          },
+          "openvla": {
+            "sha": "c8f03f48af692657d3060c19588038c7220e9af9",
+            "dirty": false
+          },
+          "LIBERO": {
+            "sha": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+            "dirty": false
+          }
+        },
+        "versions": {
+          "torch": "2.2.0+cu121",
+          "transformers": "4.40.1",
+          "numpy": "1.26.4",
+          "mujoco": "2.3.7",
+          "robosuite": "1.4.1",
+          "h5py": "3.16.0",
+          "imageio": "2.37.4",
+          "tensorflow": "2.15.0"
+        },
+        "gpu": "NVIDIA GeForce RTX 4090"
+      },
+      "episode_ids": [
+        "libero_10-t00-i010-s0-none",
+        "libero_10-t00-i011-s0-none",
+        "libero_10-t00-i012-s0-none",
+        "libero_10-t00-i013-s0-none",
+        "libero_10-t00-i014-s0-none",
+        "libero_10-t01-i010-s0-none",
+        "libero_10-t01-i011-s0-none",
+        "libero_10-t01-i012-s0-none",
+        "libero_10-t01-i013-s0-none",
+        "libero_10-t01-i014-s0-none",
+        "libero_10-t02-i010-s0-none",
+        "libero_10-t02-i011-s0-none",
+        "libero_10-t02-i012-s0-none",
+        "libero_10-t02-i013-s0-none",
+        "libero_10-t02-i014-s0-none",
+        "libero_10-t03-i010-s0-none",
+        "libero_10-t03-i011-s0-none",
+        "libero_10-t03-i012-s0-none",
+        "libero_10-t03-i013-s0-none",
+        "libero_10-t03-i014-s0-none",
+        "libero_10-t04-i010-s0-none",
+        "libero_10-t04-i011-s0-none",
+        "libero_10-t04-i012-s0-none",
+        "libero_10-t04-i013-s0-none",
+        "libero_10-t04-i014-s0-none",
+        "libero_10-t05-i010-s0-none",
+        "libero_10-t05-i011-s0-none",
+        "libero_10-t05-i012-s0-none",
+        "libero_10-t05-i013-s0-none",
+        "libero_10-t05-i014-s0-none",
+        "libero_10-t06-i010-s0-none",
+        "libero_10-t06-i011-s0-none",
+        "libero_10-t06-i012-s0-none",
+        "libero_10-t06-i013-s0-none",
+        "libero_10-t06-i014-s0-none",
+        "libero_10-t07-i010-s0-none",
+        "libero_10-t07-i011-s0-none",
+        "libero_10-t07-i012-s0-none",
+        "libero_10-t07-i013-s0-none",
+        "libero_10-t07-i014-s0-none",
+        "libero_10-t08-i010-s0-none",
+        "libero_10-t08-i011-s0-none",
+        "libero_10-t08-i012-s0-none",
+        "libero_10-t08-i013-s0-none",
+        "libero_10-t08-i014-s0-none",
+        "libero_10-t09-i010-s0-none",
+        "libero_10-t09-i011-s0-none",
+        "libero_10-t09-i012-s0-none",
+        "libero_10-t09-i013-s0-none",
+        "libero_10-t09-i014-s0-none"
+      ]
+    },
+    {
+      "dir": "outputs/20261006T010333Z-adbd165-mpvz0f3nbm11b8",
+      "config": {
+        "out_dir": "outputs/baseline_i15-19",
+        "tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "init_states": [
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "suite": "libero_10",
+        "seed": 0,
+        "policy": "openvla",
+        "mode": "logged",
+        "max_steps": null,
+        "video": true,
+        "allow_dirty": false,
+        "camera_size": 256,
+        "checkpoint": "openvla/openvla-7b-finetuned-libero-10",
+        "unnorm_key": "libero_10",
+        "center_crop": true
+      },
+      "environment": {
+        "git": {
+          "harness": {
+            "sha": "adbd165e7cdb9de6b6d3528b590cc0cd1ecb0d2f",
+            "dirty": false
+          },
+          "openvla": {
+            "sha": "c8f03f48af692657d3060c19588038c7220e9af9",
+            "dirty": false
+          },
+          "LIBERO": {
+            "sha": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+            "dirty": false
+          }
+        },
+        "versions": {
+          "torch": "2.2.0+cu121",
+          "transformers": "4.40.1",
+          "numpy": "1.26.4",
+          "mujoco": "2.3.7",
+          "robosuite": "1.4.1",
+          "h5py": "3.16.0",
+          "imageio": "2.37.4",
+          "tensorflow": "2.15.0"
+        },
+        "gpu": "NVIDIA GeForce RTX 4090"
+      },
+      "episode_ids": [
+        "libero_10-t00-i015-s0-none",
+        "libero_10-t00-i016-s0-none",
+        "libero_10-t00-i017-s0-none",
+        "libero_10-t00-i018-s0-none",
+        "libero_10-t00-i019-s0-none",
+        "libero_10-t01-i015-s0-none",
+        "libero_10-t01-i016-s0-none",
+        "libero_10-t01-i017-s0-none",
+        "libero_10-t01-i018-s0-none",
+        "libero_10-t01-i019-s0-none",
+        "libero_10-t02-i015-s0-none",
+        "libero_10-t02-i016-s0-none",
+        "libero_10-t02-i017-s0-none",
+        "libero_10-t02-i018-s0-none",
+        "libero_10-t02-i019-s0-none",
+        "libero_10-t03-i015-s0-none",
+        "libero_10-t03-i016-s0-none",
+        "libero_10-t03-i017-s0-none",
+        "libero_10-t03-i018-s0-none",
+        "libero_10-t03-i019-s0-none",
+        "libero_10-t04-i015-s0-none",
+        "libero_10-t04-i016-s0-none",
+        "libero_10-t04-i017-s0-none",
+        "libero_10-t04-i018-s0-none",
+        "libero_10-t04-i019-s0-none",
+        "libero_10-t05-i015-s0-none",
+        "libero_10-t05-i016-s0-none",
+        "libero_10-t05-i017-s0-none",
+        "libero_10-t05-i018-s0-none",
+        "libero_10-t05-i019-s0-none",
+        "libero_10-t06-i015-s0-none",
+        "libero_10-t06-i016-s0-none",
+        "libero_10-t06-i017-s0-none",
+        "libero_10-t06-i018-s0-none",
+        "libero_10-t06-i019-s0-none",
+        "libero_10-t07-i015-s0-none",
+        "libero_10-t07-i016-s0-none",
+        "libero_10-t07-i017-s0-none",
+        "libero_10-t07-i018-s0-none",
+        "libero_10-t07-i019-s0-none",
+        "libero_10-t08-i015-s0-none"
+      ]
+    },
+    {
+      "dir": "outputs/20261006T010504Z-adbd165-f7go3bd86hfi8z",
+      "config": {
+        "out_dir": "outputs/baseline_i20-24",
+        "tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "init_states": [
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "suite": "libero_10",
+        "seed": 0,
+        "policy": "openvla",
+        "mode": "logged",
+        "max_steps": null,
+        "video": true,
+        "allow_dirty": false,
+        "camera_size": 256,
+        "checkpoint": "openvla/openvla-7b-finetuned-libero-10",
+        "unnorm_key": "libero_10",
+        "center_crop": true
+      },
+      "environment": {
+        "git": {
+          "harness": {
+            "sha": "adbd165e7cdb9de6b6d3528b590cc0cd1ecb0d2f",
+            "dirty": false
+          },
+          "openvla": {
+            "sha": "c8f03f48af692657d3060c19588038c7220e9af9",
+            "dirty": false
+          },
+          "LIBERO": {
+            "sha": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+            "dirty": false
+          }
+        },
+        "versions": {
+          "torch": "2.2.0+cu121",
+          "transformers": "4.40.1",
+          "numpy": "1.26.4",
+          "mujoco": "2.3.7",
+          "robosuite": "1.4.1",
+          "h5py": "3.16.0",
+          "imageio": "2.37.4",
+          "tensorflow": "2.15.0"
+        },
+        "gpu": "NVIDIA GeForce RTX 4090"
+      },
+      "episode_ids": [
+        "libero_10-t00-i020-s0-none",
+        "libero_10-t00-i021-s0-none",
+        "libero_10-t00-i022-s0-none",
+        "libero_10-t00-i023-s0-none",
+        "libero_10-t00-i024-s0-none",
+        "libero_10-t01-i020-s0-none",
+        "libero_10-t01-i021-s0-none",
+        "libero_10-t01-i022-s0-none",
+        "libero_10-t01-i023-s0-none",
+        "libero_10-t01-i024-s0-none",
+        "libero_10-t02-i020-s0-none",
+        "libero_10-t02-i021-s0-none",
+        "libero_10-t02-i022-s0-none",
+        "libero_10-t02-i023-s0-none",
+        "libero_10-t02-i024-s0-none",
+        "libero_10-t03-i020-s0-none",
+        "libero_10-t03-i021-s0-none",
+        "libero_10-t03-i022-s0-none",
+        "libero_10-t03-i023-s0-none",
+        "libero_10-t03-i024-s0-none",
+        "libero_10-t04-i020-s0-none",
+        "libero_10-t04-i021-s0-none",
+        "libero_10-t04-i022-s0-none",
+        "libero_10-t04-i023-s0-none",
+        "libero_10-t04-i024-s0-none",
+        "libero_10-t05-i020-s0-none",
+        "libero_10-t05-i021-s0-none",
+        "libero_10-t05-i022-s0-none",
+        "libero_10-t05-i023-s0-none",
+        "libero_10-t05-i024-s0-none",
+        "libero_10-t06-i020-s0-none",
+        "libero_10-t06-i021-s0-none",
+        "libero_10-t06-i022-s0-none",
+        "libero_10-t06-i023-s0-none",
+        "libero_10-t06-i024-s0-none",
+        "libero_10-t07-i020-s0-none",
+        "libero_10-t07-i021-s0-none",
+        "libero_10-t07-i022-s0-none",
+        "libero_10-t07-i023-s0-none",
+        "libero_10-t07-i024-s0-none",
+        "libero_10-t08-i020-s0-none",
+        "libero_10-t08-i021-s0-none",
+        "libero_10-t08-i022-s0-none",
+        "libero_10-t08-i023-s0-none",
+        "libero_10-t08-i024-s0-none",
+        "libero_10-t09-i020-s0-none",
+        "libero_10-t09-i021-s0-none",
+        "libero_10-t09-i022-s0-none",
+        "libero_10-t09-i023-s0-none",
+        "libero_10-t09-i024-s0-none"
+      ]
+    },
+    {
+      "dir": "outputs/20261006T013708Z-adbd165-yohj5wxbp2jxj2",
+      "config": {
+        "out_dir": "outputs/baseline_rerun_a",
+        "tasks": [
+          8
+        ],
+        "init_states": [
+          16,
+          17,
+          18,
+          19
+        ],
+        "suite": "libero_10",
+        "seed": 0,
+        "policy": "openvla",
+        "mode": "logged",
+        "max_steps": null,
+        "video": true,
+        "allow_dirty": false,
+        "camera_size": 256,
+        "checkpoint": "openvla/openvla-7b-finetuned-libero-10",
+        "unnorm_key": "libero_10",
+        "center_crop": true
+      },
+      "environment": {
+        "git": {
+          "harness": {
+            "sha": "adbd165e7cdb9de6b6d3528b590cc0cd1ecb0d2f",
+            "dirty": false
+          },
+          "openvla": {
+            "sha": "c8f03f48af692657d3060c19588038c7220e9af9",
+            "dirty": false
+          },
+          "LIBERO": {
+            "sha": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+            "dirty": false
+          }
+        },
+        "versions": {
+          "torch": "2.2.0+cu121",
+          "transformers": "4.40.1",
+          "numpy": "1.26.4",
+          "mujoco": "2.3.7",
+          "robosuite": "1.4.1",
+          "h5py": "3.16.0",
+          "imageio": "2.37.4",
+          "tensorflow": "2.15.0"
+        },
+        "gpu": "NVIDIA GeForce RTX 4090"
+      },
+      "episode_ids": [
+        "libero_10-t08-i016-s0-none",
+        "libero_10-t08-i017-s0-none",
+        "libero_10-t08-i018-s0-none",
+        "libero_10-t08-i019-s0-none"
+      ]
+    },
+    {
+      "dir": "outputs/20261006T013709Z-adbd165-yohj5wxbp2jxj2",
+      "config": {
+        "out_dir": "outputs/baseline_rerun_b",
+        "tasks": [
+          9
+        ],
+        "init_states": [
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "suite": "libero_10",
+        "seed": 0,
+        "policy": "openvla",
+        "mode": "logged",
+        "max_steps": null,
+        "video": true,
+        "allow_dirty": false,
+        "camera_size": 256,
+        "checkpoint": "openvla/openvla-7b-finetuned-libero-10",
+        "unnorm_key": "libero_10",
+        "center_crop": true
+      },
+      "environment": {
+        "git": {
+          "harness": {
+            "sha": "adbd165e7cdb9de6b6d3528b590cc0cd1ecb0d2f",
+            "dirty": false
+          },
+          "openvla": {
+            "sha": "c8f03f48af692657d3060c19588038c7220e9af9",
+            "dirty": false
+          },
+          "LIBERO": {
+            "sha": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+            "dirty": false
+          }
+        },
+        "versions": {
+          "torch": "2.2.0+cu121",
+          "transformers": "4.40.1",
+          "numpy": "1.26.4",
+          "mujoco": "2.3.7",
+          "robosuite": "1.4.1",
+          "h5py": "3.16.0",
+          "imageio": "2.37.4",
+          "tensorflow": "2.15.0"
+        },
+        "gpu": "NVIDIA GeForce RTX 4090"
+      },
+      "episode_ids": [
+        "libero_10-t09-i015-s0-none",
+        "libero_10-t09-i016-s0-none",
+        "libero_10-t09-i017-s0-none",
+        "libero_10-t09-i018-s0-none",
+        "libero_10-t09-i019-s0-none"
+      ]
+    }
+  ]
+}

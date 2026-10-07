@@ -1,0 +1,56 @@
+{
+  "config": {
+    "suite": "libero_10",
+    "seed": 0,
+    "policy": "openvla",
+    "mode": "logged",
+    "max_steps": null,
+    "video": true,
+    "camera_size": 256,
+    "checkpoint": "openvla/openvla-7b-finetuned-libero-10",
+    "unnorm_key": "libero_10",
+    "center_crop": true,
+    "tasks": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "init_states": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "environment": {
+    "merged_shards": 7
+  }
+}
