@@ -146,7 +146,7 @@ Outcome flips and first-divergence steps against seed 0 give the seed-to-seed no
 After the baseline (all local, on the pulled or archived run directory):
 
 ```bash
-python scripts/summarize_run.py <run>                 # unsharded runs only; a merge writes it
+python scripts/summarize_run.py <run>                 # only to re-summarize; runs and merges write it
 python scripts/pilot_report.py <run> --stage-a <stage_a>/stage_a_report.json   # pooled stats only
 python scripts/select_labeling.py <run> --n 20 --seed 0  # blind draw + empty label CSV
 ```
