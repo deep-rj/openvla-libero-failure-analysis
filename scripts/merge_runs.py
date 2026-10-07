@@ -6,7 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from harness import merge_runs
+from harness import merge_runs, summary
 from harness.cli import parse_indices
 
 
@@ -42,6 +42,8 @@ def main() -> int:
             by_init.setdefault(init, []).append(task)
         for init, tasks in sorted(by_init.items()):
             print(f"  init state {init}: tasks {tasks}")
+    print()
+    print(summary.render_markdown(report["summary"]))
     return 0
 
 

@@ -118,7 +118,8 @@ python scripts/merge_runs.py <shard>... --out outputs/baseline --tasks 0:10 --in
 The merge refuses duplicate episodes, shards with different run settings, and shards from
 different commits (`--allow-mixed-commits` overrides the last). It lists any missing
 (task, init state) pairs, which become the next chunk. Sources are only read; the merged
-directory records each shard's environment in `merged_from.json`.
+directory records each shard's environment in `merged_from.json` and gets its
+`summary.md/json` (success rate with n and Wilson interval, s/episode) from the merge itself.
 
 Cross-pod determinism, free from the baseline: the shard covering init states 0 and 1 reruns
 the eight Stage A episodes on a different host.
@@ -145,7 +146,7 @@ Outcome flips and first-divergence steps against seed 0 give the seed-to-seed no
 After the baseline (all local, on the pulled or archived run directory):
 
 ```bash
-python scripts/summarize_run.py <run>                 # success rate with n and Wilson interval, s/episode
+python scripts/summarize_run.py <run>                 # unsharded runs only; a merge writes it
 python scripts/pilot_report.py <run> --stage-a <stage_a>/stage_a_report.json   # pooled stats only
 python scripts/select_labeling.py <run> --n 20 --seed 0  # blind draw + empty label CSV
 ```

@@ -5,7 +5,7 @@ import json
 import shutil
 from pathlib import Path
 
-from harness import manifest
+from harness import manifest, summary
 
 # Shards legitimately differ in what they ran and where they wrote it.
 _SHARD_SPECIFIC = {"out_dir", "tasks", "init_states", "allow_dirty"}
@@ -126,4 +126,9 @@ def merge_runs(
         if expected_tasks is not None and expected_init_states is not None
         else set()
     )
-    return {"n_episodes": len(rows), "missing": sorted(expected - present), "out_dir": str(out)}
+    return {
+        "n_episodes": len(rows),
+        "missing": sorted(expected - present),
+        "out_dir": str(out),
+        "summary": summary.write_outputs(out),
+    }
