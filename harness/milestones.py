@@ -20,7 +20,7 @@ class GraspParams:
 
 @dataclass(frozen=True)
 class MilestoneParams:
-    debounce: int = 1
+    debounce: int = 10  # steps placed after release; 0.5 s at 20 Hz
     engaged_fraction: float = 0.05
     partial_fraction: float = 0.5
     grasp: GraspParams = GraspParams()

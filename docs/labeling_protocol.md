@@ -161,8 +161,9 @@ init regions are not receptacles. Placements elsewhere (floor, basket rim) go in
 
 Threshold notes:
 
-- **N (steps placed after release).** On the baseline, N ∈ {1, 5, 10, 20} gives identical
-  `(k, phase)` for all 120 failures once placement requires release.
+- **N (steps placed after release) = 10** (0.5 s): a released object that slides or tips does
+  so within about half a second (a released moka pot settled within 14 steps). On the
+  baseline, N ∈ {1, 5, 10, 20} gives identical `(k, phase)` for all 120 failures.
 - **Stall speed v.** Set above the end-effector jitter measured over the 10 `WAIT` steps, when
   the arm is commanded to hold still.
 
@@ -195,5 +196,5 @@ under gravity. Step indices keep counting from 0 everywhere; the first policy st
 
 ## Open (the human decides)
 
-- Threshold values (N, X, D, v, T, W, R, C, ε), on the pilot 20.
+- Threshold values (X, D, v, T, W, R, C, ε), on the pilot 20.
 - The mechanism categories and their definitions, after the pilot labels.
