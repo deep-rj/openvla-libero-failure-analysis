@@ -189,7 +189,10 @@ recovery barrier (computed where possible, e.g. `regrasp_count`), then the end s
   with a fixed phrase so it can be counted, e.g. `post: hover` (slow motion confined near one
   spot, neither stopped nor oscillating), `post: stall`, or `post: premature close` (a fixture
   moved toward closed before its prerequisite holds, short of a full close), or `post: jammed`
-  (a carried object stays pinned against an obstacle while the arm keeps moving). This applies even when a flag covers
+  (a carried object stays pinned against an obstacle while the arm keeps moving).
+- Behavior before the initiator starts with `pre:`, reusing the `post:` phrases (`pre: stall`);
+  an error the episode recovered from is `pre: recovered <error>` (`pre: recovered miss`).
+  Only failures are labeled, so these counts say nothing about recovery rates. This applies even when a flag covers
   the behavior, since flags do not record when it happened relative to the initiator.
 
 - **Observable behavior, not intent.** "Seemed to be attempting recovery" is not a label.
@@ -226,18 +229,19 @@ under gravity. Step indices keep counting from 0 everywhere; the first policy st
 
 Logged as made during the pilot; earlier episodes are re-passed when a change affects them.
 
-- Episode 1 (`t00-i013`): mechanism is the initiator of the failure sequence (event tree), not
+- `t00-i013`: mechanism is the initiator of the failure sequence (event tree), not
   the error that made success unreachable; `no_return_step` is state-based with `none`; onset
   tolerance ±10 steps; `mechanism_notes` initiator only, post-initiator behavior in `notes` with
   `post:` phrases; `stalled` means stopped; `dither` renamed `oscillation`.
-- Episode 2 (`t00-i024`): `post:` phrases also cover flagged behavior (`post: stall`); a grasp
+- `t00-i024`: `post:` phrases also cover flagged behavior (`post: stall`); a grasp
   is `perception` when the target is not between the fingers at the bottom of the descent.
-- Episode 3 (`t02-i009`): the grasp target is the part meant to be grasped (pot handle); a
+- `t02-i009`: the grasp target is the part meant to be grasped (pot handle); a
   topple is not a no-return point; `post: stall` is judged on the arm, gripper motion aside.
-- Episode 4 (`t03-i009`): `post: premature close` for a partial close of an empty drawer or door;
+- `t03-i009`: `post: premature close` for a partial close of an empty drawer or door;
   `order_violation` covers only a full close.
-- Episode 5 (`t09-i015`): `post: jammed`; behavior before the initiator (e.g. a long pause
-  before a lift) goes in `notes` as free text, untagged until it recurs.
+- `t09-i015`: `post: jammed`.
+- `t01-i010`: `pre:` phrases for behavior before the initiator, `pre: recovered <error>` for
+  recovered errors; applied to `t09-i015` (`pre: stall`).
 
 ## Open (the human decides)
 
