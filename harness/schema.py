@@ -158,6 +158,30 @@ def write_episode(path, steps: list[StepRecord], metadata: dict) -> None:
         tmp.unlink(missing_ok=True)
 
 
+# Columns that come from the simulator; reading only these keeps labeling blind to the model.
+WORLD_COLUMNS = (
+    "step_idx",
+    "is_wait_step",
+    "sim_state",
+    "object_poses",
+    "fixture_joint_qpos",
+    "eef_pos",
+    "eef_quat_raw",
+    "gripper_qpos",
+)
+
+
+def read_world_columns(path) -> tuple[dict[str, np.ndarray], dict]:
+    with h5py.File(path, "r") as f:
+        version = f.attrs["schema_version"]
+        if version != SCHEMA_VERSION:
+            raise ValueError(f"schema_version {version} unsupported (expected {SCHEMA_VERSION})")
+        metadata = json.loads(f.attrs["metadata"])
+        arrays = {name: f[name][()] for name in WORLD_COLUMNS}
+    metadata["schema_version"] = int(version)
+    return arrays, metadata
+
+
 def read_episode(path) -> tuple[dict[str, np.ndarray], dict]:
     with h5py.File(path, "r") as f:
         version = f.attrs["schema_version"]

@@ -57,16 +57,27 @@ subgoal it depends on also counts at that step.
   subgoals. Subgoals that each held at some point, but never together, do not add up.
 - Only goal objects in their goal regions advance `k`. A goal object in a different region is
   `wrong_target`, never a milestone.
+- A success episode has `k` equal to the number of subgoals by definition. The trace logs the
+  state before each action, so the state the succeeding action produced is never recorded.
 
 ### Phases
 
-- **grasped:** the object is held: off its support surface, fingers stopped at the object's
-  width (not fully shut), moving with the end effector.
-- **carried:** grasped, and the object's horizontal (xy) position lies inside the target
-  region's footprint: the target predicate without its height condition.
-- **contacted** (fixtures): the gripper is touching the drawer front, door or knob.
-- **partial** (fixtures): the joint has moved at least X% of the way from its initial value
-  to the goal threshold.
+- **grasped:** the object is lifted above its settled height, near the end effector, the
+  fingers are not open, and its offset from the end effector stays fixed over a short window.
+  Finger width alone does not separate a grasp from an empty close: a bowl held by its rim
+  leaves the fingers about 4 mm apart.
+- **carried:** grasped, and the object's horizontal (xy) position passes the xy part of the
+  target predicate: inside a region's box, or within 3 cm of a target object's origin (the
+  radius LIBERO's object-on-object `On` uses, so off-center on a plate does not count).
+- **engaged** (fixtures): the joint has moved at least 5% of the way from its settled value to
+  the goal threshold.
+- **partial** (fixtures): at least X% of the way.
+
+Fixture phases come from joint travel, not gripper contact. Contact is checked only at control
+steps (every 25 physics substeps), and a push makes and breaks contact within a step: a
+drawer closing at a steady 7 mm/step shows no robot contact at any logged state.
+`closure_fraction` (the most travel achieved, 0 to 1) is a computed column for each fixture
+subgoal, so the buckets can be re-cut later.
 
 Placement is decided by the predicate, not by how it looks; video is used only for what the
 predicates cannot express.
@@ -77,14 +88,14 @@ predicates cannot express.
 |---|---|---|---|
 | 0 | soup `In` basket, tomato sauce `In` basket | none | grasped / carried |
 | 1 | cream cheese `In` basket, butter `In` basket | none | grasped / carried |
-| 2 | stove `Turnon`, moka pot `On` stove cook region | none ⚑ | knob: contacted / partial · pot: grasped / carried |
-| 3 | bowl `In` bottom drawer, drawer `Close` | `Close` after `In` | bowl: grasped / carried · drawer: contacted / partial |
+| 2 | stove `Turnon`, moka pot `On` stove cook region | none ⚑ | knob: engaged / partial · pot: grasped / carried |
+| 3 | bowl `In` bottom drawer, drawer `Close` | `Close` after `In` | bowl: grasped / carried · drawer: engaged / partial |
 | 4 | white mug `On` left plate, yellow-white mug `On` right plate | none | grasped / carried |
 | 5 | book `In` caddy back compartment | — | grasped / carried |
 | 6 | white mug `On` plate, pudding `On` region right of plate | none | grasped / carried |
 | 7 | soup `In` basket, cream cheese `In` basket | none | grasped / carried |
 | 8 | pot 1 `On` stove, pot 2 `On` stove; stove `Turnon` (true at init) | none ⚑ | grasped / carried |
-| 9 | yellow-white mug `In` microwave, door `Close` | `Close` after `In` | mug: grasped / carried · door: contacted / partial |
+| 9 | yellow-white mug `In` microwave, door `Close` | `Close` after `In` | mug: grasped / carried · door: engaged / partial |
 
 A subgoal depends on another when completing it first would require undoing it to succeed
 (closing an empty drawer or microwave). Dependencies come from the physical scene, not the
@@ -120,7 +131,7 @@ rationale, swept as a sensitivity check (not searched), and frozen with the codi
 | Flag | Definition | Threshold(s) |
 |---|---|---|
 | `wrong_object` | an object not named in the goal is grasped and moved more than D cm | D |
-| `wrong_target` | a goal object, released and at rest, satisfies an `In`/`On` predicate against a declared region that is not its goal region | rest speed, dwell |
+| `wrong_target` | a goal object, released and at rest, satisfies its goal predicate against another receptacle | rest speed, dwell |
 | `regression` | a subgoal counted in `k` later stops holding (debounced) | N |
 | `order_violation` | a dependent subgoal holds before its prerequisite does | N |
 | `dropped` | a grasped object leaves the grasp while not over any declared region | — |
@@ -133,8 +144,10 @@ rationale, swept as a sensitivity check (not searched), and frozen with the codi
 | `workspace_limit` | a joint within ε of its limit, or the end effector at the reach boundary | ε |
 | `truncated_mid_action` | at the step cap, an object is grasped or a goal object or fixture is in motion | rest speed |
 
-`wrong_target` sees only regions declared in the BDDL file; placements elsewhere (floor,
-basket rim) go in `notes`, so `wrong_target = 0` does not mean "never misplaced".
+Receptacles are the BDDL regions attached to an object or fixture (caddy compartments, other
+drawers, the microwave top) plus every goal target (the other plate). Table regions such as
+init regions are not receptacles. Placements elsewhere (floor, basket rim) go in `notes`, so
+`wrong_target = 0` does not mean "never misplaced".
 
 Threshold notes:
 
