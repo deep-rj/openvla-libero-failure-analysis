@@ -189,7 +189,7 @@ recovery barrier (computed where possible, e.g. `regrasp_count`), then the end s
   with a fixed phrase so it can be counted, e.g. `post: hover` (slow motion confined near one
   spot, neither stopped nor oscillating), `post: stall`, or `post: premature close` (a fixture
   moved toward closed before its prerequisite holds, short of a full close), or `post: jammed`
-  (a carried object stays pinned against an obstacle while the arm keeps moving).
+  (the arm or a carried object stays pinned against an obstacle while the arm keeps moving).
 - Behavior before the initiator starts with `pre:`, reusing the `post:` phrases (`pre: stall`);
   an error the episode recovered from is `pre: recovered <error>` (`pre: recovered miss`).
   Only failures are labeled, so these counts say nothing about recovery rates. This applies even when a flag covers
@@ -242,6 +242,8 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
 - `t09-i015`: `post: jammed`.
 - `t01-i010`: `pre:` phrases for behavior before the initiator, `pre: recovered <error>` for
   recovered errors; applied to `t09-i015` (`pre: stall`).
+- `t01-i022`: recovered means the robot resumed progress toward the goal, not that the
+  obstruction went away; `post: jammed` covers the arm itself, not only a carried object.
 
 ## Open (the human decides)
 
