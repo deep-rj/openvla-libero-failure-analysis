@@ -38,7 +38,7 @@ def main() -> None:
             )
             all_hold = extracted["goal_holds"].all(axis=1)
             if info["final_success"]:
-                # Live checks read poses one substep stale, so replay may see the goal one step early.
+                # The live check reads poses one substep stale; replay can lead it by a step.
                 all_hold = all_hold[:-1]
             if all_hold.any():
                 problems.append(f"{info['episode_id']}: every subgoal holds at a logged step")

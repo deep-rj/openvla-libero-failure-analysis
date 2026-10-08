@@ -118,6 +118,42 @@ def test_object_not_following_the_end_effector_is_not_grasped():
     assert not ms.grasped(obj, eef, width, settled_z=0.9)[45:].any()
 
 
+def test_still_object_next_to_a_still_gripper_is_not_grasped():
+    # An elevated object resting near a motionless gripper keeps a fixed offset trivially.
+    n_steps = 40
+    obj = np.tile([0.0, 0.0, 0.95], (n_steps, 1))
+    eef = np.tile([0.0, 0.05, 1.0], (n_steps, 1))
+    width = np.full(n_steps, 0.04)
+    assert not ms.grasped(obj, eef, width, settled_z=0.9).any()
+
+
+def test_still_object_next_to_a_slowly_moving_gripper_is_not_grasped():
+    n_steps = 40
+    obj = np.tile([0.0, 0.0, 1.05], (n_steps, 1))
+    eef = np.tile([0.0, 0.10, 1.0], (n_steps, 1))
+    eef[:, 2] -= 0.003 * np.arange(n_steps)
+    width = np.full(n_steps, 0.04)
+    assert not ms.grasped(obj, eef, width, settled_z=0.9).any()
+
+
+def test_grasp_persists_while_the_end_effector_pauses():
+    obj, eef, width = _carry_trajectory()
+    obj[45:] = obj[45]
+    eef[45:] = eef[45]
+    held = ms.grasped(obj, eef, width, settled_z=0.9)
+    assert held[45:].all()
+
+
+def test_opening_the_fingers_ends_the_grasp():
+    obj, eef, width = _carry_trajectory()
+    obj[45:] = obj[45]
+    eef[45:] = eef[45]
+    width[50:] = 0.08
+    held = ms.grasped(obj, eef, width, settled_z=0.9)
+    assert held[45:50].all()
+    assert not held[50:].any()
+
+
 def test_travel_fraction_measures_from_the_settled_value():
     q = np.array([-0.20] * 10 + [-0.15, -0.10, -0.004, 0.001])
     frac = ms.travel_fraction(q, threshold=0.0, start=10)
@@ -181,3 +217,47 @@ def test_success_sets_k_to_all_subgoals():
     q = np.full(60, -0.15)
     extracted, info = _drawer_episode([(20, 59)], q, success=True)
     assert ms.compute_milestone(extracted, info).k == 2
+
+
+def _place_episode(holds_from, holds_to, release_at, n_steps=80):
+    """One place subgoal: carried from step 30, released at `release_at`; `On` holds in a span."""
+    obj, eef, width = _carry_trajectory(n_steps=n_steps, lift_at=30)
+    obj[release_at:] = obj[release_at - 1]
+    eef[release_at:] = eef[release_at - 1] + [0.0, 0.0, 0.05]
+    width[release_at:] = 0.08
+    holds = np.zeros((n_steps, 1), dtype=bool)
+    holds[holds_from : holds_to + 1, 0] = True
+    extracted = {
+        "goal_holds": holds,
+        "over_target": holds.copy(),
+        "fixture_q": np.full((n_steps, 1), np.nan),
+        "object_pos": obj[:, None, :],
+        "eef_pos": eef,
+        "gripper_qpos": np.stack([width / 2, -width / 2], axis=1),
+    }
+    info = {
+        "final_success": False,
+        "num_wait_steps": WAIT,
+        "subgoals": [
+            {"kind": "place", "threshold": float("nan"), "depends_on": [], "object_index": 0}
+        ],
+    }
+    return extracted, info
+
+
+def test_touchdown_while_gripped_that_slides_off_is_not_placed():
+    extracted, info = _place_episode(holds_from=40, holds_to=60, release_at=61)
+    m = ms.compute_milestone(extracted, info, ms.MilestoneParams(debounce=10))
+    assert m.k == 0
+
+
+def test_released_object_that_stays_is_placed_after_n_steps():
+    extracted, info = _place_episode(holds_from=40, holds_to=79, release_at=45)
+    m = ms.compute_milestone(extracted, info, ms.MilestoneParams(debounce=10))
+    assert (m.k, m.k_step) == (1, 54)
+
+
+def test_released_object_that_leaves_within_n_steps_is_not_placed():
+    extracted, info = _place_episode(holds_from=40, holds_to=50, release_at=45)
+    m = ms.compute_milestone(extracted, info, ms.MilestoneParams(debounce=10))
+    assert m.k == 0

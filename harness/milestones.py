@@ -15,6 +15,7 @@ class GraspParams:
     open_width_m: float = 0.07  # finger width at or above this is open
     window: int = 3  # steps over which the object must move with the end effector
     co_move_m: float = 0.01  # max change in object-to-EEF offset over the window
+    move_m: float = 0.005  # min object travel over the window; still objects keep a fixed offset
 
 
 @dataclass(frozen=True)
@@ -79,17 +80,21 @@ def grasped(
     settled_z: float,
     params: GraspParams = DEFAULT_GRASP,
 ) -> np.ndarray:
-    """[T]: lifted, near the end effector, fingers not open, and moving with the end effector."""
+    """[T]: starts when a lifted object moves with the end effector with fingers not open;
+    continues while the fingers stay closed and the offset stays fixed."""
     offset = obj_pos - eef_pos
     lifted = obj_pos[:, 2] > settled_z + params.lift_m
     near = np.linalg.norm(offset, axis=1) < params.near_m
     closed = finger_width < params.open_width_m
-    co_moving = np.zeros(len(obj_pos), dtype=bool)
+    held = np.zeros(len(obj_pos), dtype=bool)
     w = params.window
     for t in range(w, len(obj_pos)):
         drift = np.linalg.norm(offset[t - w : t + 1] - offset[t], axis=1).max()
-        co_moving[t] = drift < params.co_move_m
-    return lifted & near & closed & co_moving
+        moved = np.linalg.norm(obj_pos[t] - obj_pos[t - w]) >= params.move_m
+        onset = lifted[t] and drift < params.co_move_m and moved
+        kept = held[t - 1] and np.linalg.norm(offset[t] - offset[t - 1]) < params.co_move_m
+        held[t] = near[t] and closed[t] and (onset or kept)
+    return held
 
 
 def finger_width(gripper_qpos: np.ndarray) -> np.ndarray:
@@ -105,16 +110,24 @@ def travel_fraction(q: np.ndarray, threshold: float, start: int) -> np.ndarray:
     return np.clip((q - q0) / span, 0.0, 1.0)
 
 
-def _phase_levels(extracted, info, params: MilestoneParams, start: int) -> np.ndarray:
-    """[T, G] phase level per subgoal: 0 none, 1 grasped/engaged, 2 carried/partial."""
-    subgoals = info["subgoals"]
+def held_goal_objects(extracted, info, params: MilestoneParams, start: int) -> np.ndarray:
+    """[T, G]: the subgoal's object is grasped; always false for fixture subgoals."""
     width = finger_width(extracted["gripper_qpos"])
-    levels = np.zeros(extracted["goal_holds"].shape, dtype=int)
-    for g, sub in enumerate(subgoals):
+    held = np.zeros(extracted["goal_holds"].shape, dtype=bool)
+    for g, sub in enumerate(info["subgoals"]):
         if sub["kind"] == "place":
             obj = extracted["object_pos"][:, sub["object_index"]]
-            held = grasped(obj, extracted["eef_pos"], width, obj[start, 2], params.grasp)
-            levels[:, g] = np.where(held & extracted["over_target"][:, g], 2, held.astype(int))
+            held[:, g] = grasped(obj, extracted["eef_pos"], width, obj[start, 2], params.grasp)
+    return held
+
+
+def _phase_levels(extracted, info, params: MilestoneParams, start: int, held) -> np.ndarray:
+    """[T, G] phase level per subgoal: 0 none, 1 grasped/engaged, 2 carried/partial."""
+    levels = np.zeros(extracted["goal_holds"].shape, dtype=int)
+    for g, sub in enumerate(info["subgoals"]):
+        if sub["kind"] == "place":
+            over = held[:, g] & extracted["over_target"][:, g]
+            levels[:, g] = np.where(over, 2, held[:, g].astype(int))
         else:
             frac = np.nan_to_num(
                 travel_fraction(extracted["fixture_q"][:, g], sub["threshold"], start)
@@ -134,10 +147,13 @@ def compute_milestone(extracted, info, params: MilestoneParams = DEFAULT_PARAMS)
         return Milestone(n_goals, "none", None)
     start = info["num_wait_steps"]
     deps = [tuple(s["depends_on"]) for s in subgoals]
-    count = counting(debounced(extracted["goal_holds"], params.debounce, start), deps)
+    held = held_goal_objects(extracted, info, params, start)
+    # A placement counts only once released: LIBERO's predicate alone accepts a gripped touchdown.
+    placed = extracted["goal_holds"] & ~held
+    count = counting(debounced(placed, params.debounce, start), deps)
     k, k_step = max_simultaneous(count)
 
-    levels = _phase_levels(extracted, info, params, start)
+    levels = _phase_levels(extracted, info, params, start, held)
     at_k = count.sum(axis=1) == k
     at_k[:start] = False
     best_level, best_kind = 0, "place"

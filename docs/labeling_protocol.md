@@ -36,8 +36,7 @@ Anything the simulator can decide is computed; hand labels cover only judgment.
 
 - **Computed** (pure functions over world-state fields extracted from the replayed
   `sim_state`): `k_completed`, `phase` and the world-state flags below. Predicates are
-  LIBERO's own (`libero/libero/envs/predicates`), so the milestone and LIBERO's success check
-  use the same definitions.
+  LIBERO's own (`libero/libero/envs/predicates`); placement adds a release condition (below).
 - **Hand-labeled from video:** `mechanism`, `mechanism_notes`, the two onset steps,
   `no_onset`, `notes`, and `computed_check`: the computed columns that disagree with the
   video, with a reason, or empty. Computed columns are validated this way on the pilot.
@@ -47,8 +46,16 @@ Anything the simulator can decide is computed; hand labels cover only judgment.
 ### Definition
 
 Each task has a set of subgoals (its BDDL goal predicates) and a dependency table. At each
-step, a subgoal **counts** if its predicate has held for the last N steps (debounce) and every
-subgoal it depends on also counts at that step.
+step, a subgoal **counts** if it has been **placed** for the last N steps and every subgoal it
+depends on also counts at that step. For a place subgoal, placed means its predicate holds
+and its object is not grasped; for a fixture subgoal, its predicate holds.
+
+The release condition departs from LIBERO's success check on purpose. LIBERO evaluates the
+predicate at one instant with no release or stability test, so a touchdown while still gripped
+satisfies it; in the baseline, 70 of 130 successes end with a goal object still gripped (0 of
+25 in tasks 3 and 9, where the last subgoal is closing). `k` measures what the robot completed;
+LIBERO's success remains the outcome metric, and a success has `k` equal to the number of
+subgoals by definition.
 
 - `k_completed` = the maximum over steps of the number of counting subgoals. Highest reached,
   not end state: later undoing is recorded in `regression`, and `k` never decreases.
@@ -62,10 +69,13 @@ subgoal it depends on also counts at that step.
 
 ### Phases
 
-- **grasped:** the object is lifted above its settled height, near the end effector, the
-  fingers are not open, and its offset from the end effector stays fixed over a short window.
-  Finger width alone does not separate a grasp from an empty close: a bowl held by its rim
-  leaves the fingers about 4 mm apart.
+- **grasped:** starts when the object, lifted above its settled height and near the end
+  effector with the fingers not open, moves at least 5 mm over a short window while its offset
+  from the end effector stays fixed. It continues while the fingers stay closed and the offset
+  stays fixed, including while the arm pauses. The object itself must move: a still object
+  next to a moving or still gripper keeps a near-fixed offset trivially. Finger width alone
+  does not separate a grasp from an empty close: a bowl held by its rim leaves the fingers
+  about 4 mm apart.
 - **carried:** grasped, and the object's horizontal (xy) position passes the xy part of the
   target predicate: inside a region's box, or within 3 cm of a target object's origin (the
   radius LIBERO's object-on-object `On` uses, so off-center on a plate does not count).
@@ -151,9 +161,8 @@ init regions are not receptacles. Placements elsewhere (floor, basket rim) go in
 
 Threshold notes:
 
-- **Debounce N.** LIBERO's success check has zero debounce: the episode ends on the first step
-  all goal predicates hold. N guards against contact flicker in `On` and objects falling
-  through an `In` region; candidates N ∈ {1, 5, 10, 20} at 20 Hz.
+- **N (steps placed after release).** On the baseline, N ∈ {1, 5, 10, 20} gives identical
+  `(k, phase)` for all 120 failures once placement requires release.
 - **Stall speed v.** Set above the end-effector jitter measured over the 10 `WAIT` steps, when
   the arm is commanded to hold still.
 
