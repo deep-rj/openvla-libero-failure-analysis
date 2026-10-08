@@ -72,7 +72,7 @@ def test_selection_ignores_everything_but_outcome_and_task():
     )
 
 
-def test_the_template_has_the_agreed_columns_and_only_episode_ids_filled(tmp_path):
+def test_the_template_has_only_the_hand_labeled_columns_and_episode_ids_filled(tmp_path):
     path = tmp_path / "labels.csv"
     labeling.write_label_template(path, ["a", "b"])
 
@@ -81,17 +81,12 @@ def test_the_template_has_the_agreed_columns_and_only_episode_ids_filled(tmp_pat
     assert list(rows[0]) == labeling.LABEL_COLUMNS
     assert labeling.LABEL_COLUMNS == [
         "episode_id",
-        "k_completed",
-        "phase",
         "mechanism",
         "mechanism_notes",
         "first_error_step",
         "no_return_step",
         "no_onset",
-        "wrong_object",
-        "regression",
-        "stalled",
-        "no_reattempt",
+        "computed_check",
         "notes",
     ]
     assert [r["episode_id"] for r in rows] == ["a", "b"]

@@ -140,19 +140,19 @@ rationale, swept as a sensitivity check (not searched), and frozen with the codi
 
 | Flag | Definition | Threshold(s) |
 |---|---|---|
-| `wrong_object` | an object not named in the goal is grasped and moved more than D cm | D |
-| `wrong_target` | a goal object, released and at rest, satisfies its goal predicate against another receptacle | rest speed, dwell |
-| `regression` | a subgoal counted in `k` later stops holding (debounced) | N |
-| `order_violation` | a dependent subgoal holds before its prerequisite does | N |
-| `dropped` | a grasped object leaves the grasp while not over any declared region | — |
-| `collision_disturbance` | an object that is not grasped moves more than D cm (knocked) | D |
-| `regrasp_count` | number of grasp onsets on goal objects (integer) | — |
-| `stalled` | end-effector speed below v for at least T s | v, T |
-| `dither` | over a window W, end-effector path length ≥ R × net displacement | W, R |
-| `gripper_chatter` | at least C open/close cycles in a window W with no object between the fingers | C, W |
-| `object_off_table` | a goal object falls below table height | — |
-| `workspace_limit` | a joint within ε of its limit, or the end effector at the reach boundary | ε |
-| `truncated_mid_action` | at the step cap, an object is grasped or a goal object or fixture is in motion | rest speed |
+| `wrong_object` | an object not named in the goal is grasped and moved more than D from its settled pose | D = 2 cm |
+| `wrong_target` | a goal object, released and at rest for a dwell, satisfies its goal predicate against another receptacle | < 1 cm/s for 10 steps |
+| `regression` | a counted subgoal later stops counting for N steps | N |
+| `order_violation` | a dependent subgoal's predicate holds while its prerequisite does not count | N |
+| `dropped` | a goal object is released away from its target and falls at least 3 cm within 10 steps; setting it down is not a drop | 3 cm, 10 steps |
+| `collision_disturbance` | an object moves more than D while not held; excluded: the 10 steps before a grasp onset (closing fingers drag an object about 2 cm before it lifts), the 10 steps after a release, and motion inside its goal container (a bowl in a closing drawer) | D = 2 cm |
+| `regrasp_count` | grasp onsets on goal objects beyond the first per object (integer) | — |
+| `stalled` | end-effector speed below v for at least 2 s; v = max(3 × median wait-step speed, 5 mm/s) | v, 2 s |
+| `dither` | at least 6 direction reversals of at least 2 cm along one axis within 4 s. A path-to-displacement ratio does not work: reaching down and lifting has a high ratio (it flagged 112 of 130 successes) | 6, 2 cm, 4 s |
+| `gripper_chatter` | at least 3 empty closes (finger width below 2 cm) within 2 s with nothing held | 3, 2 s |
+| `object_off_table` | a goal object at least 5 cm below its settled height | 5 cm |
+| `workspace_limit` | an arm joint within 2% of its range from either limit for 10 steps; gripper fingers excluded. A fully extended arm shows as joint 4 at its upper limit, so no separate reach check | 2%, 10 steps |
+| `truncated_mid_action` | a failure whose last logged step has a goal object grasped, or a goal object or fixture joint moving | 1 cm/s |
 
 Receptacles are the BDDL regions attached to an object or fixture (caddy compartments, other
 drawers, the microwave top) plus every goal target (the other plate). Table regions such as
@@ -164,8 +164,10 @@ Threshold notes:
 - **N (steps placed after release) = 10** (0.5 s): a released object that slides or tips does
   so within about half a second (a released moka pot settled within 14 steps). On the
   baseline, N ∈ {1, 5, 10, 20} gives identical `(k, phase)` for all 120 failures.
-- **Stall speed v.** Set above the end-effector jitter measured over the 10 `WAIT` steps, when
-  the arm is commanded to hold still.
+- **Stall speed v.** Above the end-effector jitter over the 10 `WAIT` steps, when the arm is
+  commanded to hold still, with a 5 mm/s floor.
+- Joint-limit margins are a fraction of each joint's range, not an angle, so they hold for
+  prismatic and revolute joints alike.
 
 ## Mechanism (hand-labeled)
 
@@ -196,5 +198,5 @@ under gravity. Step indices keep counting from 0 everywhere; the first policy st
 
 ## Open (the human decides)
 
-- Threshold values (X, D, v, T, W, R, C, ε), on the pilot 20.
+- Threshold sensitivity on the pilot 20; values above are the defaults.
 - The mechanism categories and their definitions, after the pilot labels.

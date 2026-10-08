@@ -12,19 +12,15 @@ from pathlib import Path
 
 from harness import manifest
 
+# Hand-labeled only; milestone and flags are computed (`scripts/compute_labels.py`).
 LABEL_COLUMNS = [
     "episode_id",
-    "k_completed",
-    "phase",
     "mechanism",
     "mechanism_notes",
     "first_error_step",
     "no_return_step",
     "no_onset",
-    "wrong_object",
-    "regression",
-    "stalled",
-    "no_reattempt",
+    "computed_check",
     "notes",
 ]
 

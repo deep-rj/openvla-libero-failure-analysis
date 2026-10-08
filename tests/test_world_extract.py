@@ -74,3 +74,14 @@ def test_fixtures_are_moved_to_the_logged_poses():
             assert placed[name] == pytest.approx(pose, abs=1e-6)
     finally:
         env.close()
+
+
+def test_arm_joints_are_the_seven_hinges_with_their_ranges():
+    env, _, _, _ = build_env(0)
+    try:
+        joints = world_extract.arm_joints(env.env)
+    finally:
+        env.close()
+    assert [j["name"] for j in joints] == [f"robot0_joint{i}" for i in range(1, 8)]
+    joint4 = joints[3]
+    assert joint4["range"] == pytest.approx([-3.0718, -0.0698], abs=1e-3)

@@ -13,7 +13,7 @@ import numpy as np
 
 from harness import schema
 
-EXTRACTION_VERSION = 2
+EXTRACTION_VERSION = 3
 PLACE_PREDICATES = ("in", "on")
 FIXTURE_PREDICATES = ("close", "turnon")
 # LIBERO's `On` between two objects requires their origins within this xy distance.
@@ -119,6 +119,22 @@ def build_subgoals(inner, object_names) -> list[Subgoal]:
     return subgoals
 
 
+def arm_joints(inner) -> list[dict]:
+    """The arm's joints (gripper fingers excluded), with qpos address and range."""
+    model = inner.sim.model
+    joints = []
+    for name in inner.robots[0].robot_joints:
+        joint_id = model.joint_name2id(name)
+        joints.append(
+            {
+                "name": name,
+                "qpos_addr": int(model.get_joint_qpos_addr(name)),
+                "range": [float(x) for x in model.jnt_range[joint_id]],
+            }
+        )
+    return joints
+
+
 def _xy_over_target(inner, target: str, obj_pos: np.ndarray) -> bool:
     """The xy part of LIBERO's In/On test for `target`: the object is over it, at any height."""
     sim = inner.sim
@@ -183,6 +199,8 @@ def extract_episode(episode_path) -> tuple[dict[str, np.ndarray], dict]:
         over_target = np.zeros((n_steps, n_goals), dtype=bool)
         candidate_holds = np.zeros((n_steps, n_goals, n_cand), dtype=bool)
         fixture_q = np.full((n_steps, n_goals), np.nan)
+        arm = arm_joints(inner)
+        arm_q = np.zeros((n_steps, len(arm)))
         object_pos = np.zeros((n_steps, len(object_names), 3))
 
         for t, state in enumerate(arrays["sim_state"]):
@@ -191,6 +209,7 @@ def extract_episode(episode_path) -> tuple[dict[str, np.ndarray], dict]:
             inner.sim.forward()
             for i, name in enumerate(object_names):
                 object_pos[t, i] = inner.sim.data.body_xpos[inner.obj_body_id[name]]
+            arm_q[t] = [inner.sim.data.qpos[j["qpos_addr"]] for j in arm]
             for g, sub in enumerate(subgoals):
                 goal_holds[t, g] = _eval(inner, sub.predicate)
                 if sub.kind == "place":
@@ -215,6 +234,7 @@ def extract_episode(episode_path) -> tuple[dict[str, np.ndarray], dict]:
         "over_target": over_target,
         "candidate_holds": candidate_holds,
         "fixture_q": fixture_q,
+        "arm_q": arm_q,
     }
     info = {
         "extraction_version": EXTRACTION_VERSION,
@@ -225,6 +245,7 @@ def extract_episode(episode_path) -> tuple[dict[str, np.ndarray], dict]:
         "control_freq_hz": meta["control_freq_hz"],
         "object_names": list(object_names),
         "subgoals": [asdict(s) for s in subgoals],
+        "arm_joints": arm,
     }
     return extracted, info
 
