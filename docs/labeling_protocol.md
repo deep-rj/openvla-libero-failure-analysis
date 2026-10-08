@@ -98,7 +98,7 @@ predicates cannot express.
 |---|---|---|---|
 | 0 | soup `In` basket, tomato sauce `In` basket | none | grasped / carried |
 | 1 | cream cheese `In` basket, butter `In` basket | none | grasped / carried |
-| 2 | stove `Turnon`, moka pot `On` stove cook region | none ⚑ | knob: engaged / partial · pot: grasped / carried |
+| 2 | stove `Turnon`, moka pot `On` stove cook region | none | knob: engaged / partial · pot: grasped / carried |
 | 3 | bowl `In` bottom drawer, drawer `Close` | `Close` after `In` | bowl: grasped / carried · drawer: engaged / partial |
 | 4 | white mug `On` left plate, yellow-white mug `On` right plate | none | grasped / carried |
 | 5 | book `In` caddy back compartment | — | grasped / carried |
@@ -123,11 +123,11 @@ all 50 init states:
 
 ### ⚑ Judgment points to check on video
 
-- **Task 2 order:** whether a pot on the stove blocks the knob. If it does, the pot's `On`
-  depends on `Turnon`.
+- **Task 2 order:** resolved, no dependency. The knob is set into the table surface, clear of
+  the cook region, so a pot on the stove does not block it (from scene geometry; no pot-first
+  episode observed yet).
 - **Task 8 order:** whether the first pot can occupy cook-region space the second needs.
-- **Stove indicator:** whether the burner's appearance changes when on, so the video can
-  confirm `Turnon`.
+- **Stove indicator:** resolved; the coils turn red when on, so the video confirms `Turnon`.
 - **Task 6:** the region right of the plate has no visible boundary; `carried` and placement
   for the pudding are judged from the printout, not the video.
 - **Grasp at 256 px:** where a grasp is ambiguous, use the world-state printout (finger width
@@ -147,8 +147,8 @@ rationale, swept as a sensitivity check (not searched), and frozen with the codi
 | `dropped` | a goal object is released away from its target and falls at least 3 cm within 10 steps; setting it down is not a drop | 3 cm, 10 steps |
 | `collision_disturbance` | an object moves more than D while not held; excluded: the 10 steps before a grasp onset (closing fingers drag an object about 2 cm before it lifts), the 10 steps after a release, and motion inside its goal container (a bowl in a closing drawer) | D = 2 cm |
 | `regrasp_count` | grasp onsets on goal objects beyond the first per object (integer) | — |
-| `stalled` | end-effector speed below v for at least 2 s; v = max(3 × median wait-step speed, 5 mm/s) | v, 2 s |
-| `dither` | at least 6 direction reversals of at least 2 cm along one axis within 4 s. A path-to-displacement ratio does not work: reaching down and lifting has a high ratio (it flagged 112 of 130 successes) | 6, 2 cm, 4 s |
+| `stalled` | the arm stops: end-effector speed below v for at least 2 s; v = max(3 × median wait-step speed, 5 mm/s) | v, 2 s |
+| `oscillation` | at least 6 direction reversals of at least 2 cm along one axis within 4 s. A path-to-displacement ratio does not work: reaching down and lifting has a high ratio (it flagged 112 of 130 successes). Named for what it measures: in control engineering "dither" is a deliberately injected signal, and the robot-learning term for the likely cause, mode switching, is internal to the policy | 6, 2 cm, 4 s |
 | `gripper_chatter` | at least 3 empty closes (finger width below 2 cm) within 2 s with nothing held | 3, 2 s |
 | `object_off_table` | a goal object at least 5 cm below its settled height | 5 cm |
 | `workspace_limit` | an arm joint within 2% of its range from either limit for 10 steps; gripper fingers excluded. A fully extended arm shows as joint 4 at its upper limit, so no separate reach check | 2%, 10 steps |
@@ -171,9 +171,26 @@ Threshold notes:
 
 ## Mechanism (hand-labeled)
 
-`mechanism` is the earliest error that made success unreachable. Starts from perception /
-grounding / control / recovery plus `other`; categories are revised after the pilot. What
-follows the earliest error goes in the flags, not in a second mechanism.
+`mechanism` is the initiating event of the failure sequence: the earliest error the episode
+never recovered from, whether or not success was still physically reachable after it. Starts
+from perception / grounding / control / recovery plus `other`; categories are revised after the
+pilot. What follows the initiator (the failed recovery and the end state) goes in the flags and
+`notes`, not in a second mechanism. A failure is read as an event tree: initiator, then the
+recovery barrier (computed where possible, e.g. `regrasp_count`), then the end state.
+
+- **Decidable from observables.** A category must be distinguishable on video or in world
+  state. A grasp that closes off-center on the right object is `control`; `perception` needs
+  visible evidence such as the arm going to where the object is not. For a grasp: if the target
+  is between the fingers at the bottom of the descent, a miss is `control`; if not, `perception`.
+  The target is the part meant to be grasped (the moka pot's handle, not its body).
+- **`mechanism_notes`** describe the initiator only. Unverified causes are written as
+  `Hypothesis: ...`, never as fact.
+- **`notes`** hold what follows the initiator and anything else. Post-initiator behavior starts
+  with a fixed phrase so it can be counted, e.g. `post: hover` (slow motion confined near one
+  spot, neither stopped nor oscillating), `post: stall`, or `post: premature close` (a fixture
+  moved toward closed before its prerequisite holds, short of a full close), or `post: jammed`
+  (a carried object stays pinned against an obstacle while the arm keeps moving). This applies even when a flag covers
+  the behavior, since flags do not record when it happened relative to the initiator.
 
 - **Observable behavior, not intent.** "Seemed to be attempting recovery" is not a label.
 - **Truncation is a symptom, not a mechanism.** LIBERO has no failure termination; every
@@ -183,6 +200,15 @@ follows the earliest error goes in the flags, not in a second mechanism.
   alone is the budget running out, not a policy error.
 - `first_error_step`, `no_return_step`: the overlay's step index (wait steps included).
   An error from the first policy step (for example heading for a wrong object) has onset 10.
+  Tolerance ±10 steps (0.5 s).
+- `first_error_step` is the onset of the initiator: when the behavior starts, not when the damage
+  becomes visible. A risk factor that successes also show (for example a grasp offset within the
+  successes' range) is not the initiator.
+- `no_return_step` is state-based: the first step at which the world state makes success
+  physically impossible (object off the table or out of reach). `none` if that never happens;
+  running out of steps is not a no-return point. A toppled object is not a no-return point:
+  LIBERO's `On` checks position and contact, not orientation.
+- `no_onset` is `0` or `1`. Leave `notes` blank when there is nothing to add.
 - `no_onset`: no identifiable moment of error (slow but error-free, gradual drift). Its own
   class, excluded from alignment analysis.
 
@@ -196,7 +222,32 @@ under gravity. Step indices keep counting from 0 everywhere; the first policy st
   the spawn poses at step 0.
 - Wait steps supply the end-effector jitter baseline for `stalled`.
 
+## Rule changes
+
+Logged as made during the pilot; earlier episodes are re-passed when a change affects them.
+
+- Episode 1 (`t00-i013`): mechanism is the initiator of the failure sequence (event tree), not
+  the error that made success unreachable; `no_return_step` is state-based with `none`; onset
+  tolerance ±10 steps; `mechanism_notes` initiator only, post-initiator behavior in `notes` with
+  `post:` phrases; `stalled` means stopped; `dither` renamed `oscillation`.
+- Episode 2 (`t00-i024`): `post:` phrases also cover flagged behavior (`post: stall`); a grasp
+  is `perception` when the target is not between the fingers at the bottom of the descent.
+- Episode 3 (`t02-i009`): the grasp target is the part meant to be grasped (pot handle); a
+  topple is not a no-return point; `post: stall` is judged on the arm, gripper motion aside.
+- Episode 4 (`t03-i009`): `post: premature close` for a partial close of an empty drawer or door;
+  `order_violation` covers only a full close.
+- Episode 5 (`t09-i015`): `post: jammed`; behavior before the initiator (e.g. a long pause
+  before a lift) goes in `notes` as free text, untagged until it recurs.
+
 ## Open (the human decides)
 
 - Threshold sensitivity on the pilot 20; values above are the defaults.
 - The mechanism categories and their definitions, after the pilot labels.
+- Flag timing: record when each flag fires (intervals, counts, durations), so pre/post-initiator
+  ordering is computed rather than tagged. Format undecided (interval table, JSON, or count plus
+  interval list). After labeling.
+- `truncated_mid_action` fires on a goal object moving at the cap with the gripper not engaged
+  (`t00-i024`: cans nudged while hovering). Whether to require gripper involvement.
+- The grasp detector misses a handle grasp until the object lifts (`t09-i015`: fingers closed
+  on the mug handle from ~130, counted as held from 356), so `collision_disturbance` fired on
+  the mug creeping in the gripper.
