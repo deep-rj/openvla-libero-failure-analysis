@@ -1,4 +1,4 @@
-episode_id,task_id,n_subgoals,k_completed,phase,k_step,closure_fraction,wrong_object,wrong_target,regression,order_violation,dropped,collision_disturbance,regrasp_count,stalled,dither,gripper_chatter,object_off_table,workspace_limit,truncated_mid_action
+episode_id,task_id,n_subgoals,k_completed,phase,k_step,closure_fraction,wrong_object,wrong_target,regression,order_violation,dropped,collision_disturbance,regrasp_count,stalled,oscillation,gripper_chatter,object_off_table,workspace_limit,truncated_mid_action
 libero_10-t00-i013-s0-none,0,2,0,grasped,,,0,0,0,0,1,1,0,0,0,0,0,0,0
 libero_10-t00-i024-s0-none,0,2,0,none,,,0,0,0,0,0,0,0,1,0,0,0,0,1
 libero_10-t01-i010-s0-none,1,2,0,none,,,0,0,0,0,0,1,0,1,0,0,0,0,0

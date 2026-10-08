@@ -143,24 +143,24 @@ def test_stalled_needs_the_end_effector_still_for_t_seconds():
     assert not flags.stalled(eef[:90], HZ, WAIT, v_min=0.005, seconds=2.0)
 
 
-def test_dither_is_repeated_reversals_within_the_window():
+def test_oscillation_is_repeated_reversals_within_the_window():
     t = np.arange(100)
     eef = _still(100, (0.0, 0.0, 1.0))
     eef[:, 0] = 0.03 * np.sin(t / 2.0)  # a reversal about every 6 steps
-    assert flags.dither(eef, WAIT, window=80, reversals=6, min_travel=0.02)
+    assert flags.oscillation(eef, WAIT, window=80, reversals=6, min_travel=0.02)
 
 
-def test_reaching_down_and_lifting_is_not_dither():
+def test_reaching_down_and_lifting_is_not_oscillation():
     eef = _still(100, (0.0, 0.0, 1.0))
     eef[20:40, 2] = np.linspace(1.0, 0.9, 20)
     eef[40:60, 2] = np.linspace(0.9, 1.0, 20)
-    assert not flags.dither(eef, WAIT, window=80, reversals=6, min_travel=0.02)
+    assert not flags.oscillation(eef, WAIT, window=80, reversals=6, min_travel=0.02)
 
 
-def test_reversals_below_the_travel_threshold_are_not_dither():
+def test_reversals_below_the_travel_threshold_are_not_oscillation():
     eef = _still(100, (0.0, 0.0, 1.0))
     eef[:, 0] = 0.005 * np.sin(np.arange(100) / 2.0)
-    assert not flags.dither(eef, WAIT, window=80, reversals=6, min_travel=0.02)
+    assert not flags.oscillation(eef, WAIT, window=80, reversals=6, min_travel=0.02)
 
 
 def test_gripper_chatter_counts_empty_open_close_cycles():
@@ -237,6 +237,7 @@ def _clean_place_episode(n_steps=120):
 def test_clean_pick_and_place_raises_no_flags():
     extracted, info = _clean_place_episode()
     result = flags.compute_flags(extracted, info)
+    assert "oscillation" in result
     assert result.pop("regrasp_count") == 0
     assert result.pop("stalled")  # the arm rests for the last 3 s
     assert not any(result.values()), result

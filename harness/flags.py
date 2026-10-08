@@ -20,9 +20,9 @@ class FlagParams:
     stall_seconds: float = 2.0
     stall_jitter_factor: float = 3.0
     stall_floor: float = 0.005  # m/s; still, whatever the wait-step jitter
-    dither_seconds: float = 4.0
-    dither_reversals: int = 6
-    dither_min_travel: float = 0.02
+    oscillation_seconds: float = 4.0
+    oscillation_reversals: int = 6
+    oscillation_min_travel: float = 0.02
     chatter_seconds: float = 2.0
     chatter_cycles: int = 3
     off_table_m: float = 0.05
@@ -151,7 +151,7 @@ def _reversal_steps(x: np.ndarray, min_travel: float) -> list[int]:
     return turns
 
 
-def dither(eef_pos, start: int, window: int, reversals: int, min_travel: float) -> bool:
+def oscillation(eef_pos, start: int, window: int, reversals: int, min_travel: float) -> bool:
     """At least `reversals` direction reversals of `min_travel` along one axis within
     `window` steps; a reach down and lift reverses once."""
     for axis in range(eef_pos.shape[1]):
@@ -237,7 +237,7 @@ def compute_flags(
     wait_speed = speed(eef[:start], hz)[1:]
     jitter = float(np.median(wait_speed)) if len(wait_speed) else 0.0
     v_min = max(params.stall_jitter_factor * jitter, params.stall_floor)
-    window = round(params.dither_seconds * hz)
+    window = round(params.oscillation_seconds * hz)
     chatter_window = round(params.chatter_seconds * hz)
     any_held = held.any(axis=1)
 
@@ -279,8 +279,8 @@ def compute_flags(
         ),
         "regrasp_count": sum(regrasp_count(held[start:, o]) for o in goal_objects),
         "stalled": stalled(eef, hz, start, v_min, params.stall_seconds),
-        "dither": dither(
-            eef, start, window, params.dither_reversals, params.dither_min_travel
+        "oscillation": oscillation(
+            eef, start, window, params.oscillation_reversals, params.oscillation_min_travel
         ),
         "gripper_chatter": gripper_chatter(
             width, any_held, start, chatter_window, params.chatter_cycles
