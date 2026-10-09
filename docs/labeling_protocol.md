@@ -257,6 +257,8 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
   successes end with a goal object still gripped (t05 17, t06 15, t02 14).
 - `t08-i006`: `post: miss` for a failed grasp after the initiator, with the rule's reading
   (target between the fingers or not) in prose; mechanism categories are not tags.
+  Goal predicates true at init stay subgoals, as in the BDDL goal (task 8's stove), so task 8
+  failures start at `k` = 1.
 
 ## Open (the human decides)
 
