@@ -255,6 +255,8 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
   was within 3 cm only while gripped (118-141) and off after release (147). Hypothesis: the
   policy rarely needs to release, since LIBERO ends an episode at success; 70 of 130 baseline
   successes end with a goal object still gripped (t05 17, t06 15, t02 14).
+- `t08-i006`: `post: miss` for a failed grasp after the initiator, with the rule's reading
+  (target between the fingers or not) in prose; mechanism categories are not tags.
 
 ## Open (the human decides)
 
