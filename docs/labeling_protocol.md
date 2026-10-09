@@ -257,3 +257,6 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
 - The grasp detector misses a handle grasp until the object lifts (`t09-i015`: fingers closed
   on the mug handle from ~130, counted as held from 356), so `collision_disturbance` fired on
   the mug creeping in the gripper.
+- `stalled`'s threshold (3 × wait-step jitter) can exceed motion visible on video (`t03-i011`:
+  v = 13.5 mm/s; the arm crept within a ~3 cm box for 7 s and was flagged as stopped).
+- `regrasp_count` false positive after a release (`t03-i011`: no second grasp of the bowl).
