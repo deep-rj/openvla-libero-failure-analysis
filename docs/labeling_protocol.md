@@ -59,7 +59,8 @@ subgoals by definition.
 
 - `k_completed` = the maximum over steps of the number of counting subgoals. Highest reached,
   not end state: later undoing is recorded in `regression`, and `k` never decreases.
-- `phase` = the furthest phase toward a next subgoal reached while `k` was at its maximum.
+- `phase` = the furthest phase reached on any subgoal still open when `k` was last at its
+  maximum, whenever that progress was made.
 - A failed episode never has all subgoals counting at once, so `k` is below the number of
   subgoals. Subgoals that each held at some point, but never together, do not add up.
 - Only goal objects in their goal regions advance `k`. A goal object in a different region is
@@ -298,19 +299,24 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
 
 ## Flag defects (fixed before the freeze)
 
-- `truncated_mid_action` fires on a goal object moving at the cap with the gripper not engaged
-  (`t00-i024`: cans nudged while hovering, judged 0). Whether to require gripper involvement;
-  `t09-i020` (mug nudged by a regrab attempt cut off at the cap) was judged 1.
-- The grasp detector misses a handle grasp until the object lifts (`t09-i015`: fingers closed
-  on the mug handle from ~130, counted as held from 356), so `collision_disturbance` fired on
-  the mug creeping in the gripper.
-- `stalled`'s threshold (3 × wait-step jitter) can exceed motion visible on video (`t03-i011`:
-  v = 13.5 mm/s; the arm crept within a ~3 cm box for 7 s and was flagged as stopped).
-- `regrasp_count` false positive after a release (`t03-i011`: no second grasp of the bowl; `t05-i009`: fingers nearly shut against the dropped book counted as held, which also set `truncated_mid_action`). False negative when the object stays supported: a release and
-  regrip with the object resting on the table and plate counts as one hold (`t06-i013`, ~278-285).
-- `phase` only counts progress made while `k` is at its maximum, so a subgoal carried to its
-  target before another subgoal raised `k` reads `none` (`t04-i017`).
-- Grasp detector root cause (shared by the `regrasp_count`, `collision_disturbance` and
-  `truncated_mid_action` items above): onset requires the object lifted 1 cm above its settled
-  table height, which misses grasps before lift and counts objects resting on a plate or the
-  caddy as lifted. Candidate: fingers stopped short of fully closed while the object co-moves.
+- `truncated_mid_action`: fixed. A goal object moving at the cap counts only if the fingers were
+  closed within reach of it in the last 5 s (`t00-i024` never closed near the cans, 0;
+  `t09-i020` closed near the mug 5.0 s before the cap, 1). Any window of 5 s or more gives the
+  same result on the 250 baseline episodes.
+- `collision_disturbance` on a grip before lift: fixed. The detector still needs a lift
+  (`t09-i015`: fingers on the mug handle from ~130, lift at 356), but the unbroken contact run
+  that ends in a grasp onset is excused. 55 -> 45 firings on 250 episodes; the 10 switched
+  episodes were checked on video, none a collision.
+- `stalled`: resolved without a change. The disputed arms (`t03-i011` ~1.9 mm/s, `t06-i013`
+  ~1-2 mm/s) were as still as agreed stalls (`t06-i020`, `t07-i007`); what read as motion was
+  pressing against an obstacle, recorded by `post: jammed`. A threshold cap (8 or 10 mm/s) flips
+  agreed stalls (`t03-i009`, `t08-i010`) and leaves `t03-i011` unchanged. `stalled` means the end
+  effector is nearly stopped, whether or not it presses on something.
+- `regrasp_count`: fixed at the grasp detector. Lift is measured from the object's lowest height
+  over the last 20 steps, not its settled table height, so contact with an object resting on a
+  plate or the caddy is no longer a grasp (`t03-i011`, `t05-i009`, `t06-i020`; 16 other onsets
+  removed, 8 checked on video, none a grasp). Known undercount: a release and regrip while the
+  object stays supported is one hold (`t06-i013`, ~278-285).
+- `phase`: fixed. It is the furthest phase reached on any subgoal still open when `k` was last
+  at its maximum, whenever that progress was made (`t04-i017`: carried). 7 of 120 failures
+  change, all from `none`; checked on video.
