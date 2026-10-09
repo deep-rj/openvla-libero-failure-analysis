@@ -123,3 +123,28 @@ def test_write_selection_records_the_seed_ids_and_videos(tmp_path):
     assert record["videos"] == [f"videos/{i}.mp4" for i in selected]
     assert (tmp_path / "labeling" / "labels_template.csv").exists()
     assert set(record) == {"seed", "n_requested", "episode_ids", "videos", "per_task_counts"}
+
+
+def test_excluded_episodes_are_never_drawn():
+    rows = _rows({0: 4, 1: 4})
+    exclude = {"t0-f00", "t0-f01", "t1-f03"}
+    for seed in range(5):
+        ids = labeling.select_failed_episodes(rows, n=5, seed=seed, exclude=exclude)
+        assert len(ids) == 5
+        assert not exclude & set(ids)
+
+
+def test_a_held_out_draw_excludes_an_earlier_selection_and_writes_its_own_files(tmp_path):
+    for i in range(12):
+        manifest.append_row(tmp_path / "manifest.csv", _manifest_row(f"e{i}", i % 2, False))
+    pilot = labeling.write_selection(tmp_path, n=4, seed=0)
+
+    held_out = labeling.write_selection(
+        tmp_path, n=4, seed=1, exclude=set(pilot), prefix="heldout_"
+    )
+
+    assert not set(pilot) & set(held_out)
+    record = json.loads((tmp_path / "labeling" / "heldout_label_selection.json").read_text())
+    assert record["episode_ids"] == held_out
+    assert record["excluded"] == sorted(pilot)
+    assert (tmp_path / "labeling" / "heldout_labels_template.csv").exists()

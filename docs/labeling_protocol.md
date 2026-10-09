@@ -297,6 +297,21 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
     in the pilot); grasp-error onsets sit at the start, middle or bottom of the descent
     (`t00-i024` 15, `t08-i010` 80, `t08-i006` 110), a known source of onset spread.
 
+## Freeze
+
+Rules, tags and detector definitions are frozen at git tag `block2-freeze` for the held-out
+labels. Threshold sensitivity on the pilot 20 (each threshold at x0.5 and x1.5, all 120
+failures recomputed): the defaults agree with every pilot hand check. Three sit where either
+direction flips a pilot value and were confirmed as they are: `collision_disturbance` distance
+2 cm, `stalled` duration 2 s, open-finger width 7 cm. Every other threshold has at least 50%
+margin on one side.
+
+Not validated on the pilot (no firings in the 20): `wrong_object`, `wrong_target`,
+`regression`, `order_violation`, `regrasp_count`, `oscillation`, `gripper_chatter`,
+`object_off_table`. They are frozen as defined and checked through the held-out
+`computed_check` where they fire. Across all 120 failures they fire 1, 0, 3, 0, 3, 0, 0 and
+2 times.
+
 ## Flag defects (fixed before the freeze)
 
 - `truncated_mid_action`: fixed. A goal object moving at the cap counts only if the fingers were

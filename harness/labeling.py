@@ -25,12 +25,15 @@ LABEL_COLUMNS = [
 ]
 
 
-def select_failed_episodes(rows: list[dict], n: int, seed: int) -> list[str]:
-    """Draws up to `n` failed episodes, spread as evenly across tasks as failures allow."""
+def select_failed_episodes(
+    rows: list[dict], n: int, seed: int, exclude: frozenset[str] = frozenset()
+) -> list[str]:
+    """Draws up to `n` failed episodes not in `exclude`, spread as evenly across tasks as
+    failures allow."""
     rng = random.Random(seed)  # noqa: S311
     queues = defaultdict(list)
     for row in sorted(rows, key=lambda r: r["episode_id"]):
-        if not row["success"]:
+        if not row["success"] and row["episode_id"] not in exclude:
             queues[row["task_id"]].append(row["episode_id"])
     for task in sorted(queues):
         rng.shuffle(queues[task])
@@ -54,11 +57,14 @@ def write_label_template(path, episode_ids: list[str]) -> None:
         writer.writerows({"episode_id": episode_id} for episode_id in episode_ids)
 
 
-def write_selection(run_dir, n: int, seed: int) -> list[str]:
-    """Selects episodes from a run's manifest and writes the selection and empty template."""
+def write_selection(
+    run_dir, n: int, seed: int, exclude: frozenset[str] = frozenset(), prefix: str = ""
+) -> list[str]:
+    """Selects episodes from a run's manifest and writes the selection and empty template,
+    named with `prefix`."""
     run_dir = Path(run_dir)
     rows = manifest.read_rows(run_dir / "manifest.csv")
-    ids = select_failed_episodes(rows, n, seed)
+    ids = select_failed_episodes(rows, n, seed, exclude)
     by_id = {r["episode_id"]: r for r in rows}
 
     out = run_dir / "labeling"
@@ -71,6 +77,8 @@ def write_selection(run_dir, n: int, seed: int) -> list[str]:
         "videos": [by_id[i]["video_file"] for i in ids],
         "per_task_counts": {str(t): c for t, c in sorted(task_counts.items())},
     }
-    (out / "label_selection.json").write_text(json.dumps(record, indent=2))
-    write_label_template(out / "labels_template.csv", ids)
+    if exclude:
+        record["excluded"] = sorted(exclude)
+    (out / f"{prefix}label_selection.json").write_text(json.dumps(record, indent=2))
+    write_label_template(out / f"{prefix}labels_template.csv", ids)
     return ids

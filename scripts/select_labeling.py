@@ -1,6 +1,7 @@
 """Draws failed episodes for hand labeling and writes the selection and an empty label CSV."""
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -14,8 +15,16 @@ def main() -> None:
     parser.add_argument("run_dir", type=Path)
     parser.add_argument("--n", type=int, default=20)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--exclude", type=Path, action="append", default=[],
+        help="an earlier selection JSON whose episodes are never drawn",
+    )
+    parser.add_argument("--prefix", default="", help="prefix for the output file names")
     args = parser.parse_args()
-    ids = labeling.write_selection(args.run_dir, args.n, args.seed)
+    exclude = frozenset(
+        i for path in args.exclude for i in json.loads(path.read_text())["episode_ids"]
+    )
+    ids = labeling.write_selection(args.run_dir, args.n, args.seed, exclude, args.prefix)
     print(f"selected {len(ids)} failed episodes; see {args.run_dir / 'labeling'}")
 
 
