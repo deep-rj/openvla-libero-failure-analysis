@@ -175,11 +175,23 @@ Threshold notes:
 ## Mechanism (hand-labeled)
 
 `mechanism` is the initiating event of the failure sequence: the earliest error the episode
-never recovered from, whether or not success was still physically reachable after it. Starts
-from perception / grounding / control / recovery plus `other`; categories are revised after the
-pilot. What follows the initiator (the failed recovery and the end state) goes in the flags and
+never recovered from, whether or not success was still physically reachable after it. What follows the initiator (the failed recovery and the end state) goes in the flags and
 `notes`, not in a second mechanism. A failure is read as an event tree: initiator, then the
 recovery barrier (computed where possible, e.g. `regrasp_count`), then the end state.
+
+Categories (frozen after the pilot):
+
+| Category | Initiator |
+|---|---|
+| `perception` | the target is not localized: at a grasp, the target is not between the fingers at the bottom of the descent |
+| `grounding` | the instruction is misread: wrong object or wrong target |
+| `control: grasp` | right intent, failed execution, from the start of the descent onto the object until it is lifted and held |
+| `control: transport` | from lift-off until the descent toward the target starts, including contact while moving into a receptacle (the microwave edge) |
+| `control: place` | from the descent toward the target through release until the object settles |
+| `external` | a disturbance the policy did not cause (physics, a Block 3 perturbation); expected 0 on the baseline |
+
+`perception` is not split by phase until a non-grasp case appears. Failing to recover after the
+initiator is recorded in tags and flags, never as a mechanism.
 
 - **Decidable from observables.** A category must be distinguishable on video or in world
   state. A grasp that closes off-center on the right object is `control`; `perception` needs
@@ -195,6 +207,8 @@ recovery barrier (computed where possible, e.g. `regrasp_count`), then the end s
   (the arm or a carried object stays pinned against an obstacle while the arm keeps moving).
 - Behavior before the initiator starts with `pre:`, reusing the `post:` phrases (`pre: stall`);
   an error the episode recovered from is `pre: recovered <error>` (`pre: recovered miss`).
+  The tag vocabulary is closed for the held-out labels: `post:` hover, stall, jammed, premature
+  close, miss; `pre:` the same words plus `recovered <error>`. Anything else goes in prose.
   Only failures are labeled, so these counts say nothing about recovery rates. This applies even when a flag covers
   the behavior, since flags do not record when it happened relative to the initiator.
 
@@ -259,14 +273,29 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
   (target between the fingers or not) in prose; mechanism categories are not tags.
   Goal predicates true at init stay subgoals, as in the BDDL goal (task 8's stove), so task 8
   failures start at `k` = 1.
+- Post-pilot rule session (2026-10-09):
+  - `control` split by phase (`grasp` / `transport` / `place`) at the freeze, before the held-out
+    labels; the 16 pilot `control` rows are re-passed. `recovery` renamed `external` and limited
+    to initiators the policy did not cause.
+  - `On`-tolerance near-misses are labeled like any other failure (`control: place`); no
+    near-miss flag or relaxed success rate, since a single tolerance would be arbitrary across
+    objects. Addable later as a pure function over stored world state.
+  - Flag timing: the flag columns of `computed.csv` hold intervals instead of 0/1, in Python slice
+    notation (end-exclusive), `;`-separated; a lone step is a point event (`145:175;276:417`,
+    `265`). Empty means not fired; the interval count is the count. One shared parser.
+  - Every flag defect below is fixed before the freeze, test-first from the episode it was
+    caught on.
+  - The mechanism classifier may abstain where world state cannot decide (close grasp misses);
+    abstentions are hand-labeled. Abstention criteria are set on the pilot 20 and frozen before
+    scoring the held-out set.
+  - Freeze: thresholds confirmed from a sensitivity check on the pilot 20 (only those whose
+    plausible change flips a flag against `computed_check`); closed tag vocabulary.
+  - Known gaps, documented rather than ruled: no perception test for fixtures (no fixture error
+    in the pilot); grasp-error onsets sit at the start, middle or bottom of the descent
+    (`t00-i024` 15, `t08-i010` 80, `t08-i006` 110), a known source of onset spread.
 
-## Open (the human decides)
+## Flag defects (fixed before the freeze)
 
-- Threshold sensitivity on the pilot 20; values above are the defaults.
-- The mechanism categories and their definitions, after the pilot labels.
-- Flag timing: record when each flag fires (intervals, counts, durations), so pre/post-initiator
-  ordering is computed rather than tagged. Format undecided (interval table, JSON, or count plus
-  interval list). After labeling.
 - `truncated_mid_action` fires on a goal object moving at the cap with the gripper not engaged
   (`t00-i024`: cans nudged while hovering, judged 0). Whether to require gripper involvement;
   `t09-i020` (mug nudged by a regrab attempt cut off at the cap) was judged 1.
@@ -279,5 +308,7 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
   regrip with the object resting on the table and plate counts as one hold (`t06-i013`, ~278-285).
 - `phase` only counts progress made while `k` is at its maximum, so a subgoal carried to its
   target before another subgoal raised `k` reads `none` (`t04-i017`).
-- Placements that look done but fail LIBERO's object-on-object `On` tolerance (centers within
-  3 cm, `base_object_states.py`): how many of the failures are these (`t04-i017`: 3.03 cm; `t06-i013`: 4.0 cm, unseen on video until the data was checked).
+- Grasp detector root cause (shared by the `regrasp_count`, `collision_disturbance` and
+  `truncated_mid_action` items above): onset requires the object lifted 1 cm above its settled
+  table height, which misses grasps before lift and counts objects resting on a plate or the
+  caddy as lifted. Candidate: fingers stopped short of fully closed while the object co-moves.
