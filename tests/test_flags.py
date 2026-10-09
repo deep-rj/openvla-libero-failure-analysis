@@ -49,6 +49,35 @@ def test_collision_disturbance_ignores_the_squeeze_just_before_a_grasp_onset():
     assert not flags.collision_disturbance(pos, held, in_goal, WAIT, d=0.02, settle=10)
 
 
+def _creep_then_lift():
+    """Fingers close on a handle at step 20; the object creeps 3 cm with the gripper on the
+    table, then lifts at step 120."""
+    pos = _still(160)
+    pos[20:120, 0] = np.linspace(0.0, 0.03, 100)
+    pos[120:, 0] = 0.03
+    pos[120:, 2] = 0.95
+    held = np.zeros(160, dtype=bool)
+    held[120:] = True
+    contact = np.zeros(160, dtype=bool)
+    contact[20:] = True
+    return pos, held, contact
+
+
+def test_collision_disturbance_ignores_creep_in_closed_fingers_that_leads_to_a_grasp():
+    pos, held, contact = _creep_then_lift()
+    in_goal = np.zeros(160, dtype=bool)
+    assert not flags.collision_disturbance(
+        pos, held, in_goal, WAIT, d=0.02, settle=10, contact=contact
+    )
+
+
+def test_collision_disturbance_flags_a_push_in_closed_fingers_that_never_becomes_a_grasp():
+    pos, held, contact = _creep_then_lift()
+    held[:] = False
+    in_goal = np.zeros(160, dtype=bool)
+    assert flags.collision_disturbance(pos, held, in_goal, WAIT, d=0.02, settle=10, contact=contact)
+
+
 def test_collision_disturbance_flags_an_object_knocked_while_not_held():
     pos = _still(80)
     pos[50:, 0] = np.minimum(0.003 * np.arange(30), 0.05)  # pushed 5 cm, never grasped

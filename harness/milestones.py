@@ -101,6 +101,21 @@ def grasped(
     return held
 
 
+def in_contact(
+    obj_pos: np.ndarray,
+    eef_pos: np.ndarray,
+    finger_width: np.ndarray,
+    params: GraspParams = DEFAULT_GRASP,
+) -> np.ndarray:
+    """[T]: fingers not open, object within reach, and its offset to the end effector fixed
+    since the previous step; no lift required, so it covers a grip before the object lifts."""
+    offset = obj_pos - eef_pos
+    steady = np.zeros(len(obj_pos), dtype=bool)
+    steady[1:] = np.linalg.norm(np.diff(offset, axis=0), axis=1) < params.co_move_m
+    near = np.linalg.norm(offset, axis=1) < params.near_m
+    return near & (finger_width < params.open_width_m) & steady
+
+
 def finger_width(gripper_qpos: np.ndarray) -> np.ndarray:
     return gripper_qpos[:, 0] - gripper_qpos[:, 1]
 

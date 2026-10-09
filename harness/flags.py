@@ -62,12 +62,21 @@ def wrong_object(held: np.ndarray, moved: np.ndarray, goal_objects) -> bool:
     return any(held[:, o].any() and moved[:, o].any() for o in others)
 
 
-def collision_disturbance(pos, held, in_goal, start: int, d: float, settle: int) -> bool:
+def collision_disturbance(
+    pos, held, in_goal, start: int, d: float, settle: int, contact=None
+) -> bool:
     """The object moved more than `d` while not held, outside the `settle` steps around a
-    grasp (fingers closing before onset, settling after release) and not inside its goal."""
+    grasp (fingers closing before onset, settling after release), outside an unbroken
+    `contact` run that ends in a grasp onset, and not inside its goal."""
     acquiring = np.zeros(len(pos), dtype=bool)
     for onset in np.flatnonzero(held[1:] & ~held[:-1]) + 1:
-        acquiring[max(onset - settle, 0) : onset] = True
+        first = onset - settle
+        if contact is not None:
+            t = onset - 1
+            while t >= 0 and contact[t]:
+                t -= 1
+            first = min(first, t + 1)
+        acquiring[max(first, 0) : onset] = True
     ref, ready_at = pos[start], start
     for t in range(start, len(pos)):
         if held[t] or acquiring[t]:
@@ -273,7 +282,13 @@ def compute_flags(
         ),
         "collision_disturbance": any(
             collision_disturbance(
-                obj_pos[:, o], held[:, o], in_goal[:, o], start, params.displaced_m, params.dwell
+                obj_pos[:, o],
+                held[:, o],
+                in_goal[:, o],
+                start,
+                params.displaced_m,
+                params.dwell,
+                contact=milestones.in_contact(obj_pos[:, o], eef, width, ms_params.grasp),
             )
             for o in range(n_objects)
         ),

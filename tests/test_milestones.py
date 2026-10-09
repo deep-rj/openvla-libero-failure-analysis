@@ -285,3 +285,20 @@ def test_released_object_that_leaves_within_n_steps_is_not_placed():
     extracted, info = _place_episode(holds_from=40, holds_to=50, release_at=45)
     m = ms.compute_milestone(extracted, info, ms.MilestoneParams(debounce=10))
     assert m.k == 0
+
+
+def test_object_creeping_with_closed_fingers_is_in_contact_but_not_grasped():
+    n_steps = 60
+    eef = np.tile([0.0, 0.0, 0.98], (n_steps, 1))
+    eef[20:, 0] = 0.001 * np.arange(40)
+    obj = eef - [0.0, 0.0, 0.08]
+    width = np.full(n_steps, 0.019)
+    assert ms.in_contact(obj, eef, width)[20:].all()
+    assert not ms.grasped(obj, eef, width).any()
+
+
+def test_open_fingers_are_not_in_contact():
+    n_steps = 20
+    eef = np.tile([0.0, 0.0, 0.98], (n_steps, 1))
+    obj = eef - [0.0, 0.0, 0.08]
+    assert not ms.in_contact(obj, eef, np.full(n_steps, 0.08)).any()
