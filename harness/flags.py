@@ -28,6 +28,7 @@ class FlagParams:
     off_table_m: float = 0.05
     joint_limit_fraction: float = 0.02
     joint_limit_steps: int = 10
+    engaged_seconds: float = 5.0  # an object moving at the cap counts if gripped this recently
 
 
 DEFAULT_FLAGS = FlagParams()
@@ -205,6 +206,16 @@ def workspace_limit(arm_q, ranges, start: int, fraction: float, n: int) -> bool:
     return False
 
 
+def engaged_within(
+    obj_pos, eef_pos, width, steps: int, grasp: milestones.GraspParams = milestones.DEFAULT_GRASP
+) -> bool:
+    """Fingers not open within reach of the object at some point in the last `steps` steps,
+    counting the last step and the one `steps` before it."""
+    recent = slice(len(obj_pos) - 1 - steps, None)
+    near = np.linalg.norm(obj_pos[recent] - eef_pos[recent], axis=1) < grasp.near_m
+    return bool((near & (width[recent] < grasp.open_width_m)).any())
+
+
 def truncated_mid_action(final_success: bool, held_last: bool, moving_last: bool) -> bool:
     return not final_success and (held_last or moving_last)
 
@@ -250,7 +261,12 @@ def compute_flags(
     chatter_window = round(params.chatter_seconds * hz)
     any_held = held.any(axis=1)
 
-    moving_last = any(obj_speed[o][-1] >= params.rest_speed for o in goal_objects) or any(
+    engaged_steps = round(params.engaged_seconds * hz)
+    moving_last = any(
+        obj_speed[o][-1] >= params.rest_speed
+        and engaged_within(obj_pos[:, o], eef, width, engaged_steps, ms_params.grasp)
+        for o in goal_objects
+    ) or any(
         abs(extracted["fixture_q"][-1, g] - extracted["fixture_q"][-2, g]) * hz > 0.01
         for g, s in enumerate(subgoals)
         if s["kind"] == "fixture"

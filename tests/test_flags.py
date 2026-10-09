@@ -270,3 +270,22 @@ def test_clean_pick_and_place_raises_no_flags():
     assert result.pop("regrasp_count") == 0
     assert result.pop("stalled")  # the arm rests for the last 3 s
     assert not any(result.values()), result
+
+
+def test_engaged_within_needs_closed_fingers_near_the_object_in_the_last_steps():
+    n_steps = 200
+    obj = _still(n_steps)
+    eef = _still(n_steps, (0.0, 0.0, 1.0))
+    width = np.full(n_steps, 0.08)
+    assert not flags.engaged_within(obj, eef, width, steps=100)
+    width[99] = 0.03  # 100 steps before the last step
+    assert flags.engaged_within(obj, eef, width, steps=100)
+    assert not flags.engaged_within(obj, eef, width, steps=99)
+
+
+def test_engaged_within_ignores_closed_fingers_far_from_the_object():
+    n_steps = 50
+    obj = _still(n_steps)
+    eef = _still(n_steps, (0.0, 0.3, 1.0))
+    width = np.full(n_steps, 0.03)
+    assert not flags.engaged_within(obj, eef, width, steps=40)
