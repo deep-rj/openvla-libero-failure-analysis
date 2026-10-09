@@ -13,7 +13,10 @@ import numpy as np
 
 from harness import schema
 
-EXTRACTION_VERSION = 3
+EXTRACTION_VERSION = 4
+# Ordered to match gripper_qpos: finger 1 is the left finger (qpos[0]).
+FINGER_PAD_GEOMS = ("gripper0_finger1_pad_collision", "gripper0_finger2_pad_collision")
+GRIP_SITE = "gripper0_grip_site"
 PLACE_PREDICATES = ("in", "on")
 FIXTURE_PREDICATES = ("close", "turnon")
 # LIBERO's `On` between two objects requires their origins within this xy distance.
@@ -135,6 +138,35 @@ def arm_joints(inner) -> list[dict]:
     return joints
 
 
+def finger_pad_positions(inner) -> np.ndarray:
+    """[2, 3]: world positions of the left and right finger pad centers."""
+    model, data = inner.sim.model, inner.sim.data
+    return np.array([data.geom_xpos[model.geom_name2id(g)] for g in FINGER_PAD_GEOMS])
+
+
+def finger_pad_half_size(inner) -> list[float]:
+    """Pad box half-extents along the grip frame's x (closing axis), y and z."""
+    model, data = inner.sim.model, inner.sim.data
+    geom = model.geom_name2id(FINGER_PAD_GEOMS[0])
+    grip = data.site_xmat[model.site_name2id(GRIP_SITE)].reshape(3, 3)
+    pad_in_grip = grip.T @ data.geom_xmat[geom].reshape(3, 3)
+    return [float(s) for s in np.abs(pad_in_grip) @ model.geom_size[geom]]
+
+
+def grip_quat(inner) -> np.ndarray:
+    """[4] xyzw: grip site orientation; x is the closing axis, z the approach direction."""
+    from robosuite.utils.transform_utils import mat2quat
+
+    xmat = inner.sim.data.site_xmat[inner.sim.model.site_name2id(GRIP_SITE)]
+    return mat2quat(xmat.reshape(3, 3))
+
+
+def object_quats(inner, object_names) -> np.ndarray:
+    """[n_obj, 4] xyzw, the convention of the env's `<name>_quat` observations."""
+    quats = [inner.sim.data.body_xquat[inner.obj_body_id[name]] for name in object_names]
+    return np.array(quats)[:, [1, 2, 3, 0]]
+
+
 def _xy_over_target(inner, target: str, obj_pos: np.ndarray) -> bool:
     """The xy part of LIBERO's In/On test for `target`: the object is over it, at any height."""
     sim = inner.sim
@@ -202,6 +234,10 @@ def extract_episode(episode_path) -> tuple[dict[str, np.ndarray], dict]:
         arm = arm_joints(inner)
         arm_q = np.zeros((n_steps, len(arm)))
         object_pos = np.zeros((n_steps, len(object_names), 3))
+        object_quat = np.zeros((n_steps, len(object_names), 4))
+        finger_pad_pos = np.zeros((n_steps, 2, 3))
+        grip_quat_t = np.zeros((n_steps, 4))
+        pad_half_size = finger_pad_half_size(inner)
 
         for t, state in enumerate(arrays["sim_state"]):
             inner.sim.set_state_from_flattened(state)
@@ -209,6 +245,9 @@ def extract_episode(episode_path) -> tuple[dict[str, np.ndarray], dict]:
             inner.sim.forward()
             for i, name in enumerate(object_names):
                 object_pos[t, i] = inner.sim.data.body_xpos[inner.obj_body_id[name]]
+            object_quat[t] = object_quats(inner, object_names)
+            finger_pad_pos[t] = finger_pad_positions(inner)
+            grip_quat_t[t] = grip_quat(inner)
             arm_q[t] = [inner.sim.data.qpos[j["qpos_addr"]] for j in arm]
             for g, sub in enumerate(subgoals):
                 goal_holds[t, g] = _eval(inner, sub.predicate)
@@ -235,6 +274,9 @@ def extract_episode(episode_path) -> tuple[dict[str, np.ndarray], dict]:
         "candidate_holds": candidate_holds,
         "fixture_q": fixture_q,
         "arm_q": arm_q,
+        "object_quat": object_quat,
+        "finger_pad_pos": finger_pad_pos,
+        "grip_quat": grip_quat_t,
     }
     info = {
         "extraction_version": EXTRACTION_VERSION,
@@ -246,6 +288,7 @@ def extract_episode(episode_path) -> tuple[dict[str, np.ndarray], dict]:
         "object_names": list(object_names),
         "subgoals": [asdict(s) for s in subgoals],
         "arm_joints": arm,
+        "finger_pad_half_size": pad_half_size,
     }
     return extracted, info
 
