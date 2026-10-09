@@ -10,7 +10,8 @@ FIXTURE_PHASES = ("none", "engaged", "partial")
 
 @dataclass(frozen=True)
 class GraspParams:
-    lift_m: float = 0.01  # above the settled height
+    lift_m: float = 0.01  # above the lowest height in the support window
+    support_window: int = 20  # steps; a raised resting surface (plate, caddy) is the support
     near_m: float = 0.12  # object origin to end effector
     open_width_m: float = 0.07  # finger width at or above this is open
     window: int = 3  # steps over which the object must move with the end effector
@@ -77,13 +78,16 @@ def grasped(
     obj_pos: np.ndarray,
     eef_pos: np.ndarray,
     finger_width: np.ndarray,
-    settled_z: float,
     params: GraspParams = DEFAULT_GRASP,
 ) -> np.ndarray:
     """[T]: starts when a lifted object moves with the end effector with fingers not open;
     continues while the fingers stay closed and the offset stays fixed."""
     offset = obj_pos - eef_pos
-    lifted = obj_pos[:, 2] > settled_z + params.lift_m
+    z = obj_pos[:, 2]
+    support = np.array(
+        [z[max(t - params.support_window, 0) : t + 1].min() for t in range(len(z))]
+    )
+    lifted = z > support + params.lift_m
     near = np.linalg.norm(offset, axis=1) < params.near_m
     closed = finger_width < params.open_width_m
     held = np.zeros(len(obj_pos), dtype=bool)
@@ -110,14 +114,14 @@ def travel_fraction(q: np.ndarray, threshold: float, start: int) -> np.ndarray:
     return np.clip((q - q0) / span, 0.0, 1.0)
 
 
-def held_goal_objects(extracted, info, params: MilestoneParams, start: int) -> np.ndarray:
+def held_goal_objects(extracted, info, params: MilestoneParams) -> np.ndarray:
     """[T, G]: the subgoal's object is grasped; always false for fixture subgoals."""
     width = finger_width(extracted["gripper_qpos"])
     held = np.zeros(extracted["goal_holds"].shape, dtype=bool)
     for g, sub in enumerate(info["subgoals"]):
         if sub["kind"] == "place":
             obj = extracted["object_pos"][:, sub["object_index"]]
-            held[:, g] = grasped(obj, extracted["eef_pos"], width, obj[start, 2], params.grasp)
+            held[:, g] = grasped(obj, extracted["eef_pos"], width, params.grasp)
     return held
 
 
@@ -147,7 +151,7 @@ def compute_milestone(extracted, info, params: MilestoneParams = DEFAULT_PARAMS)
         return Milestone(n_goals, "none", None)
     start = info["num_wait_steps"]
     deps = [tuple(s["depends_on"]) for s in subgoals]
-    held = held_goal_objects(extracted, info, params, start)
+    held = held_goal_objects(extracted, info, params)
     # A placement counts only once released: LIBERO's predicate alone accepts a gripped touchdown.
     placed = extracted["goal_holds"] & ~held
     count = counting(debounced(placed, params.debounce, start), deps)

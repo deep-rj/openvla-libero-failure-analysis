@@ -101,7 +101,7 @@ def _carry_trajectory(n_steps=60, lift_at=30):
 
 def test_object_moving_with_closed_fingers_is_grasped():
     obj, eef, width = _carry_trajectory()
-    held = ms.grasped(obj, eef, width, settled_z=0.9)
+    held = ms.grasped(obj, eef, width)
     assert not held[:30].any()
     assert held[45:].all()
 
@@ -109,13 +109,13 @@ def test_object_moving_with_closed_fingers_is_grasped():
 def test_lifted_object_with_open_fingers_is_not_grasped():
     obj, eef, width = _carry_trajectory()
     width[:] = 0.08
-    assert not ms.grasped(obj, eef, width, settled_z=0.9).any()
+    assert not ms.grasped(obj, eef, width).any()
 
 
 def test_object_not_following_the_end_effector_is_not_grasped():
     obj, eef, width = _carry_trajectory()
     obj[30:, 2] = 0.95  # lifted once, then left behind while the EEF rises
-    assert not ms.grasped(obj, eef, width, settled_z=0.9)[45:].any()
+    assert not ms.grasped(obj, eef, width)[45:].any()
 
 
 def test_still_object_next_to_a_still_gripper_is_not_grasped():
@@ -124,7 +124,7 @@ def test_still_object_next_to_a_still_gripper_is_not_grasped():
     obj = np.tile([0.0, 0.0, 0.95], (n_steps, 1))
     eef = np.tile([0.0, 0.05, 1.0], (n_steps, 1))
     width = np.full(n_steps, 0.04)
-    assert not ms.grasped(obj, eef, width, settled_z=0.9).any()
+    assert not ms.grasped(obj, eef, width).any()
 
 
 def test_still_object_next_to_a_slowly_moving_gripper_is_not_grasped():
@@ -133,14 +133,38 @@ def test_still_object_next_to_a_slowly_moving_gripper_is_not_grasped():
     eef = np.tile([0.0, 0.10, 1.0], (n_steps, 1))
     eef[:, 2] -= 0.003 * np.arange(n_steps)
     width = np.full(n_steps, 0.04)
-    assert not ms.grasped(obj, eef, width, settled_z=0.9).any()
+    assert not ms.grasped(obj, eef, width).any()
+
+
+def _raised_rest_then_drag(n_steps=80, rest_z=0.95, drag_at=40):
+    """An object resting on a raised surface (plate, caddy edge), then pushed sideways by
+    nearly closed fingers at a fixed offset."""
+    obj = np.tile([0.0, 0.0, rest_z], (n_steps, 1))
+    eef = np.tile([0.0, 0.0, rest_z + 0.08], (n_steps, 1))
+    for t in range(drag_at, n_steps):
+        obj[t, 1] = eef[t, 1] = 0.003 * (t - drag_at + 1)
+    width = np.full(n_steps, 0.005)
+    return obj, eef, width
+
+
+def test_object_dragged_on_a_raised_surface_is_not_grasped():
+    obj, eef, width = _raised_rest_then_drag()
+    assert not ms.grasped(obj, eef, width).any()
+
+
+def test_object_lifted_off_a_raised_surface_is_grasped():
+    obj, eef, width = _raised_rest_then_drag()
+    for t in range(40, 80):
+        obj[t, 2] = eef[t, 2] - 0.08 + 0.002 * (t - 39)
+        eef[t, 2] = obj[t, 2] + 0.08
+    assert ms.grasped(obj, eef, width)[55:].all()
 
 
 def test_grasp_persists_while_the_end_effector_pauses():
     obj, eef, width = _carry_trajectory()
     obj[45:] = obj[45]
     eef[45:] = eef[45]
-    held = ms.grasped(obj, eef, width, settled_z=0.9)
+    held = ms.grasped(obj, eef, width)
     assert held[45:].all()
 
 
@@ -149,7 +173,7 @@ def test_opening_the_fingers_ends_the_grasp():
     obj[45:] = obj[45]
     eef[45:] = eef[45]
     width[50:] = 0.08
-    held = ms.grasped(obj, eef, width, settled_z=0.9)
+    held = ms.grasped(obj, eef, width)
     assert held[45:50].all()
     assert not held[50:].any()
 

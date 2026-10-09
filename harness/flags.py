@@ -214,7 +214,7 @@ def compute_flags(
 
     held = np.stack(
         [
-            milestones.grasped(obj_pos[:, o], eef, width, obj_pos[start, o, 2], ms_params.grasp)
+            milestones.grasped(obj_pos[:, o], eef, width, ms_params.grasp)
             for o in range(n_objects)
         ],
         axis=1,
@@ -222,7 +222,7 @@ def compute_flags(
     moved = np.stack(
         [displaced(obj_pos[:, o], start, params.displaced_m) for o in range(n_objects)], axis=1
     )
-    goal_held = milestones.held_goal_objects(extracted, info, ms_params, start)
+    goal_held = milestones.held_goal_objects(extracted, info, ms_params)
     placed = extracted["goal_holds"] & ~goal_held
     count = milestones.counting(milestones.debounced(placed, ms_params.debounce, start), deps)
     stable = milestones.debounced(extracted["goal_holds"], ms_params.debounce, start)
