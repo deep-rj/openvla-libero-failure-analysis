@@ -268,7 +268,8 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
   ordering is computed rather than tagged. Format undecided (interval table, JSON, or count plus
   interval list). After labeling.
 - `truncated_mid_action` fires on a goal object moving at the cap with the gripper not engaged
-  (`t00-i024`: cans nudged while hovering). Whether to require gripper involvement.
+  (`t00-i024`: cans nudged while hovering, judged 0). Whether to require gripper involvement;
+  `t09-i020` (mug nudged by a regrab attempt cut off at the cap) was judged 1.
 - The grasp detector misses a handle grasp until the object lifts (`t09-i015`: fingers closed
   on the mug handle from ~130, counted as held from 356), so `collision_disturbance` fired on
   the mug creeping in the gripper.
