@@ -244,6 +244,9 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
   recovered errors; applied to `t09-i015` (`pre: stall`).
 - `t01-i022`: recovered means the robot resumed progress toward the goal, not that the
   obstruction went away; `post: jammed` covers the arm itself, not only a carried object.
+- `t06-i013`: the context card gives each `On` subgoal's end state (holds or not; for
+  object-on-object, distance from the target's center against the 3 cm tolerance), since
+  a near-miss cannot be judged on video. Earlier rows already account for theirs.
 
 ## Open (the human decides)
 
