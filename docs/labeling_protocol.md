@@ -247,6 +247,11 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
 - `t06-i013`: the context card gives each `On` subgoal's end state (holds or not; for
   object-on-object, distance from the target's center against the 3 cm tolerance), since
   a near-miss cannot be judged on video. Earlier rows already account for theirs.
+- `t06-i020`: a subgoal completes only once its object is released (kept: the pudding was
+  held in its region to the cap, so `k` = 0). Consistent with `t04-i017`, where the white mug
+  was within 3 cm only while gripped (118-141) and off after release (147). Hypothesis: the
+  policy rarely needs to release, since LIBERO ends an episode at success; 70 of 130 baseline
+  successes end with a goal object still gripped (t05 17, t06 15, t02 14).
 
 ## Open (the human decides)
 
