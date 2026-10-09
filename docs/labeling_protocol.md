@@ -185,9 +185,9 @@ Categories (frozen after the pilot):
 |---|---|
 | `perception` | the target is not localized: at a grasp, the target is not between the fingers at the bottom of the descent |
 | `grounding` | the instruction is misread: wrong object or wrong target |
-| `control: grasp` | right intent, failed execution, from the start of the descent onto the object until it is lifted and held |
-| `control: transport` | from lift-off until the descent toward the target starts, including contact while moving into a receptacle (the microwave edge) |
-| `control: place` | from the descent toward the target through release until the object settles |
+| `control: grasp` | right intent, failed execution, from heading for the object until it is lifted and held (computed `phase` none) |
+| `control: transport` | from lift-off until the descent toward the target starts, including contact while moving into a receptacle (the microwave edge) (`phase` grasped) |
+| `control: place` | from the descent toward the target through release until the object settles (`phase` carried) |
 | `external` | a disturbance the policy did not cause (physics, a Block 3 perturbation); expected 0 on the baseline |
 
 `perception` is not split by phase until a non-grasp case appears. Failing to recover after the
@@ -275,7 +275,9 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
   failures start at `k` = 1.
 - Post-pilot rule session (2026-10-09):
   - `control` split by phase (`grasp` / `transport` / `place`) at the freeze, before the held-out
-    labels; the 16 pilot `control` rows are re-passed. `recovery` renamed `external` and limited
+    labels; the 16 pilot `control` rows are re-passed (8 grasp, 2 transport, 6 place). `grasp`
+    starts when the arm heads for the object, so an empty-handed collision on the way is `grasp`
+    (`t01-i022`). `recovery` renamed `external` and limited
     to initiators the policy did not cause.
   - `On`-tolerance near-misses are labeled like any other failure (`control: place`); no
     near-miss flag or relaxed success rate, since a single tolerance would be arbitrary across
