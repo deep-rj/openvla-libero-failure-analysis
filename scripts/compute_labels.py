@@ -31,7 +31,7 @@ def computed_row(extracted, info) -> dict:
         "phase": m.phase,
         "k_step": "" if m.k_step is None else m.k_step,
         "closure_fraction": ";".join("" if np.isnan(f) else f"{f:.3f}" for f in fractions),
-        **{k: int(v) for k, v in flags.compute_flags(extracted, info).items()},
+        **{k: flags.format_intervals(v) for k, v in flags.compute_flags(extracted, info).items()},
     }
 
 

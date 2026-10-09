@@ -84,6 +84,8 @@ def test_collision_disturbance_flags_an_object_knocked_while_not_held():
     held = np.zeros(80, dtype=bool)
     in_goal = np.zeros(80, dtype=bool)
     assert flags.collision_disturbance(pos, held, in_goal, WAIT, d=0.02, settle=10)
+    # from passing 2 cm until the object comes to rest
+    assert flags.collision_disturbance(pos, held, in_goal, WAIT, d=0.02, settle=10) == [(57, 68)]
 
 
 def test_collision_disturbance_ignores_motion_inside_its_goal_container():
@@ -155,13 +157,39 @@ def test_setting_an_object_down_is_not_dropped():
     assert not flags.dropped(z, held, np.zeros(60, dtype=bool), fall_m=0.03, window=10)
 
 
-def test_regrasp_count_counts_grasps_after_the_first():
+def test_regrasps_are_the_grasp_onsets_after_the_first():
     held = np.zeros(60, dtype=bool)
-    assert flags.regrasp_count(held) == 0
+    assert flags.regrasps(held, WAIT) == []
     held[10:20] = True
     held[30:35] = True
     held[40:45] = True
-    assert flags.regrasp_count(held) == 2
+    assert flags.regrasps(held, WAIT) == [(30, 31), (40, 41)]
+
+
+def test_intervals_format_as_python_slices_and_points():
+    assert flags.format_intervals([]) == ""
+    assert flags.format_intervals([(145, 175), (265, 266)]) == "145:175;265"
+
+
+def test_intervals_parse_back_to_the_same_list():
+    for intervals in ([], [(145, 175), (265, 266)], [(10, 530)]):
+        assert flags.parse_intervals(flags.format_intervals(intervals)) == intervals
+
+
+def test_stalled_reports_each_still_run_end_exclusive():
+    eef = _still(120, (0.0, 0.0, 1.0))
+    eef[WAIT:60, 0] = 0.002 * np.arange(50)
+    eef[60:, 0] = eef[59, 0]
+    assert flags.stalled(eef, HZ, WAIT, v_min=0.005, seconds=2.0) == [(60, 120)]
+
+
+def test_dropped_reports_the_release_step():
+    z = np.full(60, 1.0)
+    held = np.zeros(60, dtype=bool)
+    held[20:30] = True
+    z[30:36] = np.linspace(1.0, 0.9, 6)
+    z[36:] = 0.9
+    assert flags.dropped(z, held, np.zeros(60, dtype=bool), fall_m=0.03, window=10) == [(30, 31)]
 
 
 def test_stalled_needs_the_end_effector_still_for_t_seconds():
@@ -221,10 +249,11 @@ def test_workspace_limit_uses_a_fraction_of_each_joint_range():
 
 
 def test_truncated_mid_action_needs_a_grasp_or_motion_at_the_cap():
-    assert not flags.truncated_mid_action(False, held_last=False, moving_last=False)
-    assert flags.truncated_mid_action(False, held_last=True, moving_last=False)
-    assert flags.truncated_mid_action(False, held_last=False, moving_last=True)
-    assert not flags.truncated_mid_action(True, held_last=True, moving_last=True)
+    assert not flags.truncated_mid_action(False, held_last=False, moving_last=False, last_step=519)
+    assert flags.truncated_mid_action(False, held_last=True, moving_last=False, last_step=519)
+    assert flags.truncated_mid_action(False, held_last=False, moving_last=True, last_step=519)
+    assert not flags.truncated_mid_action(True, held_last=True, moving_last=True, last_step=519)
+    assert flags.truncated_mid_action(False, True, False, last_step=519) == [(519, 520)]
 
 
 def _clean_place_episode(n_steps=120):
@@ -267,7 +296,7 @@ def test_clean_pick_and_place_raises_no_flags():
     extracted, info = _clean_place_episode()
     result = flags.compute_flags(extracted, info)
     assert "oscillation" in result
-    assert result.pop("regrasp_count") == 0
+    assert result.pop("regrasp_count") == []
     assert result.pop("stalled")  # the arm rests for the last 3 s
     assert not any(result.values()), result
 

@@ -1,7 +1,8 @@
 """Behavior flags as pure functions of extracted world-state fields.
 
 Every flag considers only steps at or after the end of the wait; displacements are measured
-from the settled poses at that step.
+from the settled poses at that step. Each flag returns the step intervals where it fired, as
+end-exclusive `(start, end)` pairs; an empty list means it did not fire.
 """
 
 from dataclasses import dataclass
@@ -34,13 +35,51 @@ class FlagParams:
 DEFAULT_FLAGS = FlagParams()
 
 
-def _runs_at_least(mask: np.ndarray, n: int) -> bool:
-    run = 0
-    for value in mask:
-        run = run + 1 if value else 0
-        if run >= n:
-            return True
-    return False
+Intervals = list[tuple[int, int]]
+
+
+def _runs(mask: np.ndarray, n: int = 1, offset: int = 0) -> Intervals:
+    """Runs of at least `n` true steps, shifted by `offset`."""
+    out, first = [], None
+    for t, value in enumerate([*mask, False]):
+        if value and first is None:
+            first = t
+        elif not value and first is not None:
+            if t - first >= n:
+                out.append((first + offset, t + offset))
+            first = None
+    return out
+
+
+def _merge(intervals) -> Intervals:
+    out: Intervals = []
+    for a, b in sorted(intervals):
+        if out and a <= out[-1][1]:
+            out[-1] = (out[-1][0], max(out[-1][1], b))
+        else:
+            out.append((a, b))
+    return out
+
+
+def _union(interval_lists) -> Intervals:
+    return _merge(i for intervals in interval_lists for i in intervals)
+
+
+def _point(t) -> tuple[int, int]:
+    return (int(t), int(t) + 1)
+
+
+def format_intervals(intervals: Intervals) -> str:
+    """`145:175;265`: Python slices, `;`-separated; a one-step interval is its step alone."""
+    return ";".join(str(a) if b == a + 1 else f"{a}:{b}" for a, b in intervals)
+
+
+def parse_intervals(text: str) -> Intervals:
+    out = []
+    for part in filter(None, text.split(";")):
+        a, _, b = part.partition(":")
+        out.append((int(a), int(b) if b else int(a) + 1))
+    return out
 
 
 def speed(pos: np.ndarray, hz: float) -> np.ndarray:
@@ -57,18 +96,20 @@ def displaced(pos: np.ndarray, start: int, d: float) -> np.ndarray:
     return out
 
 
-def wrong_object(held: np.ndarray, moved: np.ndarray, goal_objects) -> bool:
-    """A non-goal object was grasped and moved. `held`, `moved`: [T, n_objects]."""
+def wrong_object(held: np.ndarray, moved: np.ndarray, goal_objects) -> Intervals:
+    """Holds of a non-goal object that was grasped and moved. `held`, `moved`: [T, n_objects]."""
     others = [o for o in range(held.shape[1]) if o not in set(goal_objects)]
-    return any(held[:, o].any() and moved[:, o].any() for o in others)
+    return _merge(i for o in others if moved[:, o].any() for i in _runs(held[:, o]))
 
 
 def collision_disturbance(
-    pos, held, in_goal, start: int, d: float, settle: int, contact=None
-) -> bool:
+    pos, held, in_goal, start: int, d: float, settle: int, contact=None, rest_step=0.0005
+) -> Intervals:
     """The object moved more than `d` while not held, outside the `settle` steps around a
     grasp (fingers closing before onset, settling after release), outside an unbroken
-    `contact` run that ends in a grasp onset, and not inside its goal."""
+    `contact` run that ends in a grasp onset, and not inside its goal. Each firing runs from
+    the step the displacement passed `d` until the object moves less than `rest_step` per step
+    or is grasped; the reference then resets to where it stopped."""
     acquiring = np.zeros(len(pos), dtype=bool)
     for onset in np.flatnonzero(held[1:] & ~held[:-1]) + 1:
         first = onset - settle
@@ -78,8 +119,10 @@ def collision_disturbance(
                 t -= 1
             first = min(first, t + 1)
         acquiring[max(first, 0) : onset] = True
-    ref, ready_at = pos[start], start
+    ref, ready_at, out, busy_until = pos[start], start, [], start
     for t in range(start, len(pos)):
+        if t < busy_until:
+            continue
         if held[t] or acquiring[t]:
             ref, ready_at = None, (t + 1 + settle) if held[t] else (t + 1)
             continue
@@ -89,57 +132,73 @@ def collision_disturbance(
             ref = pos[t]
             continue
         if np.linalg.norm(pos[t] - ref) > d:
-            return True
-    return False
+            end = t + 1
+            while (
+                end < len(pos)
+                and not held[end]
+                and np.linalg.norm(pos[end] - pos[end - 1]) >= rest_step
+            ):
+                end += 1
+            out.append((t, end))
+            ref, busy_until = pos[end - 1], end
+    return out
 
 
-def wrong_target(candidate_holds, held, obj_speed, start: int, rest_speed: float, dwell: int):
+def wrong_target(
+    candidate_holds, held, obj_speed, start: int, rest_speed: float, dwell: int
+) -> Intervals:
     """Released and at rest for `dwell` steps on a receptacle that is not the goal."""
     at_rest = ~held & (obj_speed < rest_speed)
+    found = []
     for c in range(candidate_holds.shape[1]):
         mask = candidate_holds[:, c] & at_rest
         mask[:start] = False
-        if _runs_at_least(mask, dwell):
-            return True
-    return False
+        found += _runs(mask, dwell)
+    return _merge(found)
 
 
-def regression(count: np.ndarray, n: int) -> bool:
+def regression(count: np.ndarray, n: int) -> Intervals:
     """A counted subgoal later stopped counting for at least `n` steps."""
+    found = []
     for g in range(count.shape[1]):
-        first = np.argmax(count[:, g]) if count[:, g].any() else None
-        if first is not None and _runs_at_least(~count[first:, g], n):
-            return True
-    return False
+        if count[:, g].any():
+            first = int(np.argmax(count[:, g]))
+            found += _runs(~count[first:, g], n, offset=first)
+    return _merge(found)
 
 
-def order_violation(stable: np.ndarray, count: np.ndarray, deps) -> bool:
+def order_violation(stable: np.ndarray, count: np.ndarray, deps) -> Intervals:
     """A dependent subgoal's predicate held while a prerequisite did not count."""
-    for g, prerequisites in enumerate(deps):
-        for d in prerequisites:
-            if (stable[:, g] & ~count[:, d]).any():
-                return True
-    return False
+    return _merge(
+        i
+        for g, prerequisites in enumerate(deps)
+        for d in prerequisites
+        for i in _runs(stable[:, g] & ~count[:, d])
+    )
 
 
-def dropped(z, held, over_target, fall_m: float, window: int) -> bool:
-    """A release followed by a fall of at least `fall_m` within `window` steps, away from
-    the target."""
+def dropped(z, held, over_target, fall_m: float, window: int) -> Intervals:
+    """Releases followed by a fall of at least `fall_m` within `window` steps, away from
+    the target; each at the release step."""
+    out = []
     for t in range(1, len(z)):
         released = held[t - 1] and not held[t] and not over_target[t - 1]
         if released and z[t - 1] - z[t : t + window].min() >= fall_m:
-            return True
-    return False
+            out.append(_point(t))
+    return out
 
 
-def regrasp_count(held: np.ndarray) -> int:
-    onsets = int(held[0]) + int(np.sum(held[1:] & ~held[:-1]))
-    return max(onsets - 1, 0)
+def regrasps(held: np.ndarray, start: int) -> Intervals:
+    """Grasp onsets at or after `start`, after the first; a hold already on at `start` is
+    the first."""
+    onsets = [start] if held[start] else []
+    onsets += list(np.flatnonzero(held[start + 1 :] & ~held[start:-1]) + start + 1)
+    return [_point(t) for t in onsets[1:]]
 
 
-def stalled(eef_pos, hz: float, start: int, v_min: float, seconds: float) -> bool:
+def stalled(eef_pos, hz: float, start: int, v_min: float, seconds: float) -> Intervals:
     still = speed(eef_pos, hz) < v_min
-    return _runs_at_least(still[start + 1 :], round(seconds * hz))
+    return _runs(still[start + 1 :], round(seconds * hz), offset=start + 1)
 
 
 def _reversal_steps(x: np.ndarray, min_travel: float) -> list[int]:
@@ -161,22 +220,25 @@ def _reversal_steps(x: np.ndarray, min_travel: float) -> list[int]:
     return turns
 
 
-def oscillation(eef_pos, start: int, window: int, reversals: int, min_travel: float) -> bool:
+def oscillation(
+    eef_pos, start: int, window: int, reversals: int, min_travel: float
+) -> Intervals:
     """At least `reversals` direction reversals of `min_travel` along one axis within
-    `window` steps; a reach down and lift reverses once."""
+    `window` steps, from the first to the last reversal; a reach down and lift reverses once."""
+    found = []
     for axis in range(eef_pos.shape[1]):
-        turns = _reversal_steps(eef_pos[start:, axis], min_travel)
-        if any(
-            turns[i + reversals - 1] - turns[i] < window
-            for i in range(len(turns) - reversals + 1)
-        ):
-            return True
-    return False
+        turns = [t + start for t in _reversal_steps(eef_pos[start:, axis], min_travel)]
+        for i in range(len(turns) - reversals + 1):
+            first, last = turns[i], turns[i + reversals - 1]
+            if last - first < window:
+                found.append((first, last + 1))
+    return _merge(found)
 
 
 def gripper_chatter(width, any_held, start: int, window: int, cycles: int,
-                    open_w: float = 0.06, closed_w: float = 0.02) -> bool:  # fmt: skip
-    """At least `cycles` empty closes within `window` steps, with nothing held throughout."""
+                    open_w: float = 0.06, closed_w: float = 0.02) -> Intervals:  # fmt: skip
+    """At least `cycles` empty closes within `window` steps, with nothing held throughout,
+    from the first close to the last."""
     closes, state = [], "open"
     for t in range(len(width)):
         if state == "open" and width[t] < closed_w:
@@ -185,25 +247,26 @@ def gripper_chatter(width, any_held, start: int, window: int, cycles: int,
                 closes.append(t)
         elif state == "closed" and width[t] > open_w:
             state = "open"
+    found = []
     for i in range(len(closes) - cycles + 1):
         first, last = closes[i], closes[i + cycles - 1]
         if last - first < window and not any_held[first : last + 1].any():
-            return True
-    return False
+            found.append((first, last + 1))
+    return _merge(found)
 
 
-def object_off_table(z, settled_z: float, drop_m: float) -> bool:
-    return bool((z < settled_z - drop_m).any())
+def object_off_table(z, settled_z: float, drop_m: float) -> Intervals:
+    return _runs(z < settled_z - drop_m)
 
 
-def workspace_limit(arm_q, ranges, start: int, fraction: float, n: int) -> bool:
+def workspace_limit(arm_q, ranges, start: int, fraction: float, n: int) -> Intervals:
     """An arm joint within `fraction` of its range from either limit for `n` steps."""
+    found = []
     for j, (lo, hi) in enumerate(ranges):
         margin = fraction * (hi - lo)
         near = (arm_q[:, j] < lo + margin) | (arm_q[:, j] > hi - margin)
-        if _runs_at_least(near[start:], n):
-            return True
-    return False
+        found += _runs(near[start:], n, offset=start)
+    return _merge(found)
 
 
 def engaged_within(
@@ -216,8 +279,11 @@ def engaged_within(
     return bool((near & (width[recent] < grasp.open_width_m)).any())
 
 
-def truncated_mid_action(final_success: bool, held_last: bool, moving_last: bool) -> bool:
-    return not final_success and (held_last or moving_last)
+def truncated_mid_action(
+    final_success: bool, held_last: bool, moving_last: bool, last_step: int
+) -> Intervals:
+    """The last step, when a failure ends with a goal object held or still moving."""
+    return [_point(last_step)] if not final_success and (held_last or moving_last) else []
 
 
 def compute_flags(
@@ -273,7 +339,7 @@ def compute_flags(
     )
     return {
         "wrong_object": wrong_object(held, moved, goal_objects),
-        "wrong_target": any(
+        "wrong_target": _union(
             wrong_target(
                 extracted["candidate_holds"][:, g, : len(s["candidates"])],
                 goal_held[:, g],
@@ -286,7 +352,7 @@ def compute_flags(
         ),
         "regression": regression(count, ms_params.debounce),
         "order_violation": order_violation(stable, count, deps),
-        "dropped": any(
+        "dropped": _union(
             dropped(
                 obj_pos[:, s["object_index"], 2],
                 goal_held[:, g],
@@ -296,7 +362,7 @@ def compute_flags(
             )
             for g, s in place
         ),
-        "collision_disturbance": any(
+        "collision_disturbance": _union(
             collision_disturbance(
                 obj_pos[:, o],
                 held[:, o],
@@ -305,10 +371,11 @@ def compute_flags(
                 params.displaced_m,
                 params.dwell,
                 contact=milestones.in_contact(obj_pos[:, o], eef, width, ms_params.grasp),
+                rest_step=params.rest_speed / hz,
             )
             for o in range(n_objects)
         ),
-        "regrasp_count": sum(regrasp_count(held[start:, o]) for o in goal_objects),
+        "regrasp_count": _union(regrasps(held[:, o], start) for o in goal_objects),
         "stalled": stalled(eef, hz, start, v_min, params.stall_seconds),
         "oscillation": oscillation(
             eef, start, window, params.oscillation_reversals, params.oscillation_min_travel
@@ -316,7 +383,7 @@ def compute_flags(
         "gripper_chatter": gripper_chatter(
             width, any_held, start, chatter_window, params.chatter_cycles
         ),
-        "object_off_table": any(
+        "object_off_table": _union(
             object_off_table(obj_pos[:, o, 2], obj_pos[start, o, 2], params.off_table_m)
             for o in goal_objects
         ),
@@ -328,6 +395,6 @@ def compute_flags(
             params.joint_limit_steps,
         ),
         "truncated_mid_action": truncated_mid_action(
-            info["final_success"], bool(goal_held[-1].any()), moving_last
+            info["final_success"], bool(goal_held[-1].any()), moving_last, len(eef) - 1
         ),
     }
