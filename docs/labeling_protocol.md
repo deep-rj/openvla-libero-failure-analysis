@@ -104,7 +104,7 @@ predicates cannot express.
 | 5 | book `In` caddy back compartment | — | grasped / carried |
 | 6 | white mug `On` plate, pudding `On` region right of plate | none | grasped / carried |
 | 7 | soup `In` basket, cream cheese `In` basket | none | grasped / carried |
-| 8 | pot 1 `On` stove, pot 2 `On` stove; stove `Turnon` (true at init) | none ⚑ | grasped / carried |
+| 8 | pot 1 `On` stove, pot 2 `On` stove; stove `Turnon` (true at init) | none | grasped / carried |
 | 9 | yellow-white mug `In` microwave, door `Close` | `Close` after `In` | mug: grasped / carried · door: engaged / partial |
 
 A subgoal depends on another when completing it first would require undoing it to succeed
@@ -126,7 +126,10 @@ all 50 init states:
 - **Task 2 order:** resolved, no dependency. The knob is set into the table surface, clear of
   the cook region, so a pot on the stove does not block it (from scene geometry; no pot-first
   episode observed yet).
-- **Task 8 order:** whether the first pot can occupy cook-region space the second needs.
+- **Task 8 order:** resolved, no dependency. Both pots fit on the stove in either order
+  (`t08-i022`). LIBERO's region `On` is the pot inside the cook region plus contact with the
+  stove, checked every step, so success fires when the second pot touches down, held or not;
+  settling both pots is never tested.
 - **Stove indicator:** resolved; the coils turn red when on, so the video confirms `Turnon`.
 - **Task 6:** the region right of the plate has no visible boundary; `carried` and placement
   for the pudding are judged from the printout, not the video.
