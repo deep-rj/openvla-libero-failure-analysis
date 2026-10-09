@@ -259,8 +259,9 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
   the mug creeping in the gripper.
 - `stalled`'s threshold (3 × wait-step jitter) can exceed motion visible on video (`t03-i011`:
   v = 13.5 mm/s; the arm crept within a ~3 cm box for 7 s and was flagged as stopped).
-- `regrasp_count` false positive after a release (`t03-i011`: no second grasp of the bowl; `t05-i009`: fingers nearly shut against the dropped book counted as held, which also set `truncated_mid_action`).
+- `regrasp_count` false positive after a release (`t03-i011`: no second grasp of the bowl; `t05-i009`: fingers nearly shut against the dropped book counted as held, which also set `truncated_mid_action`). False negative when the object stays supported: a release and
+  regrip with the object resting on the table and plate counts as one hold (`t06-i013`, ~278-285).
 - `phase` only counts progress made while `k` is at its maximum, so a subgoal carried to its
   target before another subgoal raised `k` reads `none` (`t04-i017`).
 - Placements that look done but fail LIBERO's object-on-object `On` tolerance (centers within
-  3 cm, `base_object_states.py`): how many of the failures are these (`t04-i017`: 3.03 cm).
+  3 cm, `base_object_states.py`): how many of the failures are these (`t04-i017`: 3.03 cm; `t06-i013`: 4.0 cm, unseen on video until the data was checked).
