@@ -302,3 +302,34 @@ def test_open_fingers_are_not_in_contact():
     eef = np.tile([0.0, 0.0, 0.98], (n_steps, 1))
     obj = eef - [0.0, 0.0, 0.08]
     assert not ms.in_contact(obj, eef, np.full(n_steps, 0.08)).any()
+
+
+def test_phase_counts_progress_made_before_k_reached_its_maximum():
+    """Mug 0 is carried over its target and released off it; mug 1 lands in its goal later,
+    raising k to 1. The carry toward mug 0 still sets the phase."""
+    n_steps = 100
+    obj0, eef, width = _carry_trajectory(n_steps=n_steps, lift_at=30)
+    obj0[56:] = obj0[55]
+    eef[56:] = eef[55] + [0.0, 0.0, 0.05]
+    width[56:] = 0.08
+    obj1 = np.tile([0.5, 0.5, 0.9], (n_steps, 1))
+    holds = np.zeros((n_steps, 2), dtype=bool)
+    holds[70:, 1] = True
+    over = np.zeros((n_steps, 2), dtype=bool)
+    over[40:56, 0] = True
+    extracted = {
+        "goal_holds": holds,
+        "over_target": over,
+        "fixture_q": np.full((n_steps, 2), np.nan),
+        "object_pos": np.stack([obj0, obj1], axis=1),
+        "eef_pos": eef,
+        "gripper_qpos": np.stack([width / 2, -width / 2], axis=1),
+    }
+    place = {"kind": "place", "threshold": float("nan"), "depends_on": []}
+    info = {
+        "final_success": False,
+        "num_wait_steps": WAIT,
+        "subgoals": [{**place, "object_index": 0}, {**place, "object_index": 1}],
+    }
+    m = ms.compute_milestone(extracted, info)
+    assert (m.k, m.phase) == (1, "carried")

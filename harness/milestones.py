@@ -173,14 +173,18 @@ def compute_milestone(extracted, info, params: MilestoneParams = DEFAULT_PARAMS)
     k, k_step = max_simultaneous(count)
 
     levels = _phase_levels(extracted, info, params, start, held)
-    at_k = count.sum(axis=1) == k
-    at_k[:start] = False
+    at_k = np.flatnonzero(count.sum(axis=1) == k)
+    # Subgoals still open when k was last at its maximum; their progress counts whenever made.
+    still_open = ~count[at_k[-1]] if len(at_k) else np.ones(n_goals, dtype=bool)
+    after_wait = np.arange(len(count)) >= start
     best_level, best_kind = 0, "place"
     for g, sub in enumerate(subgoals):
-        prerequisites_met = np.ones(len(at_k), dtype=bool)
+        if not still_open[g]:
+            continue
+        prerequisites_met = np.ones(len(count), dtype=bool)
         for d in deps[g]:
             prerequisites_met &= count[:, d]
-        open_steps = at_k & ~count[:, g] & prerequisites_met
+        open_steps = after_wait & ~count[:, g] & prerequisites_met
         if open_steps.any():
             level = int(levels[open_steps, g].max())
             if level > best_level:
