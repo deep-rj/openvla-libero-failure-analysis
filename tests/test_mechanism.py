@@ -386,13 +386,10 @@ def _miss_then_aligned_close():
     return _sync(x), info, boxes
 
 
-def test_a_miss_corrected_by_a_later_aligned_attempt_is_recovered_per_object():
+def test_a_miss_corrected_by_a_later_aligned_close_is_recovered():
     x, info, boxes = _miss_then_aligned_close()
-    by_k = mechanism.classify(x, info, NO_FLAGS, boxes, reference={})
-    params = mechanism.MechanismParams(per_object_recovery=True)
-    per_object = mechanism.classify(x, info, NO_FLAGS, boxes, {}, params)
-    assert by_k.mechanism == "perception"
-    assert per_object.mechanism == "control: grasp"
+    pred = mechanism.classify(x, info, NO_FLAGS, boxes, reference={})
+    assert pred.mechanism == "control: grasp"
 
 
 def test_a_later_open_descent_over_the_object_does_not_recover_a_miss():
@@ -403,17 +400,62 @@ def test_a_later_open_descent_over_the_object_does_not_recover_a_miss():
     pads[80:, :, 2] = 0.30
     pads[80:, 0, 0], pads[80:, 1, 0] = -0.04, 0.04
     _reach(x, 120, 160, at_xy=(0.0, 0.0))  # hovers down over it, never closes, parks
-    params = mechanism.MechanismParams(per_object_recovery=True)
-    pred = mechanism.classify(_sync(x), info, NO_FLAGS, boxes, {}, params)
+    pred = mechanism.classify(_sync(x), info, NO_FLAGS, boxes, reference={})
     assert (pred.mechanism, pred.onset_step) == ("perception", 60)
 
 
-def test_recovery_by_another_subgoal_counting_depends_on_the_recovery_mode():
+def test_a_placement_jammed_to_the_cap_has_its_onset_at_the_descent_that_jammed_it():
+    x, info, boxes = _scene(n=300)
+    _reach(x, 20, 60, at_xy=(0.0, 0.0))
+    _close(x, 61, to_half_gap=0.016)
+    _lift(x, 70)
+    pads, obj = x["finger_pad_pos"], x["object_pos"]
+    x["over_target"][100:, 0] = True
+    top = pads[99, :, 2].copy()
+    for t in range(100, 300):
+        down = min(t - 100, 30) * 0.003  # descends 9 cm over 30 steps, then jams there
+        jiggle = 0.004 * (t % 20 >= 10) if t > 200 else 0.0  # the arm keeps nudging up
+        pads[t, :, 2] = top - down + jiggle
+        obj[t, 0] = pads[t].mean(axis=0)
+    pred = _classify(x, info, boxes)
+    assert pred.mechanism == "control: place"
+    assert abs(pred.onset_step - 100) <= 2
+
+
+def test_a_placement_attempt_later_carried_off_the_target_keeps_its_onset():
+    x, info, boxes = _scene(n=300)
+    _reach(x, 20, 60, at_xy=(0.0, 0.0))
+    _close(x, 61, to_half_gap=0.016)
+    _lift(x, 70)
+    pads, obj = x["finger_pad_pos"], x["object_pos"]
+    x["over_target"][100:200, 0] = True
+    top = pads[99, :, 2].copy()
+    for t in range(100, 300):
+        down = min(t - 100, 30) * 0.003
+        rise = min(max(t - 200, 0), 10) * 0.002  # lifted 2 cm off the jam at 200
+        away = max(t - 210, 0) * 0.002  # then carried off the target and down
+        pads[t, :, 2] = top - down + rise - away
+        pads[t, :, 1] = away
+        obj[t, 0] = pads[t].mean(axis=0)
+    pred = _classify(x, info, boxes)
+    assert pred.mechanism == "control: place"
+    assert abs(pred.onset_step - 100) <= 2
+
+
+def test_another_subgoal_counting_does_not_recover_an_error():
     x, info, boxes = _two_objects_second_placed()
-    _sync(x)
-    by_k = mechanism.classify(x, info, NO_FLAGS, boxes, reference={})
-    per_object = mechanism.classify(
-        x, info, NO_FLAGS, boxes, {}, mechanism.MechanismParams(per_object_recovery=True)
-    )
-    assert by_k.abstained
-    assert per_object.mechanism == "control: place"
+    pred = mechanism.classify(_sync(x), info, NO_FLAGS, boxes, reference={})
+    assert pred.mechanism == "control: place"
+
+
+def test_a_stall_from_the_first_policy_step_to_the_cap_is_inaction():
+    x, info, boxes = _scene(n=200)
+    stalled = dict(NO_FLAGS, stalled=[(WAIT + 1, 200)])
+    pred = _classify(x, info, boxes, stalled)
+    assert (pred.mechanism, pred.onset_step) == ("inaction", WAIT)
+
+
+def test_a_stall_that_starts_after_the_policy_moved_is_not_inaction():
+    x, info, boxes = _scene(n=200)
+    late = dict(NO_FLAGS, stalled=[(60, 200)])
+    assert _classify(x, info, boxes, late).abstained

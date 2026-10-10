@@ -190,6 +190,7 @@ Categories (frozen after the pilot):
 | `control: transport` | from lift-off until the descent toward the target starts, including contact while moving into a receptacle (the microwave edge) (`phase` grasped) |
 | `control: place` | from the descent toward the target through release until the object settles (`phase` carried) |
 | `external` | a disturbance the policy did not cause (physics, a Block 3 perturbation); expected 0 on the baseline |
+| `inaction` | the policy commands no motion from the first policy step to the cap (`stalled` throughout); onset 10 |
 
 `perception` is not split by phase until a non-grasp case appears. Failing to recover after the
 initiator is recorded in tags and flags, never as a mechanism.
@@ -313,18 +314,34 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
     `control` too.
   - The between-the-fingers test spans the bottom of the descent through the end of the close,
     not the bottom alone. No pilot label changes.
+  - New category `inaction`: the arm never moves (`stalled` from step 11 to the cap). Seen in
+    3 unlabeled non-held-out failures (`t03-i016`, `t07-i004`, `t07-i005`), none in the pilot.
+    None of the other categories fits: no world state shows where the policy was aiming.
+  - Recovered means progress on the error's own subgoal, not on any subgoal (see "Mechanism
+    classifier", "Recovered").
 
 ## Mechanism classifier
 
 Assigns each failure a `mechanism` from world state, or abstains. Developed on the pilot 20,
 scored against the held-out labels. Rules approved so far:
 
-- **Rule order.** (1) `wrong_object` or `wrong_target` fired: `grounding`. (2) Otherwise find
-  the initiator, the earliest error not recovered from; recovered means progress resumed (`k`
-  rose, or the same object was later grasped with progress). (3) The phase at the initiator,
-  not the episode's final phase, gives the `control` sub-label: none `grasp`, grasped
-  `transport`, carried `place`. (4) At a failed grasp attempt, the between-the-fingers test
-  splits `perception` from `control: grasp`.
+- **Rule order.** (1) `wrong_object` or `wrong_target` fired: `grounding`. (2) `stalled` from
+  the first policy step to the cap: `inaction`, onset 10. (3) Otherwise find the initiator,
+  the earliest error not recovered from. (4) The phase at the initiator, not the episode's
+  final phase, gives the `control` sub-label: none `grasp`, grasped `transport`, carried
+  `place`. (5) At a failed grasp attempt, the between-the-fingers test splits `perception`
+  from `control: grasp`.
+- **Recovered.** Progress resumed on the error's own subgoal: it counts later, or its object
+  reaches a higher phase (held, then held over the target). Progress on another subgoal does
+  not recover it (`t04-i017`: the second mug's placement does not undo the first mug's
+  near-miss). A miss is also recovered by a later close with the same object between the
+  fingers (`t01-i010`, "pre: recovered miss"); a later open descent over it is not enough
+  (`t08-i006`). Errors on non-goal objects (collisions) are recovered by progress on any
+  subgoal.
+- **Abstention.** No initiator found: reported as an abstention with that reason, separate
+  from close calls. On the 70 unlabeled non-held-out failures: 14, by pattern mid-air stalls
+  away from every goal object, an object held to the cap without placing, and fixture-stage
+  errors (no fixture detector).
 - **Between the fingers.** Some part of the target object's collision geometry (boxes, from
   `object_geometry.json`, placed by `object_pos` and `object_quat`) lies in the box between
   the finger pads (`finger_pad_pos`, `grip_quat`, `finger_pad_half_size`). Score: pad-face
@@ -350,13 +367,18 @@ scored against the held-out labels. Rules approved so far:
   object's settled up axis at step 10 against its axis 10 steps after the placement first
   holds) or rest height outside that task's successes for the object. Task 3 bowl successes
   tilt 0–23.8°; `t03-i011` is at 32.7°. No upright requirement.
-- **Other thresholds** (slip 5 mm and 2 mm, transport shift 5 mm, detector internals) go
-  through the x0.5 / x1.5 sensitivity check; only those that flip a pilot value are raised.
+- **Sensitivity** (each numeric parameter at x0.5 and x1.5, pilot 20 and the 70 unlabeled
+  non-held-out failures): the defaults agree with all 20 pilot labels. Three flip a pilot
+  value in one direction only, with at least 50% margin in the other: `cover_cutoff` 0.3
+  (0.15 turns `t07-i013` into `control`), `near_m` 12 cm (6 cm drops the four "beside the
+  object" `perception` attempts), `shift_m` 5 mm (2.5 mm turns `t06-i020` into
+  `transport`). No other parameter flips a pilot value or changes more than 3 of the 70.
 - **Onsets.** Slip: the step the object leaves the hand. `perception` and `control: grasp`: the
   bottom of the descent of the first failed attempt. `transport`: the first step the held
-  object shifts more than 5 mm relative to the pad midpoint. `place`: the start of the final
-  descent toward the target before release (not the first held-over-target step, which
-  near-miss placements never reach). Collision initiators: the collision step. Pilot offsets
+  object shifts more than 5 mm relative to the pad midpoint. `place`: the start of the
+  descent that brought the object to rest on or near the target, before release or, for an
+  object held to the cap, before it last left the target (not the first held-over-target
+  step, which near-miss placements never reach). Collision initiators: the collision step. Pilot offsets
   are reported signed and not fitted; hand onsets for grasp errors sit anywhere in the
   descent.
 - Grip-site geometry uses simulator-state fields only; `eef_pos` and `gripper_qpos` are

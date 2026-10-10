@@ -36,9 +36,8 @@ class MechanismParams:
     shift_settle: int = 5  # steps after a grasp onset before the held offset is the reference
     place_near_m: float = 0.10  # release this close to an object target is a placement
     descent_tol_m: float = 0.001
+    rest_band_m: float = 0.01  # within this of its last height, a placed object is at rest
     defect_delay: int = 10  # steps after a placement first holds when its state is read
-    # Recovery from progress on the event's own subgoal, not any subgoal.
-    per_object_recovery: bool = False
 
 
 DEFAULT_PARAMS = MechanismParams()
@@ -385,12 +384,18 @@ def _placements(w: _World, params: MechanismParams) -> list[Event]:
             last = e - 1
             if e == n:
                 attempted = over[a:e].any()
+                if attempted:  # held to the cap: the attempt ends where it left the target
+                    last = a + int(np.flatnonzero(over[a:e])[-1])
             else:
                 d = _target_xy_distance(w, g, last)
                 near = over[last] or (d is not None and d < params.place_near_m)
                 attempted = near and _release_kind(w, i, (a, e), params) == "release"
             if attempted:
-                out.append(Event("placement", final_descent_start(z, last), i, last))
+                # The descent that brought it to rest, not later nudges at that height; searched
+                # from the carry's highest point, since the lift also passes that height.
+                peak = a + int(np.argmax(z[a : last + 1]))
+                at_rest = peak + int(np.argmax(z[peak : last + 1] <= z[last] + params.rest_band_m))
+                out.append(Event("placement", final_descent_start(z, at_rest), i, last))
     return out
 
 
@@ -466,14 +471,16 @@ def _between(event: Event, w: _World, params: MechanismParams) -> bool:
 
 
 def _recovered(event: Event, w: _World, params: MechanismParams, attempts) -> bool:
+    """Progress resumed on the event's own subgoal; for events on other objects, on any.
+    A miss is also recovered by a later close with the same object between the fingers."""
     if event.decisive is None:
         return False
-    if params.per_object_recovery and event.kind == "grasp_attempt":
+    if event.kind == "grasp_attempt":
         later = [a for a in attempts if a.obj == event.obj and a.step > event.step and a.closed]
         if not _between(event, w, params) and any(_between(a, w, params) for a in later):
             return True
     prog = w.progress
-    if params.per_object_recovery and event.obj in w.goal_objects:
+    if event.obj in w.goal_objects:
         g = w.subgoal_of(event.obj)
         prog = 3 * w.count[:, g] + w.levels[:, g]
     before = prog[max(event.decisive - 1, 0)]
@@ -507,11 +514,17 @@ def _label(event: Event, w: _World, params: MechanismParams) -> Prediction:
 
 
 def classify(x, info, flag_intervals, boxes, reference, params=DEFAULT_PARAMS) -> Prediction:
-    """Rule order: grounding flags; else the earliest unrecovered event, labeled by its kind."""
+    """Rule order: grounding flags; inaction; else the earliest unrecovered event, labeled by
+    its kind."""
     grounding = list(flag_intervals["wrong_object"]) + list(flag_intervals["wrong_target"])
     if grounding:
         onset = min(a for a, _ in grounding)
         return Prediction("grounding", onset, False, "wrong_object or wrong_target fired")
+    start, n = info["num_wait_steps"], len(x["finger_pad_pos"])
+    # `stalled` is judged from the step after the wait, so a stall from the first policy
+    # step starts at start + 1.
+    if any(a <= start + 1 and b == n for a, b in flag_intervals.get("stalled", [])):
+        return Prediction("inaction", start, False, "stalled from the first policy step to the cap")
     w = _World(x, info)
     collisions = _collisions(w, params)
     attempts = _grasp_attempts(w, boxes, collisions, params)
