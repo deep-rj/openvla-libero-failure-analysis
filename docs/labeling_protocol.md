@@ -319,6 +319,12 @@ scored against the held-out labels. Rules approved so far:
   `object_geometry.json`, placed by `object_pos` and `object_quat`) lies in the box between
   the finger pads (`finger_pad_pos`, `grip_quat`, `finger_pad_half_size`). Score and step are
   open.
+- **Slips are `control: grasp` in any phase.** A drop where the object leaves the hand (5 mm
+  from the pad midpoint) before the fingers open (pad gap +2 mm) is a slip, unless a collision
+  initiator precedes it (`t09-i020`). Fingers opening first or on the same step is a release,
+  labeled by its phase (`t04-i004`). Matches both pilot slips (`t00-i013`, `t04-i002`) and two
+  checked on video (`t03-i002`, `t07-i019`). At 20 Hz, ties and 2-step margins occur; the
+  cutoffs go through the sensitivity check.
 - **Completed-subgoal initiators.** A placement whose end state is outside the successes'
   range (tilted, raised, off-center) and blocks a dependent subgoal is a `control: place`
   initiator even though `k` counted it (`t03-i011`).
