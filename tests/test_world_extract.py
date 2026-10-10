@@ -185,3 +185,25 @@ def test_object_quats_match_the_env_observation_convention(reset_env):
 def test_finger_pad_half_size_is_thinnest_along_the_closing_axis(reset_env):
     env, _ = reset_env
     assert world_extract.finger_pad_half_size(env.env) == pytest.approx([0.004, 0.008, 0.008])
+
+
+def test_collision_boxes_placed_by_the_object_pose_match_the_sim(reset_env):
+    from robosuite.utils.transform_utils import quat2mat
+
+    env, _ = reset_env
+    inner, model, data = env.env, env.sim.model, env.sim.data
+    names = world.scene_layout(env).object_names
+    boxes = world_extract.object_collision_boxes(inner, names)
+    for name, quat in zip(names, world_extract.object_quats(inner, names), strict=True):
+        body = inner.obj_body_id[name]
+        geoms = [
+            g for g in range(model.ngeom) if model.geom_bodyid[g] == body and model.geom_contype[g]
+        ]
+        assert len(boxes[name]) == len(geoms)
+        # robosuite's quat2mat computes in float32, hence the 1e-6 tolerances.
+        r_obj, p_obj = quat2mat(quat), data.body_xpos[body]
+        for box, g in zip(boxes[name], geoms, strict=True):
+            assert p_obj + r_obj @ box["pos"] == pytest.approx(data.geom_xpos[g], abs=1e-6)
+            r_box = r_obj @ quat2mat(box["quat_xyzw"])
+            assert r_box == pytest.approx(data.geom_xmat[g].reshape(3, 3), abs=1e-6)
+            assert box["half_size"] == pytest.approx(model.geom_size[g])

@@ -17,6 +17,7 @@ EXTRACTION_VERSION = 4
 # Ordered to match gripper_qpos: finger 1 is the left finger (qpos[0]).
 FINGER_PAD_GEOMS = ("gripper0_finger1_pad_collision", "gripper0_finger2_pad_collision")
 GRIP_SITE = "gripper0_grip_site"
+MJ_GEOM_BOX = 6
 PLACE_PREDICATES = ("in", "on")
 FIXTURE_PREDICATES = ("close", "turnon")
 # LIBERO's `On` between two objects requires their origins within this xy distance.
@@ -165,6 +166,28 @@ def object_quats(inner, object_names) -> np.ndarray:
     """[n_obj, 4] xyzw, the convention of the env's `<name>_quat` observations."""
     quats = [inner.sim.data.body_xquat[inner.obj_body_id[name]] for name in object_names]
     return np.array(quats)[:, [1, 2, 3, 0]]
+
+
+def object_collision_boxes(inner, object_names) -> dict[str, list[dict]]:
+    """Each object's collision boxes in its body frame: pos, quat_xyzw, half_size (m)."""
+    model = inner.sim.model
+    boxes = {}
+    for name in object_names:
+        body = inner.obj_body_id[name]
+        boxes[name] = []
+        for g in range(model.ngeom):
+            if model.geom_bodyid[g] != body or not model.geom_contype[g]:
+                continue
+            if model.geom_type[g] != MJ_GEOM_BOX:
+                raise NotImplementedError(f"{name}: collision geom type {model.geom_type[g]}")
+            boxes[name].append(
+                {
+                    "pos": model.geom_pos[g].tolist(),
+                    "quat_xyzw": model.geom_quat[g][[1, 2, 3, 0]].tolist(),
+                    "half_size": model.geom_size[g].tolist(),
+                }
+            )
+    return boxes
 
 
 def _xy_over_target(inner, target: str, obj_pos: np.ndarray) -> bool:
