@@ -216,6 +216,12 @@ initiator is recorded in tags and flags, never as a mechanism.
   The target is any part of the target object: successes grasp mugs by the wall or the handle,
   depending on the task. Between the fingers means at pad height, between the pads; an object
   under a finger, or below pads held up by a finger resting on it, is not between them.
+  The target must sit in the gap between the two pad faces: one touched only by the edge or tip
+  of a pad, so that the closing fingers push it aside or slide off it rather than squeeze it,
+  is not between them. Reference cases: `t07-i013` (a sliver of the can at the pad edge,
+  `perception`) and `t03-i009` (the bowl rim between the pads, `control: grasp`). A case
+  between the two is labeled as judged, with "Close call with control" or "Close call with
+  perception" in the notes.
 - **Recovered** means progress resumed on the error's own subgoal: it counts later, or its
   object reaches a higher phase. Progress on another subgoal does not recover it. A miss is
   also recovered by a later close with the same object between the fingers; errors on
@@ -336,6 +342,10 @@ re-passed when a change affects them.
     None of the other categories fits: no world state shows where the policy was aiming.
   - Recovered means progress on the error's own subgoal, not on any subgoal (see "Mechanism
     classifier", "Recovered").
+- Held-out labeling (2026-10-10): the hand rule for between the fingers gets a visual minimum,
+  anchored on reference cases (`t07-i013` below it, `t03-i009` above), matching the pilot labels
+  and the classifier's pad-face cover cutoff of 0.3 (about 5 mm of a 1.6 cm pad, not visible at
+  256 px). No label changes, pilot or held-out; the classifier is unchanged.
 
 ## Mechanism classifier
 
