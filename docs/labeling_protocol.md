@@ -199,7 +199,8 @@ initiator is recorded in tags and flags, never as a mechanism.
   visible evidence such as the arm going to where the object is not. For a grasp: if the target
   is between the fingers at the bottom of the descent, a miss is `control`; if not, `perception`.
   The target is any part of the target object: successes grasp mugs by the wall or the handle,
-  depending on the task.
+  depending on the task. Between the fingers means at pad height, between the pads; an object
+  under a finger, or below pads held up by a finger resting on it, is not between them.
 - **`mechanism_notes`** describe the initiator only. Unverified causes are written as
   `Hypothesis: ...`, never as fact.
 - **`notes`** hold what follows the initiator and anything else. Post-initiator behavior starts
@@ -303,6 +304,11 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
     Successes grasp the porcelain mug by its wall (tasks 4, 6) and the white-yellow mug by
     its handle (task 9) or its far wall (task 4). No pilot label changes: in `t02-i009` and
     `t02-i023` no part of the pot is between the pads at any close.
+  - Between the fingers means at pad height. `t08-i006` relabeled `perception` (was `control:
+    grasp`): a finger stuck on the pot top kept the pads above the pot, as in `t02-i023` where
+    a finger hit the handle. A test extended 3 cm past the pads (the fingers straddle the
+    object) would keep `t08-i006` as `control` but turn `t02-i023` and `t07-i013` into
+    `control` too.
 
 ## Mechanism classifier
 
