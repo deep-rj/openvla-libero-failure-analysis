@@ -184,7 +184,7 @@ Categories (frozen after the pilot):
 
 | Category | Initiator |
 |---|---|
-| `perception` | the target is not localized: at a grasp, the target is not between the fingers at the bottom of the descent |
+| `perception` | the target is not localized: at a grasp, the target is not between the fingers at any point from the bottom of the descent through the close |
 | `grounding` | the instruction is misread: wrong object or wrong target |
 | `control: grasp` | right intent, failed execution, from heading for the object until it is lifted and held (computed `phase` none) |
 | `control: transport` | from lift-off until the descent toward the target starts, including contact while moving into a receptacle (the microwave edge) (`phase` grasped) |
@@ -197,7 +197,9 @@ initiator is recorded in tags and flags, never as a mechanism.
 - **Decidable from observables.** A category must be distinguishable on video or in world
   state. A grasp that closes off-center on the right object is `control`; `perception` needs
   visible evidence such as the arm going to where the object is not. For a grasp: if the target
-  is between the fingers at the bottom of the descent, a miss is `control`; if not, `perception`.
+  is between the fingers at any point from the bottom of the descent through the end of the
+  close, a miss is `control`; if not, `perception`. A descent that never closes is judged at its
+  bottom.
   The target is any part of the target object: successes grasp mugs by the wall or the handle,
   depending on the task. Between the fingers means at pad height, between the pads; an object
   under a finger, or below pads held up by a finger resting on it, is not between them.
@@ -309,6 +311,8 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
     a finger hit the handle. A test extended 3 cm past the pads (the fingers straddle the
     object) would keep `t08-i006` as `control` but turn `t02-i023` and `t07-i013` into
     `control` too.
+  - The between-the-fingers test spans the bottom of the descent through the end of the close,
+    not the bottom alone. No pilot label changes.
 
 ## Mechanism classifier
 
@@ -323,8 +327,11 @@ scored against the held-out labels. Rules approved so far:
   splits `perception` from `control: grasp`.
 - **Between the fingers.** Some part of the target object's collision geometry (boxes, from
   `object_geometry.json`, placed by `object_pos` and `object_quat`) lies in the box between
-  the finger pads (`finger_pad_pos`, `grip_quat`, `finger_pad_half_size`). Score and step are
-  open.
+  the finger pads (`finger_pad_pos`, `grip_quat`, `finger_pad_half_size`). Score: pad-face
+  cover, the share of the pad face whose closing-axis line passes through the object. Taken
+  as the maximum from the bottom of the descent through the end of the close: 12 of 192
+  successful grasping closes have nothing between the pads at the bottom and are aligned
+  during the close. The cutoff is open.
 - **Slips are `control: grasp` in any phase.** A drop where the object leaves the hand (5 mm
   from the pad midpoint) before the fingers open (pad gap +2 mm) is a slip, unless a collision
   initiator precedes it (`t09-i020`). Fingers opening first or on the same step is a release,
