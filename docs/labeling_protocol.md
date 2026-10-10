@@ -331,7 +331,12 @@ scored against the held-out labels. Rules approved so far:
   cover, the share of the pad face whose closing-axis line passes through the object. Taken
   as the maximum from the bottom of the descent through the end of the close: 12 of 192
   successful grasping closes have nothing between the pads at the bottom and are aligned
-  during the close. The cutoff is open.
+  during the close. Cover below 0.3 is `perception`; for the moka pot any cover counts, since
+  7 of its 30 successful handle grasps cover less than 0.3 (minimum 0.01). Other objects'
+  successful grasps fall below 0.3 in 2 of 162. Matches all 8 pilot grasp-stage labels; no
+  abstention band. Rejected: cover at the end of the close (a miss closes on nothing, so
+  `t03-i009`, whose rim was between the pads at 0.52, would read as `perception`), and a
+  top-down view past the pads (the straddle test above).
 - **Slips are `control: grasp` in any phase.** A drop where the object leaves the hand (5 mm
   from the pad midpoint) before the fingers open (pad gap +2 mm) is a slip, unless a collision
   initiator precedes it (`t09-i020`). Fingers opening first or on the same step is a release,
@@ -340,7 +345,13 @@ scored against the held-out labels. Rules approved so far:
   cutoffs go through the sensitivity check.
 - **Completed-subgoal initiators.** A placement whose end state is outside the successes'
   range (tilted, raised, off-center) and blocks a dependent subgoal is a `control: place`
-  initiator even though `k` counted it (`t03-i011`).
+  initiator even though `k` counted it (`t03-i011`). Checked only for placements a later
+  subgoal depends on (tasks 3 and 9), so basket drops never are. Defective: tilt (the
+  object's settled up axis at step 10 against its axis 10 steps after the placement first
+  holds) or rest height outside that task's successes for the object. Task 3 bowl successes
+  tilt 0–23.8°; `t03-i011` is at 32.7°. No upright requirement.
+- **Other thresholds** (slip 5 mm and 2 mm, transport shift 5 mm, detector internals) go
+  through the x0.5 / x1.5 sensitivity check; only those that flip a pilot value are raised.
 - **Onsets.** Slip: the step the object leaves the hand. `perception` and `control: grasp`: the
   bottom of the descent of the first failed attempt. `transport`: the first step the held
   object shifts more than 5 mm relative to the pad midpoint. `place`: the start of the final
