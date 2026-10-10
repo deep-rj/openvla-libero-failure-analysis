@@ -341,6 +341,13 @@ scored against the held-out labels. Rules approved so far:
 - **Completed-subgoal initiators.** A placement whose end state is outside the successes'
   range (tilted, raised, off-center) and blocks a dependent subgoal is a `control: place`
   initiator even though `k` counted it (`t03-i011`).
+- **Onsets.** Slip: the step the object leaves the hand. `perception` and `control: grasp`: the
+  bottom of the descent of the first failed attempt. `transport`: the first step the held
+  object shifts more than 5 mm relative to the pad midpoint. `place`: the start of the final
+  descent toward the target before release (not the first held-over-target step, which
+  near-miss placements never reach). Collision initiators: the collision step. Pilot offsets
+  are reported signed and not fitted; hand onsets for grasp errors sit anywhere in the
+  descent.
 - Grip-site geometry uses simulator-state fields only; `eef_pos` and `gripper_qpos` are
   observations one 2 ms physics substep behind.
 
