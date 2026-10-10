@@ -1,17 +1,19 @@
-# Labeling protocol (provisional until the pilot labels exist)
+# Labeling protocol
 
-Status: living. The milestone and mechanism coding rules are provisional; they are revised
-after the ~20 pilot labels and then frozen (commit + hash) before the separability gate's
-first plot. Any later change is logged as a decision, and the gate and Block 4 are re-run.
-The agent does not label.
+Status: frozen for the held-out labels. The coding rules were revised on the 20 pilot labels,
+frozen at git tag `block2-freeze`, and amended once by the classifier rule session, frozen
+at `block2-classifier-freeze` (see "Freeze"). Any later change is logged as a decision, and the
+gate and Block 4 are re-run. The agent does not label.
 
 ## Independence from model outputs (hard rule)
 
-Labels, event detectors and detector thresholds never use model outputs. Until the label CSV
-is committed:
+Labels, event detectors and detector thresholds never use model outputs. Until all ~50 hand
+labels (pilot and held-out) are committed:
 
 - No per-episode or time-aligned plots of logits, entropy or confidence.
 - No model-output values in video overlays or filenames.
+- No mechanism-classifier output or its scores (such as pad-face cover) for a held-out episode;
+  the classifier is scored against the held-out labels, so they are written without it.
 - The pooled pilot report (`scripts/pilot_report.py`) is allowed: it has no per-episode or
   time-aligned output and no split by outcome.
 
@@ -30,6 +32,12 @@ coding rules; agreement is measured on the remaining ~30 of Block 2's ~50.
 
 This seed is the draw's own and has no relation to the run seed.
 
+The held-out draw (`--n 30 --seed 1 --prefix heldout_`, with `--exclude` for earlier
+selections) takes 3 failures per task and never draws an excluded episode: the pilot 20 and the
+3 failures watched on video during the flag fixes (`t02-i005`, `t05-i002`,
+`t08-i008`). It was committed before any held-out episode was watched. The held-out labels go in
+`heldout_labels.csv`, committed only once all 30 are done.
+
 ## Computed vs hand-labeled
 
 Anything the simulator can decide is computed; hand labels cover only judgment.
@@ -39,7 +47,8 @@ Anything the simulator can decide is computed; hand labels cover only judgment.
   LIBERO's own (`libero/libero/envs/predicates`); placement adds a release condition (below).
 - **Hand-labeled from video:** `mechanism`, `mechanism_notes`, the two onset steps,
   `no_onset`, `notes`, and `computed_check`: the computed columns that disagree with the
-  video, with a reason, or empty. Computed columns are validated this way on the pilot.
+  video, with a reason, or empty. Computed columns are validated this way on the pilot and the
+  held-out labels; the computed row is shown only after the hand row is written.
 
 ## Milestone
 
@@ -70,9 +79,10 @@ subgoals by definition.
 
 ### Phases
 
-- **grasped:** starts when the object, lifted above its settled height and near the end
-  effector with the fingers not open, moves at least 5 mm over a short window while its offset
-  from the end effector stays fixed. It continues while the fingers stay closed and the offset
+- **grasped:** starts when the object, lifted at least 1 cm above its support (its lowest
+  height over the last 20 steps: table, plate or caddy) and within 12 cm of the end effector
+  with the fingers not open (width below 7 cm), moves at least 5 mm over a short window while
+  its offset from the end effector stays fixed. It continues while the fingers stay closed and the offset
   stays fixed, including while the arm pauses. The object itself must move: a still object
   next to a moving or still gripper keeps a near-fixed offset trivially. Finger width alone
   does not separate a grasp from an empty close: a bowl held by its rim leaves the fingers
@@ -141,6 +151,8 @@ all 50 init states:
 
 All world-state flags are computed. Each threshold is set on the pilot 20 with a physical
 rationale, swept as a sensitivity check (not searched), and frozen with the coding rules.
+Each flag is a list of step intervals (Python slice notation, `;`-separated, a lone step for a
+point event; empty means not fired), so its count is the number of entries.
 
 | Flag | Definition | Threshold(s) |
 |---|---|---|
@@ -149,14 +161,14 @@ rationale, swept as a sensitivity check (not searched), and frozen with the codi
 | `regression` | a counted subgoal later stops counting for N steps | N |
 | `order_violation` | a dependent subgoal's predicate holds while its prerequisite does not count | N |
 | `dropped` | a goal object is released away from its target and falls at least 3 cm within 10 steps; setting it down is not a drop | 3 cm, 10 steps |
-| `collision_disturbance` | an object moves more than D while not held; excluded: the 10 steps before a grasp onset (closing fingers drag an object about 2 cm before it lifts), the 10 steps after a release, and motion inside its goal container (a bowl in a closing drawer) | D = 2 cm |
-| `regrasp_count` | grasp onsets on goal objects beyond the first per object (integer) | — |
+| `collision_disturbance` | an object moves more than D while not held; each firing runs from the step the displacement passes D until the object rests. Excluded: the 10 steps before a grasp onset (closing fingers drag an object about 2 cm before it lifts), an unbroken contact run that ends in a grasp onset (a grip held before lift), the 10 steps after a release, and motion inside its goal container (a bowl in a closing drawer) | D = 2 cm |
+| `regrasp_count` | grasp onsets on goal objects beyond the first per object, as point events | — |
 | `stalled` | the arm stops: end-effector speed below v for at least 2 s; v = max(3 × median wait-step speed, 5 mm/s) | v, 2 s |
 | `oscillation` | at least 6 direction reversals of at least 2 cm along one axis within 4 s. A path-to-displacement ratio does not work: reaching down and lifting has a high ratio (it flagged 112 of 130 successes). Named for what it measures: in control engineering "dither" is a deliberately injected signal, and the robot-learning term for the likely cause, mode switching, is internal to the policy | 6, 2 cm, 4 s |
 | `gripper_chatter` | at least 3 empty closes (finger width below 2 cm) within 2 s with nothing held | 3, 2 s |
 | `object_off_table` | a goal object at least 5 cm below its settled height | 5 cm |
 | `workspace_limit` | an arm joint within 2% of its range from either limit for 10 steps; gripper fingers excluded. A fully extended arm shows as joint 4 at its upper limit, so no separate reach check | 2%, 10 steps |
-| `truncated_mid_action` | a failure whose last logged step has a goal object grasped, or a goal object or fixture joint moving | 1 cm/s |
+| `truncated_mid_action` | a failure whose last logged step has a goal object grasped, or a goal object or fixture joint moving; a moving object counts only if the fingers were closed within reach of it in the last 5 s | 1 cm/s, 5 s |
 
 Receptacles are the BDDL regions attached to an object or fixture (caddy compartments, other
 drawers, the microwave top) plus every goal target (the other plate). Table regions such as
@@ -204,6 +216,10 @@ initiator is recorded in tags and flags, never as a mechanism.
   The target is any part of the target object: successes grasp mugs by the wall or the handle,
   depending on the task. Between the fingers means at pad height, between the pads; an object
   under a finger, or below pads held up by a finger resting on it, is not between them.
+- **Recovered** means progress resumed on the error's own subgoal: it counts later, or its
+  object reaches a higher phase. Progress on another subgoal does not recover it. A miss is
+  also recovered by a later close with the same object between the fingers; errors on
+  non-goal objects (collisions) are recovered by progress on any subgoal.
 - **`mechanism_notes`** describe the initiator only. Unverified causes are written as
   `Hypothesis: ...`, never as fact.
 - **`notes`** hold what follows the initiator and anything else. Post-initiator behavior starts
@@ -250,7 +266,8 @@ under gravity. Step indices keep counting from 0 everywhere; the first policy st
 
 ## Rule changes
 
-Logged as made during the pilot; earlier episodes are re-passed when a change affects them.
+Logged as made; a later entry supersedes an earlier one, and labels already written are
+re-passed when a change affects them.
 
 - `t00-i013`: mechanism is the initiator of the failure sequence (event tree), not
   the error that made success unreachable; `no_return_step` is state-based with `none`; onset
@@ -392,6 +409,11 @@ failures recomputed): the defaults agree with every pilot hand check. Three sit 
 direction flips a pilot value and were confirmed as they are: `collision_disturbance` distance
 2 cm, `stalled` duration 2 s, open-finger width 7 cm. Every other threshold has at least 50%
 margin on one side.
+
+The classifier rule session (see "Rule changes") amended the hand-labeling rules: grasp target,
+between the fingers at pad height through the close, `inaction`, per-subgoal recovery. Flags,
+milestones and thresholds are unchanged. Rules, tags and the classifier are frozen at
+`block2-classifier-freeze`; held-out labels written before it are re-passed against it.
 
 Not validated on the pilot (no firings in the 20): `wrong_object`, `wrong_target`,
 `regression`, `order_violation`, `regrasp_count`, `oscillation`, `gripper_chatter`,
