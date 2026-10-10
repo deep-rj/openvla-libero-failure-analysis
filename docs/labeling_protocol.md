@@ -251,7 +251,9 @@ initiator is recorded in tags and flags, never as a mechanism.
   Tolerance ±10 steps (0.5 s).
 - `first_error_step` is the onset of the initiator: when the behavior starts, not when the damage
   becomes visible. A risk factor that successes also show (for example a grasp offset within the
-  successes' range) is not the initiator.
+  successes' range) is not the initiator. For `perception` and `control: grasp` at a failed
+  grasp attempt, the onset is the bottom of that attempt's descent: the last step before the
+  fingers start closing, or for a descent that never closes, the step it stops going down.
 - `no_return_step` is state-based: the first step at which the world state makes success
   physically impossible (object off the table or out of reach). `none` if that never happens;
   running out of steps is not a no-return point. A toppled object is not a no-return point:
@@ -346,6 +348,10 @@ re-passed when a change affects them.
   anchored on reference cases (`t07-i013` below it, `t03-i009` above), matching the pilot labels
   and the classifier's pad-face cover cutoff of 0.3 (about 5 mm of a 1.6 cm pad, not visible at
   256 px). No label changes, pilot or held-out; the classifier is unchanged.
+- Held-out labeling (2026-10-10): onsets for `perception` and `control: grasp` at a failed grasp
+  attempt are the bottom of the descent, closing the onset known gap above for the held-out
+  labels. Matches the classifier's onset rule. Held-out rows written before it are re-passed;
+  pilot onsets are left as written (development set).
 
 ## Mechanism classifier
 
