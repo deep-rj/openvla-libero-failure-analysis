@@ -202,7 +202,7 @@ Categories (frozen after the pilot):
 | `control: transport` | from lift-off until the descent toward the target starts, including contact while moving into a receptacle (the microwave edge) (`phase` grasped) |
 | `control: place` | from the descent toward the target through release until the object settles (`phase` carried) |
 | `external` | a disturbance the policy did not cause (physics, a Block 3 perturbation); expected 0 on the baseline |
-| `inaction` | the policy commands no motion from the first policy step to the cap (`stalled` throughout); onset 10 |
+| `inaction` | the arm stops for good with no unrecovered error before it: `stalled` runs to the cap, ignoring moves of up to 1 s inside it. Onset: the start of that stall (10 if it starts at the first policy step) |
 
 `perception` is not split by phase until a non-grasp case appears. Failing to recover after the
 initiator is recorded in tags and flags, never as a mechanism.
@@ -352,6 +352,20 @@ re-passed when a change affects them.
   attempt are the bottom of the descent, closing the onset known gap above for the held-out
   labels. Matches the classifier's onset rule. Held-out rows written before it are re-passed;
   pilot onsets are left as written (development set).
+- Held-out labeling (2026-10-10), from held-out `t02-i013` (the stove turned on past every
+  success's knob travel, then the arm stood still at the knob to the cap, never heading for
+  the pot): `inaction` broadened from "no motion from the first policy step" to "stops for
+  good with no unrecovered error before it", onset at the stall's start. The overturn is not
+  the initiator: it blocks nothing. Moves of up to 20 steps (1 s) inside the final stall are
+  ignored (`t02-i013`: 187-460 and 462-530 is one stall); 10 or 30 steps change no
+  mechanism among the 70 unlabeled failures, and one onset (`t04-i010`, 363 vs 434 at 10).
+  No pilot label changes. Of the 70 unlabeled non-held-out failures, 8 abstentions become
+  `inaction`: `t00-i011`, `t02-i007`, `t02-i014` (stop right after progress or mid knob turn),
+  and `t02-i008`, `t04-i006`, `t04-i010`, `t04-i016`, `t07-i012`, where 50-270 steps separate
+  the last progress from the stall; these five are to be checked on video for an error the
+  classifier cannot see (an open descent, hovering) before the classifier is re-frozen.
+  Because a held-out episode prompted this rule, held-out agreement on `inaction` is reported
+  with that caveat.
 
 ## Mechanism classifier
 
@@ -363,7 +377,8 @@ scored against the held-out labels. Rules approved so far:
   the earliest error not recovered from. (4) The phase at the initiator, not the episode's
   final phase, gives the `control` sub-label: none `grasp`, grasped `transport`, carried
   `place`. (5) At a failed grasp attempt, the between-the-fingers test splits `perception`
-  from `control: grasp`.
+  from `control: grasp`. (6) No initiator, and a stall runs to the cap (stall runs at most
+  20 steps apart merged): `inaction` at the stall's start.
 - **Recovered.** Progress resumed on the error's own subgoal: it counts later, or its object
   reaches a higher phase (held, then held over the target). Progress on another subgoal does
   not recover it (`t04-i017`: the second mug's placement does not undo the first mug's
@@ -371,10 +386,10 @@ scored against the held-out labels. Rules approved so far:
   fingers (`t01-i010`, "pre: recovered miss"); a later open descent over it is not enough
   (`t08-i006`). Errors on non-goal objects (collisions) are recovered by progress on any
   subgoal.
-- **Abstention.** No initiator found: reported as an abstention with that reason, separate
-  from close calls. On the 70 unlabeled non-held-out failures: 14, by pattern mid-air stalls
-  away from every goal object, an object held to the cap without placing, and fixture-stage
-  errors (no fixture detector).
+- **Abstention.** No initiator found and no stall to the cap: reported as an abstention with
+  that reason, separate from close calls. On the 70 unlabeled non-held-out failures: 6 (14
+  before `inaction` was broadened), by pattern an object held to the cap without placing and
+  fixture-stage errors (no fixture detector).
 - **Between the fingers.** Some part of the target object's collision geometry (boxes, from
   `object_geometry.json`, placed by `object_pos` and `object_quat`) lies in the box between
   the finger pads (`finger_pad_pos`, `grip_quat`, `finger_pad_half_size`). Score: pad-face

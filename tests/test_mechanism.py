@@ -455,7 +455,35 @@ def test_a_stall_from_the_first_policy_step_to_the_cap_is_inaction():
     assert (pred.mechanism, pred.onset_step) == ("inaction", WAIT)
 
 
-def test_a_stall_that_starts_after_the_policy_moved_is_not_inaction():
+def test_a_stall_to_the_cap_after_the_policy_moved_is_inaction_from_its_start():
     x, info, boxes = _scene(n=200)
     late = dict(NO_FLAGS, stalled=[(60, 200)])
-    assert _classify(x, info, boxes, late).abstained
+    pred = _classify(x, info, boxes, late)
+    assert (pred.mechanism, pred.onset_step, pred.abstained) == ("inaction", 60, False)
+
+
+def test_short_moves_inside_the_final_stall_do_not_split_it():
+    x, info, boxes = _scene(n=200)
+    twitch = dict(NO_FLAGS, stalled=[(60, 120), (120 + P.inaction_gap, 200)])
+    assert _classify(x, info, boxes, twitch).onset_step == 60
+
+
+def test_a_longer_move_starts_the_final_stall_after_it():
+    x, info, boxes = _scene(n=200)
+    moved = dict(NO_FLAGS, stalled=[(60, 100), (101 + P.inaction_gap, 200)])
+    assert _classify(x, info, boxes, moved).onset_step == 101 + P.inaction_gap
+
+
+def test_a_stall_that_ends_before_the_cap_is_not_inaction():
+    x, info, boxes = _scene(n=200)
+    early = dict(NO_FLAGS, stalled=[(60, 150)])
+    assert _classify(x, info, boxes, early).abstained
+
+
+def test_an_unrecovered_error_before_a_final_stall_stays_the_initiator():
+    x, info, boxes = _scene()
+    _reach(x, 20, 60, at_xy=(0.06, 0.0))
+    _close(x, 61)
+    _lift(x, 80, carry=False)
+    stalled = dict(NO_FLAGS, stalled=[(120, 200)])
+    assert _classify(x, info, boxes, stalled).mechanism == "perception"

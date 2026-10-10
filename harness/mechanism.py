@@ -38,6 +38,7 @@ class MechanismParams:
     descent_tol_m: float = 0.001
     rest_band_m: float = 0.01  # within this of its last height, a placed object is at rest
     defect_delay: int = 10  # steps after a placement first holds when its state is read
+    inaction_gap: int = 20  # steps of motion between stall runs still read as one stall
 
 
 DEFAULT_PARAMS = MechanismParams()
@@ -513,9 +514,22 @@ def _label(event: Event, w: _World, params: MechanismParams) -> Prediction:
     return Prediction(mechanism, event.step, False, reason)
 
 
+def final_stall_start(stalled, n: int, gap: int) -> int | None:
+    """Start of the stall that runs to the cap, merging runs separated by at most `gap` steps."""
+    runs = sorted(stalled)
+    if not runs or runs[-1][1] != n:
+        return None
+    start = runs[-1][0]
+    for a, b in reversed(runs[:-1]):
+        if start - b > gap:
+            break
+        start = a
+    return start
+
+
 def classify(x, info, flag_intervals, boxes, reference, params=DEFAULT_PARAMS) -> Prediction:
-    """Rule order: grounding flags; inaction; else the earliest unrecovered event, labeled by
-    its kind."""
+    """Rule order: grounding flags; inaction from the first policy step; else the earliest
+    unrecovered event, labeled by its kind; else inaction if a stall runs to the cap."""
     grounding = list(flag_intervals["wrong_object"]) + list(flag_intervals["wrong_target"])
     if grounding:
         onset = min(a for a, _ in grounding)
@@ -539,4 +553,7 @@ def classify(x, info, flag_intervals, boxes, reference, params=DEFAULT_PARAMS) -
     for event in sorted(events, key=lambda e: e.step):
         if not _recovered(event, w, params, attempts):
             return _label(event, w, params)
+    stall = final_stall_start(flag_intervals.get("stalled", []), n, params.inaction_gap)
+    if stall is not None:
+        return Prediction("inaction", stall, False, "stalled to the cap with no unrecovered error")
     return Prediction("", None, True, "no unrecovered error found")
