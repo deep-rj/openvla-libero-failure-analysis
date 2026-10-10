@@ -198,7 +198,8 @@ initiator is recorded in tags and flags, never as a mechanism.
   state. A grasp that closes off-center on the right object is `control`; `perception` needs
   visible evidence such as the arm going to where the object is not. For a grasp: if the target
   is between the fingers at the bottom of the descent, a miss is `control`; if not, `perception`.
-  The target is the part meant to be grasped (the moka pot's handle, not its body).
+  The target is any part of the target object: successes grasp mugs by the wall or the handle,
+  depending on the task.
 - **`mechanism_notes`** describe the initiator only. Unverified causes are written as
   `Hypothesis: ...`, never as fact.
 - **`notes`** hold what follows the initiator and anything else. Post-initiator behavior starts
@@ -296,6 +297,33 @@ Logged as made during the pilot; earlier episodes are re-passed when a change af
   - Known gaps, documented rather than ruled: no perception test for fixtures (no fixture error
     in the pilot); grasp-error onsets sit at the start, middle or bottom of the descent
     (`t00-i024` 15, `t08-i010` 80, `t08-i006` 110), a known source of onset spread.
+- Classifier rule session (2026-10-09), amending the `block2-freeze` rules while held-out
+  labeling is paused; held-out labels written before it are re-passed against it:
+  - The grasp target is any part of the target object, not the part meant to be grasped.
+    Successes grasp the porcelain mug by its wall (tasks 4, 6) and the white-yellow mug by
+    its handle (task 9) or its far wall (task 4). No pilot label changes: in `t02-i009` and
+    `t02-i023` no part of the pot is between the pads at any close.
+
+## Mechanism classifier
+
+Assigns each failure a `mechanism` from world state, or abstains. Developed on the pilot 20,
+scored against the held-out labels. Rules approved so far:
+
+- **Rule order.** (1) `wrong_object` or `wrong_target` fired: `grounding`. (2) Otherwise find
+  the initiator, the earliest error not recovered from; recovered means progress resumed (`k`
+  rose, or the same object was later grasped with progress). (3) The phase at the initiator,
+  not the episode's final phase, gives the `control` sub-label: none `grasp`, grasped
+  `transport`, carried `place`. (4) At a failed grasp attempt, the between-the-fingers test
+  splits `perception` from `control: grasp`.
+- **Between the fingers.** Some part of the target object's collision geometry (boxes, from
+  `object_geometry.json`, placed by `object_pos` and `object_quat`) lies in the box between
+  the finger pads (`finger_pad_pos`, `grip_quat`, `finger_pad_half_size`). Score and step are
+  open.
+- **Completed-subgoal initiators.** A placement whose end state is outside the successes'
+  range (tilted, raised, off-center) and blocks a dependent subgoal is a `control: place`
+  initiator even though `k` counted it (`t03-i011`).
+- Grip-site geometry uses simulator-state fields only; `eef_pos` and `gripper_qpos` are
+  observations one 2 ms physics substep behind.
 
 ## Freeze
 
