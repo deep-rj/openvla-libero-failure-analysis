@@ -439,6 +439,13 @@ scored against the held-out labels. Rules approved so far:
   descent.
 - Grip-site geometry uses simulator-state fields only; `eef_pos` and `gripper_qpos` are
   observations one 2 ms physics substep behind.
+- **Known gap: no fixture detector** (stove knob, drawer, microwave door). Fixture-stage errors
+  abstain, or read as `inaction` when a stall to the cap follows. Parked candidate: the point
+  where the fingers first meet the fixture (the step its joint starts moving, else the closest
+  approach) against the successes' range for that task and fixture, as for defective
+  placements. Decided after the held-out labels are committed, once the count of fixture
+  errors is known; it would be scored on the held-out set only with the caveat that
+  `t03-i008` prompted it.
 
 ## Freeze
 
