@@ -224,6 +224,11 @@ initiator is recorded in tags and flags, never as a mechanism.
   perception" in the notes.
   At a fixture, `perception` when the arm meets it outside the successes' contact range
   (`t03-i008`: pushing the drawer with the finger pads above every success's push height).
+- **Off-tolerance releases.** A release that leaves the object resting on the target object but
+  outside LIBERO's tolerance is `control: place`. One that leaves it off the target (beside it,
+  on a receptacle's rim) is labeled by the error that put it there (`control: transport`, or
+  `perception` if the arm went to the wrong spot). The computed `phase` is not the test
+  (`t04-i000` place, `t01-i024` transport).
 - **Recovered** means progress resumed on the error's own subgoal: it counts later, or its
   object reaches a higher phase. Progress on another subgoal does not recover it. A miss is
   also recovered by a later close with the same object between the fingers; errors on
@@ -374,6 +379,11 @@ re-passed when a change affects them.
   classifier still has no fixture detector). Consequence for the broadened `inaction`: a
   fixture-stage error followed by a stall to the cap reads as `inaction` to the classifier, so
   `t02-i007` and `t02-i014` (stalled mid knob turn) join the video check before re-freezing.
+- Held-out labeling (2026-10-11), from held-out `t01-i024` and `t04-i000`: an off-tolerance
+  release is `place` when the object rests on the target, otherwise labeled by the error that
+  put it off the target; the computed `phase` does not decide the `control` sub-label for hand
+  labels. The classifier labels any release near the target `place`, so `t01-i024` is an
+  expected disagreement.
 
 ## Mechanism classifier
 
