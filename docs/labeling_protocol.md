@@ -456,6 +456,11 @@ scored against the held-out labels. Rules approved so far:
   placements. Decided after the held-out labels are committed, once the count of fixture
   errors is known; it would be scored on the held-out set only with the caveat that
   `t03-i008` prompted it.
+- **Known flaw: grounding before the initiator.** Rule order (1) returns `grounding` whenever
+  `wrong_object` or `wrong_target` fires, even after an earlier unrecovered error, against the
+  earliest-initiator principle (held-out `t04-i019`: a plate grasp ~370 steps after a failed
+  mug grasp). To be fixed, test-first on non-held-out cases, before the classifier is
+  re-frozen.
 
 ## Freeze
 
