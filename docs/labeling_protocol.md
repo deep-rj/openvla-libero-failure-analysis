@@ -264,7 +264,8 @@ initiator is recorded in tags and flags, never as a mechanism.
 - `no_return_step` is state-based: the first step at which the world state makes success
   physically impossible (object off the table or out of reach). `none` if that never happens;
   running out of steps is not a no-return point. A toppled object is not a no-return point:
-  LIBERO's `On` checks position and contact, not orientation.
+  LIBERO's `On` checks position and contact, not orientation. An object held off the table in the
+  gripper is not a no-return point either (`t05-i020`); one that falls off is.
 - `no_onset` is `0` or `1`. Leave `notes` blank when there is nothing to add.
 - `no_onset`: no identifiable moment of error (slow but error-free, gradual drift). Its own
   class, excluded from alignment analysis.
