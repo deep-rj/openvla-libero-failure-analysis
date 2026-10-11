@@ -224,7 +224,6 @@ initiator is recorded in tags and flags, never as a mechanism.
   perception" in the notes.
   At a fixture, `perception` when the arm meets it outside the successes' contact range
   (`t03-i008`: pushing the drawer with the finger pads above every success's push height).
-  The video judgment is backed by that range from world state, since the camera hides height.
 - **Recovered** means progress resumed on the error's own subgoal: it counts later, or its
   object reaches a higher phase. Progress on another subgoal does not recover it. A miss is
   also recovered by a later close with the same object between the fingers; errors on
