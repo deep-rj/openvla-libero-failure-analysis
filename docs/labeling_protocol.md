@@ -222,6 +222,9 @@ initiator is recorded in tags and flags, never as a mechanism.
   `perception`) and `t03-i009` (the bowl rim between the pads, `control: grasp`). A case
   between the two is labeled as judged, with "Close call with control" or "Close call with
   perception" in the notes.
+  At a fixture, `perception` when the arm meets it outside the successes' contact range
+  (`t03-i008`: pushing the drawer with the finger pads above every success's push height).
+  The video judgment is backed by that range from world state, since the camera hides height.
 - **Recovered** means progress resumed on the error's own subgoal: it counts later, or its
   object reaches a higher phase. Progress on another subgoal does not recover it. A miss is
   also recovered by a later close with the same object between the fingers; errors on
@@ -366,6 +369,12 @@ re-passed when a change affects them.
   classifier cannot see (an open descent, hovering) before the classifier is re-frozen.
   Because a held-out episode prompted this rule, held-out agreement on `inaction` is reported
   with that caveat.
+- Held-out labeling (2026-10-11), from held-out `t03-i008`: fixture `perception` is the arm
+  meeting a fixture outside the successes' contact range; the first fixture-stage label,
+  closing that part of the "no perception test for fixtures" gap for hand labels only (the
+  classifier still has no fixture detector). Consequence for the broadened `inaction`: a
+  fixture-stage error followed by a stall to the cap reads as `inaction` to the classifier, so
+  `t02-i007` and `t02-i014` (stalled mid knob turn) join the video check before re-freezing.
 
 ## Mechanism classifier
 
