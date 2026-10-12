@@ -63,7 +63,18 @@ def load(run_dir: Path, anchors_csv: Path, zero_bins, params=gate.DEFAULT_PARAMS
             values[(name, METRICS[1])] = float((rk[window] == 1).mean())
             values[(name, METRICS[2])] = gate.subset_mean(exp_h[:, d], window, rk <= 1)
             values[(name, METRICS[3])] = gate.subset_mean(exp_h[:, d], window, rk == 2)
-        out.append({"row": r, "values": values, "curve_rank": curve_rank, "valid": valid})
+        curve_exp_h = np.full((len(span), len(MOTION_DIMS)), np.nan)
+        curve_exp_h[valid] = exp_h[steps[valid], : len(MOTION_DIMS)]
+        out.append(
+            {
+                "row": r,
+                "values": values,
+                "curve_rank": curve_rank,
+                "curve_exp_h": curve_exp_h,
+                "valid": valid,
+                "steps": (is_wait, exp_h, rank),
+            }
+        )
     return out
 
 
@@ -119,9 +130,65 @@ def plot(loaded, path: Path) -> None:
                 ax.set_ylabel(f"share of runs: {label}", color=sg.MUTED, fontsize=9)
             if row == 1:
                 ax.set_xlabel("steps from the grasp descent's bottom", color=sg.MUTED, fontsize=9)
-    axes[0, 0].legend(frameon=False, labelcolor=sg.INK, fontsize=9)
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper right", ncol=2, frameon=False, labelcolor=sg.INK)
     fig.suptitle(
         "Where the no-motion bin ranks per step, aligned on the grasp descent",
+        color=sg.INK,
+        fontsize=12,
+        x=0.01,
+        ha="left",
+    )
+    fig.tight_layout()
+    fig.savefig(path, dpi=150, facecolor=sg.SURFACE)
+    plt.close(fig)
+
+
+def plot_filtered(loaded, path: Path, min_runs: int = 10) -> None:
+    """Per-step mean exp(H) over the runs whose step qualifies; points with fewer than
+    `min_runs` qualifying runs are left out."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    span = np.arange(-sg.CURVE_BEFORE, sg.CURVE_AFTER + 1)
+    rows = (
+        ("all steps", lambda rk: rk >= 0),
+        ("stop not in top two", lambda rk: rk == 2),
+        ("stop in top two", lambda rk: (rk == 0) | (rk == 1)),
+    )
+    fig, axes = plt.subplots(3, 6, figsize=(18, 8.5), sharex=True, facecolor=sg.SURFACE)
+    for d, name in enumerate(MOTION_DIMS):
+        for row, (label, keep) in enumerate(rows):
+            ax = axes[row, d]
+            ax.set_facecolor(sg.SURFACE)
+            for group in ("success", "failure"):
+                us = [u for u in loaded if u["row"]["group"] == group]
+                h = np.stack([u["curve_exp_h"][:, d] for u in us])
+                ok = np.stack([keep(u["curve_rank"][:, d]) for u in us])
+                n = ok.sum(axis=0)
+                mean = np.where(ok, h, 0.0).sum(axis=0) / np.maximum(n, 1)
+                ax.plot(span, np.where(n >= min_runs, mean, np.nan), color=sg.COLORS[group],
+                        lw=2, label=f"{sg.PLURAL[group]} (n = {len(us)})")  # fmt: skip
+            ax.axvline(0, color=sg.MUTED, lw=1, ls="--")
+            ax.grid(color=sg.GRID, lw=0.8)
+            ax.tick_params(colors=sg.MUTED, labelsize=9)
+            for side in ("top", "right"):
+                ax.spines[side].set_visible(False)
+            for side in ("left", "bottom"):
+                ax.spines[side].set_color(sg.GRID)
+            if row == 0:
+                ax.set_title(name, color=sg.INK, fontsize=11, loc="left")
+            if d == 0:
+                ax.set_ylabel(f"exp(H): {label}", color=sg.MUTED, fontsize=9)
+            if row == 2:
+                ax.set_xlabel("steps from the grasp descent's bottom", color=sg.MUTED, fontsize=9)
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper right", ncol=2, frameon=False, labelcolor=sg.INK)
+    fig.suptitle(
+        f"Mean exp(H) per step, filtered by where the no-motion bin ranks "
+        f"(points with fewer than {min_runs} qualifying runs omitted)",
         color=sg.INK,
         fontsize=12,
         x=0.01,
@@ -170,6 +237,7 @@ def main() -> None:
     )
     (args.out / "stop_check.md").write_text("\n".join(lines) + "\n")
     plot(loaded, args.out / "stop_curves.png")
+    plot_filtered(loaded, args.out / "stop_filtered_curves.png")
     print("\n".join(lines))
 
 

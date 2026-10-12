@@ -72,8 +72,7 @@ python scripts/separability_gate.py outputs/baseline --out outputs/baseline/gate
 ## Result (2026-10-12, freeze `f117928`)
 
 70 failures, 202 success grasps. Files: `docs/results/baseline/gate/` (`gate_report.md`,
-`gate_results.json`, `anchors.csv`). Plots are gitignored; the scripts write them to `--out`
-(`curves.png`).
+`gate_results.json`, `anchors.csv`, `curves.png`).
 
 | Metric | CI level | Same-task AUROC [CI] | Pooled AUROC [CI] |
 |---|---|---|---|
@@ -89,7 +88,26 @@ python scripts/separability_gate.py outputs/baseline --out outputs/baseline/gate
 **Gate: pass** under the pre-registered rule: the same-task CIs of x, y and pitch exclude 0.5.
 **P1: not supported**: the primary CI includes 0.5, and its point estimate is below it.
 
-Interpretation: not yet written.
+![Per-step exp(H) aligned on the grasp descent](results/baseline/gate/curves.png)
+
+### Interpretation and decision (2026-10-12)
+
+The gate passes, but the separation is weak. Three motion dims separate within task (AUROC
+0.62–0.63, lower bounds 0.51–0.53); pooled across tasks only pitch does, and the interquartile
+bands of failures and successes overlap almost entirely at every step. The gripper, the one
+signal predicted in advance, shows no warning before the grasp.
+
+The exploratory checks below do not strengthen the case for a pre-grasp warning. Arm speed does
+not explain the difference, and it sits on steps where the policy weighs different motions
+rather than motion against stopping (roll 0.70 on those steps). It grows with the window
+length instead of peaking near the grasp, and no 10-step block stands out. That reads as a
+small, persistent offset over the approach rather than a warning that builds before the grasp.
+All of this was found after looking at the data and is a lead, not evidence.
+
+**Decision: go to Block 4, with modest expectations.** Block 4 tests whether combining dims,
+longer context and the no-motion filter yields a usable detector. Signals are explored on the
+baseline 250 episodes; the frozen detector is evaluated once on init states 25–49 (250 new
+episodes, ~8.5 GPU-h).
 
 ## Exploratory, after the freeze: motion check (2026-10-12)
 
@@ -106,7 +124,7 @@ from world state (`scripts/gate_motion_check.py`, `docs/results/baseline/gate/mo
 
 Per step and motion dim, the no-motion bin (raw action 0) is the top choice, the runner-up, or
 neither (`scripts/gate_stop_check.py`, `docs/results/baseline/gate/stop_check.md`; plot
-`stop_curves.png` in `--out`). Same-task AUROC with 99.17% CIs; 24 tests.
+`stop_curves.png`, `stop_filtered_curves.png`). Same-task AUROC with 99.17% CIs; 24 tests.
 
 - The share of window steps with stop chosen, or stop runner-up, separates on no dim. Stop is
   the runner-up in 0–17% of runs at any step.
@@ -114,3 +132,22 @@ neither (`scripts/gate_stop_check.py`, `docs/results/baseline/gate/stop_check.md
   roll 0.701 [0.597, 0.800], pitch 0.630 [0.516, 0.741] and yaw 0.649 [0.540, 0.753].
 - exp(H) on steps where stop *is* in the top two separates only on z: 0.654 [0.525, 0.769],
   on 53 failures and 177 success units with such steps.
+
+![Where the no-motion bin ranks per step](results/baseline/gate/stop_curves.png)
+
+![Mean exp(H) per step, filtered by the no-motion bin's rank](results/baseline/gate/stop_filtered_curves.png)
+
+## Exploratory, after the freeze: window sweep (2026-10-12)
+
+Is 50 steps the right window? Same-task AUROC of mean exp(H) over the last 10–50 steps before
+the anchor, and over disjoint 10-step blocks, on all steps and on steps with stop not in the top
+two (`scripts/gate_window_sweep.py`, `docs/results/baseline/gate/window_sweep.md`). 2,000
+bootstrap draws, 99.17% CIs, 130 tests.
+
+- The AUROC rises with window length. Over the last 10 steps no dim separates (0.49–0.64); over
+  the last 50, x, y, pitch, roll and yaw do, depending on the filter.
+- No 10-step block stands out consistently. 6 of 65 block CIs exclude 0.5, scattered across
+  dims and blocks.
+- The gripper is 0.43–0.44 for every cumulative window.
+
+![Same-task AUROC by window](results/baseline/gate/window_sweep.png)

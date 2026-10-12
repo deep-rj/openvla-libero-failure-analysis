@@ -1,0 +1,1432 @@
+{
+  "cumulative | last 10 | x | all steps": {
+    "auroc": 0.5424588086185045,
+    "ci": [
+      0.42585551330798477,
+      0.6653992395437263
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 10 | x | stop not in top two": {
+    "auroc": 0.5996376811594203,
+    "ci": [
+      0.4724348486958134,
+      0.7168339837159429
+    ],
+    "n": {
+      "failure": 56,
+      "success": 185
+    }
+  },
+  "cumulative | last 10 | y | all steps": {
+    "auroc": 0.5716096324461344,
+    "ci": [
+      0.4427492606675116,
+      0.6903305872412334
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 10 | y | stop not in top two": {
+    "auroc": 0.5593869731800766,
+    "ci": [
+      0.4299271832941034,
+      0.687738189105723
+    ],
+    "n": {
+      "failure": 56,
+      "success": 171
+    }
+  },
+  "cumulative | last 10 | z | all steps": {
+    "auroc": 0.5348542458808618,
+    "ci": [
+      0.4224704267004647,
+      0.6425855513307985
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 10 | z | stop not in top two": {
+    "auroc": 0.5277419354838709,
+    "ci": [
+      0.40599462365591377,
+      0.6426129032258048
+    ],
+    "n": {
+      "failure": 69,
+      "success": 201
+    }
+  },
+  "cumulative | last 10 | roll | all steps": {
+    "auroc": 0.5449936628643853,
+    "ci": [
+      0.43387727080692856,
+      0.6527249683143219
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 10 | roll | stop not in top two": {
+    "auroc": 0.636,
+    "ci": [
+      0.4855165235159856,
+      0.7987073612516219
+    ],
+    "n": {
+      "failure": 35,
+      "success": 122
+    }
+  },
+  "cumulative | last 10 | pitch | all steps": {
+    "auroc": 0.5158428390367554,
+    "ci": [
+      0.39670468948035487,
+      0.632446134347275
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 10 | pitch | stop not in top two": {
+    "auroc": 0.5124113475177305,
+    "ci": [
+      0.3757321322657176,
+      0.6487272063896404
+    ],
+    "n": {
+      "failure": 59,
+      "success": 170
+    }
+  },
+  "cumulative | last 10 | yaw | all steps": {
+    "auroc": 0.5171102661596958,
+    "ci": [
+      0.38910012674271227,
+      0.6358312209547948
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 10 | yaw | stop not in top two": {
+    "auroc": 0.48663101604278075,
+    "ci": [
+      0.3545837488227799,
+      0.6243445796460173
+    ],
+    "n": {
+      "failure": 55,
+      "success": 181
+    }
+  },
+  "cumulative | last 10 | gripper | all steps": {
+    "auroc": 0.4404309252217998,
+    "ci": [
+      0.3286728981833544,
+      0.5604272285593571
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 20 | x | all steps": {
+    "auroc": 0.6007604562737643,
+    "ci": [
+      0.49132868610054914,
+      0.7034220532319392
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 20 | x | stop not in top two": {
+    "auroc": 0.5918653576437588,
+    "ci": [
+      0.47654364600916316,
+      0.6963273993607574
+    ],
+    "n": {
+      "failure": 68,
+      "success": 194
+    }
+  },
+  "cumulative | last 20 | y | all steps": {
+    "auroc": 0.5728770595690748,
+    "ci": [
+      0.4461185044359948,
+      0.6928654414871143
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 20 | y | stop not in top two": {
+    "auroc": 0.5931232091690545,
+    "ci": [
+      0.48303319209039536,
+      0.701970844456243
+    ],
+    "n": {
+      "failure": 66,
+      "success": 193
+    }
+  },
+  "cumulative | last 20 | z | all steps": {
+    "auroc": 0.5728770595690748,
+    "ci": [
+      0.45669095901985635,
+      0.6844106463878327
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 20 | z | stop not in top two": {
+    "auroc": 0.5627376425855514,
+    "ci": [
+      0.4427492606675116,
+      0.6835762568652297
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 20 | roll | all steps": {
+    "auroc": 0.5766793409378961,
+    "ci": [
+      0.46047739754964073,
+      0.6869613434727495
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 20 | roll | stop not in top two": {
+    "auroc": 0.6069246435845214,
+    "ci": [
+      0.4842405682079595,
+      0.7238640071789846
+    ],
+    "n": {
+      "failure": 52,
+      "success": 167
+    }
+  },
+  "cumulative | last 20 | pitch | all steps": {
+    "auroc": 0.5652724968314322,
+    "ci": [
+      0.4537230671736374,
+      0.6814585973806504
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 20 | pitch | stop not in top two": {
+    "auroc": 0.5468531468531469,
+    "ci": [
+      0.43070512947157685,
+      0.6691183531962098
+    ],
+    "n": {
+      "failure": 66,
+      "success": 194
+    }
+  },
+  "cumulative | last 20 | yaw | all steps": {
+    "auroc": 0.5399239543726235,
+    "ci": [
+      0.42585551330798477,
+      0.6539923954372624
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 20 | yaw | stop not in top two": {
+    "auroc": 0.5273492286115007,
+    "ci": [
+      0.40853459579556967,
+      0.6427697150618639
+    ],
+    "n": {
+      "failure": 65,
+      "success": 197
+    }
+  },
+  "cumulative | last 20 | gripper | all steps": {
+    "auroc": 0.42902408111533585,
+    "ci": [
+      0.31769909167722854,
+      0.5479536332910857
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 30 | x | all steps": {
+    "auroc": 0.6032953105196451,
+    "ci": [
+      0.4976658217152513,
+      0.715679129700042
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 30 | x | stop not in top two": {
+    "auroc": 0.5880829015544041,
+    "ci": [
+      0.47208923457546104,
+      0.7067519992263958
+    ],
+    "n": {
+      "failure": 70,
+      "success": 199
+    }
+  },
+  "cumulative | last 30 | y | all steps": {
+    "auroc": 0.596958174904943,
+    "ci": [
+      0.4828897338403042,
+      0.7110266159695817
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 30 | y | stop not in top two": {
+    "auroc": 0.5850066934404283,
+    "ci": [
+      0.47522362256019635,
+      0.6958371271862074
+    ],
+    "n": {
+      "failure": 68,
+      "success": 199
+    }
+  },
+  "cumulative | last 30 | z | all steps": {
+    "auroc": 0.5690747782002535,
+    "ci": [
+      0.4533058724123362,
+      0.6755386565272496
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 30 | z | stop not in top two": {
+    "auroc": 0.5551330798479087,
+    "ci": [
+      0.43260984368398814,
+      0.6666666666666666
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 30 | roll | all steps": {
+    "auroc": 0.5779467680608364,
+    "ci": [
+      0.4516054076890577,
+      0.697084917617237
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 30 | roll | stop not in top two": {
+    "auroc": 0.6452648475120385,
+    "ci": [
+      0.5362532173844571,
+      0.7522889860454707
+    ],
+    "n": {
+      "failure": 59,
+      "success": 186
+    }
+  },
+  "cumulative | last 30 | pitch | all steps": {
+    "auroc": 0.5678073510773131,
+    "ci": [
+      0.45709231094212066,
+      0.678522391212504
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 30 | pitch | stop not in top two": {
+    "auroc": 0.5943396226415094,
+    "ci": [
+      0.4806555209617698,
+      0.7071972779112872
+    ],
+    "n": {
+      "failure": 67,
+      "success": 200
+    }
+  },
+  "cumulative | last 30 | yaw | all steps": {
+    "auroc": 0.5994930291508238,
+    "ci": [
+      0.4921789184621884,
+      0.7080745669623995
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 30 | yaw | stop not in top two": {
+    "auroc": 0.596,
+    "ci": [
+      0.4835180125480671,
+      0.7033915665929721
+    ],
+    "n": {
+      "failure": 67,
+      "success": 201
+    }
+  },
+  "cumulative | last 30 | gripper | all steps": {
+    "auroc": 0.435361216730038,
+    "ci": [
+      0.3231939163498099,
+      0.5528147444021966
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 40 | x | all steps": {
+    "auroc": 0.6096324461343473,
+    "ci": [
+      0.5023183354457118,
+      0.7194814110688633
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 40 | x | stop not in top two": {
+    "auroc": 0.5848329048843187,
+    "ci": [
+      0.4776500638569604,
+      0.7016731568145449
+    ],
+    "n": {
+      "failure": 70,
+      "success": 200
+    }
+  },
+  "cumulative | last 40 | y | all steps": {
+    "auroc": 0.605830164765526,
+    "ci": [
+      0.4921630756231515,
+      0.7249841571609624
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 40 | y | stop not in top two": {
+    "auroc": 0.5894736842105263,
+    "ci": [
+      0.47060307017543856,
+      0.705279605263157
+    ],
+    "n": {
+      "failure": 68,
+      "success": 201
+    }
+  },
+  "cumulative | last 40 | z | all steps": {
+    "auroc": 0.5437262357414449,
+    "ci": [
+      0.4220532319391635,
+      0.6485054921841992
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 40 | z | stop not in top two": {
+    "auroc": 0.5373891001267427,
+    "ci": [
+      0.41233100971694125,
+      0.6468208702999573
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 40 | roll | all steps": {
+    "auroc": 0.5956907477820025,
+    "ci": [
+      0.47696979298690323,
+      0.7101922264469788
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 40 | roll | stop not in top two": {
+    "auroc": 0.712166172106825,
+    "ci": [
+      0.6100895015105741,
+      0.811522968705139
+    ],
+    "n": {
+      "failure": 62,
+      "success": 195
+    }
+  },
+  "cumulative | last 40 | pitch | all steps": {
+    "auroc": 0.6134347275031685,
+    "ci": [
+      0.5031685678073511,
+      0.724551119560625
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 40 | pitch | stop not in top two": {
+    "auroc": 0.6290115532734275,
+    "ci": [
+      0.5139013692768506,
+      0.7389869490800168
+    ],
+    "n": {
+      "failure": 69,
+      "success": 202
+    }
+  },
+  "cumulative | last 40 | yaw | all steps": {
+    "auroc": 0.5906210392902408,
+    "ci": [
+      0.47696979298690323,
+      0.7008871989860583
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 40 | yaw | stop not in top two": {
+    "auroc": 0.6292875989445911,
+    "ci": [
+      0.5176596276905178,
+      0.7358186652255894
+    ],
+    "n": {
+      "failure": 68,
+      "success": 201
+    }
+  },
+  "cumulative | last 40 | gripper | all steps": {
+    "auroc": 0.4340937896070976,
+    "ci": [
+      0.32361111111111107,
+      0.5475443599493021
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 50 | x | all steps": {
+    "auroc": 0.632446134347275,
+    "ci": [
+      0.5306189269117025,
+      0.7406104773975491
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 50 | x | stop not in top two": {
+    "auroc": 0.5969387755102041,
+    "ci": [
+      0.48917621575655407,
+      0.706234147249492
+    ],
+    "n": {
+      "failure": 70,
+      "success": 201
+    }
+  },
+  "cumulative | last 50 | y | all steps": {
+    "auroc": 0.6286438529784537,
+    "ci": [
+      0.5187948880439375,
+      0.7469476130122513
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 50 | y | stop not in top two": {
+    "auroc": 0.6253229974160207,
+    "ci": [
+      0.5236810938845823,
+      0.7235142118863049
+    ],
+    "n": {
+      "failure": 69,
+      "success": 202
+    }
+  },
+  "cumulative | last 50 | z | all steps": {
+    "auroc": 0.5893536121673004,
+    "ci": [
+      0.47146704689480345,
+      0.6894803548795945
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 50 | z | stop not in top two": {
+    "auroc": 0.5690747782002535,
+    "ci": [
+      0.44740177439797213,
+      0.6814585973806504
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 50 | roll | all steps": {
+    "auroc": 0.5627376425855514,
+    "ci": [
+      0.43346007604562736,
+      0.6780735107731305
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 50 | roll | stop not in top two": {
+    "auroc": 0.7006993006993008,
+    "ci": [
+      0.5960973031069375,
+      0.800197170889508
+    ],
+    "n": {
+      "failure": 65,
+      "success": 198
+    }
+  },
+  "cumulative | last 50 | pitch | all steps": {
+    "auroc": 0.6197718631178707,
+    "ci": [
+      0.5095057034220533,
+      0.7292036332910853
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 50 | pitch | stop not in top two": {
+    "auroc": 0.6302952503209243,
+    "ci": [
+      0.5160462130937099,
+      0.7355584082156611
+    ],
+    "n": {
+      "failure": 69,
+      "success": 202
+    }
+  },
+  "cumulative | last 50 | yaw | all steps": {
+    "auroc": 0.5855513307984791,
+    "ci": [
+      0.4740177439797212,
+      0.7008871989860583
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "cumulative | last 50 | yaw | stop not in top two": {
+    "auroc": 0.648786717752235,
+    "ci": [
+      0.5331911840823286,
+      0.7509611538190397
+    ],
+    "n": {
+      "failure": 70,
+      "success": 201
+    }
+  },
+  "cumulative | last 50 | gripper | all steps": {
+    "auroc": 0.4372623574144487,
+    "ci": [
+      0.32129277566539927,
+      0.5538656527249683
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -50 to -40 | x | all steps": {
+    "auroc": 0.5765645805592543,
+    "ci": [
+      0.4539409214623593,
+      0.6880797884653205
+    ],
+    "n": {
+      "failure": 67,
+      "success": 190
+    }
+  },
+  "blocks | -50 to -40 | x | stop not in top two": {
+    "auroc": 0.525984251968504,
+    "ci": [
+      0.3904100190219757,
+      0.6658054247339956
+    ],
+    "n": {
+      "failure": 61,
+      "success": 171
+    }
+  },
+  "blocks | -50 to -40 | y | all steps": {
+    "auroc": 0.5805592543275633,
+    "ci": [
+      0.45918409050481007,
+      0.6935494934524258
+    ],
+    "n": {
+      "failure": 67,
+      "success": 190
+    }
+  },
+  "blocks | -50 to -40 | y | stop not in top two": {
+    "auroc": 0.5383411580594679,
+    "ci": [
+      0.41519329420354434,
+      0.6627517625925821
+    ],
+    "n": {
+      "failure": 63,
+      "success": 178
+    }
+  },
+  "blocks | -50 to -40 | z | all steps": {
+    "auroc": 0.6364846870838882,
+    "ci": [
+      0.5208596998090211,
+      0.7430596423886818
+    ],
+    "n": {
+      "failure": 67,
+      "success": 190
+    }
+  },
+  "blocks | -50 to -40 | z | stop not in top two": {
+    "auroc": 0.6449704142011834,
+    "ci": [
+      0.5297044815639805,
+      0.7592574187238869
+    ],
+    "n": {
+      "failure": 64,
+      "success": 164
+    }
+  },
+  "blocks | -50 to -40 | roll | all steps": {
+    "auroc": 0.4766977363515313,
+    "ci": [
+      0.35918412834347213,
+      0.5890050892327332
+    ],
+    "n": {
+      "failure": 67,
+      "success": 190
+    }
+  },
+  "blocks | -50 to -40 | roll | stop not in top two": {
+    "auroc": 0.55625,
+    "ci": [
+      0.42259615384615384,
+      0.6907090108401082
+    ],
+    "n": {
+      "failure": 52,
+      "success": 154
+    }
+  },
+  "blocks | -50 to -40 | pitch | all steps": {
+    "auroc": 0.5539280958721704,
+    "ci": [
+      0.4431557635377588,
+      0.6618357989551138
+    ],
+    "n": {
+      "failure": 67,
+      "success": 190
+    }
+  },
+  "blocks | -50 to -40 | pitch | stop not in top two": {
+    "auroc": 0.5492063492063493,
+    "ci": [
+      0.42690302341412034,
+      0.6656298754319542
+    ],
+    "n": {
+      "failure": 61,
+      "success": 169
+    }
+  },
+  "blocks | -50 to -40 | yaw | all steps": {
+    "auroc": 0.5193075898801598,
+    "ci": [
+      0.3875302396008313,
+      0.648756739890528
+    ],
+    "n": {
+      "failure": 67,
+      "success": 190
+    }
+  },
+  "blocks | -50 to -40 | yaw | stop not in top two": {
+    "auroc": 0.5318471337579618,
+    "ci": [
+      0.4044006034447609,
+      0.6588507039645414
+    ],
+    "n": {
+      "failure": 62,
+      "success": 173
+    }
+  },
+  "blocks | -50 to -40 | gripper | all steps": {
+    "auroc": 0.507323568575233,
+    "ci": [
+      0.42448991305629236,
+      0.5962143820994839
+    ],
+    "n": {
+      "failure": 67,
+      "success": 190
+    }
+  },
+  "blocks | -40 to -30 | x | all steps": {
+    "auroc": 0.5038860103626943,
+    "ci": [
+      0.3829236739974127,
+      0.6207363648292417
+    ],
+    "n": {
+      "failure": 68,
+      "success": 200
+    }
+  },
+  "blocks | -40 to -30 | x | stop not in top two": {
+    "auroc": 0.49300155520995337,
+    "ci": [
+      0.3722391859732624,
+      0.6252564347604485
+    ],
+    "n": {
+      "failure": 60,
+      "success": 187
+    }
+  },
+  "blocks | -40 to -30 | y | all steps": {
+    "auroc": 0.5453367875647669,
+    "ci": [
+      0.4230082509362665,
+      0.6613483080068473
+    ],
+    "n": {
+      "failure": 68,
+      "success": 200
+    }
+  },
+  "blocks | -40 to -30 | y | stop not in top two": {
+    "auroc": 0.5327102803738317,
+    "ci": [
+      0.3844516361021215,
+      0.6705382253319441
+    ],
+    "n": {
+      "failure": 61,
+      "success": 188
+    }
+  },
+  "blocks | -40 to -30 | z | all steps": {
+    "auroc": 0.5103626943005182,
+    "ci": [
+      0.39619829760244835,
+      0.6292656043676141
+    ],
+    "n": {
+      "failure": 68,
+      "success": 200
+    }
+  },
+  "blocks | -40 to -30 | z | stop not in top two": {
+    "auroc": 0.5324858757062146,
+    "ci": [
+      0.4050105363984674,
+      0.6505186901219717
+    ],
+    "n": {
+      "failure": 65,
+      "success": 191
+    }
+  },
+  "blocks | -40 to -30 | roll | all steps": {
+    "auroc": 0.5401554404145078,
+    "ci": [
+      0.41545978870202666,
+      0.6564601604967475
+    ],
+    "n": {
+      "failure": 68,
+      "success": 200
+    }
+  },
+  "blocks | -40 to -30 | roll | stop not in top two": {
+    "auroc": 0.6263498920086393,
+    "ci": [
+      0.4940869589415767,
+      0.7465985575057807
+    ],
+    "n": {
+      "failure": 49,
+      "success": 160
+    }
+  },
+  "blocks | -40 to -30 | pitch | all steps": {
+    "auroc": 0.6113989637305699,
+    "ci": [
+      0.49545435859747666,
+      0.7175560586459678
+    ],
+    "n": {
+      "failure": 68,
+      "success": 200
+    }
+  },
+  "blocks | -40 to -30 | pitch | stop not in top two": {
+    "auroc": 0.6473429951690821,
+    "ci": [
+      0.5159950589231613,
+      0.7609961483297542
+    ],
+    "n": {
+      "failure": 59,
+      "success": 176
+    }
+  },
+  "blocks | -40 to -30 | yaw | all steps": {
+    "auroc": 0.5025906735751295,
+    "ci": [
+      0.38567537095004767,
+      0.630012936610608
+    ],
+    "n": {
+      "failure": 68,
+      "success": 200
+    }
+  },
+  "blocks | -40 to -30 | yaw | stop not in top two": {
+    "auroc": 0.5752066115702479,
+    "ci": [
+      0.4501095751930735,
+      0.6937773466430815
+    ],
+    "n": {
+      "failure": 61,
+      "success": 181
+    }
+  },
+  "blocks | -40 to -30 | gripper | all steps": {
+    "auroc": 0.5278497409326425,
+    "ci": [
+      0.43638960758947815,
+      0.6080287839586024
+    ],
+    "n": {
+      "failure": 68,
+      "success": 200
+    }
+  },
+  "blocks | -30 to -20 | x | all steps": {
+    "auroc": 0.5487959442332065,
+    "ci": [
+      0.43387727080692856,
+      0.6586449091677226
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -30 to -20 | x | stop not in top two": {
+    "auroc": 0.5426136363636364,
+    "ci": [
+      0.41783075796692537,
+      0.6566931321126881
+    ],
+    "n": {
+      "failure": 67,
+      "success": 186
+    }
+  },
+  "blocks | -30 to -20 | y | all steps": {
+    "auroc": 0.5335868187579215,
+    "ci": [
+      0.4212029995775243,
+      0.6539923954372624
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -30 to -20 | y | stop not in top two": {
+    "auroc": 0.5523809523809524,
+    "ci": [
+      0.4353008110100761,
+      0.6748142775590885
+    ],
+    "n": {
+      "failure": 62,
+      "success": 185
+    }
+  },
+  "blocks | -30 to -20 | z | all steps": {
+    "auroc": 0.5209125475285171,
+    "ci": [
+      0.40345901985635824,
+      0.6375316856780727
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -30 to -20 | z | stop not in top two": {
+    "auroc": 0.5265888456549935,
+    "ci": [
+      0.41245136186770426,
+      0.6446173800259404
+    ],
+    "n": {
+      "failure": 68,
+      "success": 202
+    }
+  },
+  "blocks | -30 to -20 | roll | all steps": {
+    "auroc": 0.523447401774398,
+    "ci": [
+      0.40007393324883816,
+      0.6294940853400927
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -30 to -20 | roll | stop not in top two": {
+    "auroc": 0.6272040302267002,
+    "ci": [
+      0.49112368420490404,
+      0.7608234300091639
+    ],
+    "n": {
+      "failure": 49,
+      "success": 143
+    }
+  },
+  "blocks | -30 to -20 | pitch | all steps": {
+    "auroc": 0.5678073510773131,
+    "ci": [
+      0.46259505703422044,
+      0.6738540346430077
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -30 to -20 | pitch | stop not in top two": {
+    "auroc": 0.5933884297520661,
+    "ci": [
+      0.4609560373381511,
+      0.7216842159840271
+    ],
+    "n": {
+      "failure": 59,
+      "success": 182
+    }
+  },
+  "blocks | -30 to -20 | yaw | all steps": {
+    "auroc": 0.6083650190114068,
+    "ci": [
+      0.5035857625686523,
+      0.7110424588086177
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -30 to -20 | yaw | stop not in top two": {
+    "auroc": 0.6311475409836066,
+    "ci": [
+      0.517055402509948,
+      0.7443707351406822
+    ],
+    "n": {
+      "failure": 59,
+      "success": 185
+    }
+  },
+  "blocks | -30 to -20 | gripper | all steps": {
+    "auroc": 0.5373891001267427,
+    "ci": [
+      0.44781896915927333,
+      0.61956326573722
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -20 to -10 | x | all steps": {
+    "auroc": 0.6261089987325729,
+    "ci": [
+      0.5276668779045205,
+      0.7317384875369661
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -20 to -10 | x | stop not in top two": {
+    "auroc": 0.5907738095238095,
+    "ci": [
+      0.4709890807461016,
+      0.7137189985322475
+    ],
+    "n": {
+      "failure": 66,
+      "success": 188
+    }
+  },
+  "blocks | -20 to -10 | y | all steps": {
+    "auroc": 0.5538656527249683,
+    "ci": [
+      0.43384558512885485,
+      0.6776563160118291
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -20 to -10 | y | stop not in top two": {
+    "auroc": 0.5480132450331126,
+    "ci": [
+      0.42470453970865246,
+      0.6670296717171716
+    ],
+    "n": {
+      "failure": 62,
+      "success": 172
+    }
+  },
+  "blocks | -20 to -10 | z | all steps": {
+    "auroc": 0.5817490494296578,
+    "ci": [
+      0.4664131812420786,
+      0.6839934516265312
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -20 to -10 | z | stop not in top two": {
+    "auroc": 0.5750962772785623,
+    "ci": [
+      0.46897197261446294,
+      0.6850716730851516
+    ],
+    "n": {
+      "failure": 69,
+      "success": 202
+    }
+  },
+  "blocks | -20 to -10 | roll | all steps": {
+    "auroc": 0.5741444866920152,
+    "ci": [
+      0.4664131812420786,
+      0.6738540346430077
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -20 to -10 | roll | stop not in top two": {
+    "auroc": 0.5714285714285714,
+    "ci": [
+      0.4440799402334692,
+      0.7071994884494882
+    ],
+    "n": {
+      "failure": 49,
+      "success": 134
+    }
+  },
+  "blocks | -20 to -10 | pitch | all steps": {
+    "auroc": 0.5728770595690748,
+    "ci": [
+      0.45754119138149557,
+      0.6839934516265312
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -20 to -10 | pitch | stop not in top two": {
+    "auroc": 0.58,
+    "ci": [
+      0.44941097956495957,
+      0.6964801759607094
+    ],
+    "n": {
+      "failure": 60,
+      "success": 176
+    }
+  },
+  "blocks | -20 to -10 | yaw | all steps": {
+    "auroc": 0.5842839036755386,
+    "ci": [
+      0.47696979298690323,
+      0.697100760456273
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -20 to -10 | yaw | stop not in top two": {
+    "auroc": 0.5558912386706949,
+    "ci": [
+      0.4333933287186075,
+      0.6762636815984706
+    ],
+    "n": {
+      "failure": 65,
+      "success": 182
+    }
+  },
+  "blocks | -20 to -10 | gripper | all steps": {
+    "auroc": 0.49366286438529783,
+    "ci": [
+      0.39606305449936624,
+      0.6045785804816215
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -10 to 0 | x | all steps": {
+    "auroc": 0.5424588086185045,
+    "ci": [
+      0.42585551330798477,
+      0.6653992395437263
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -10 to 0 | x | stop not in top two": {
+    "auroc": 0.5996376811594203,
+    "ci": [
+      0.4724348486958134,
+      0.7168339837159429
+    ],
+    "n": {
+      "failure": 56,
+      "success": 185
+    }
+  },
+  "blocks | -10 to 0 | y | all steps": {
+    "auroc": 0.5716096324461344,
+    "ci": [
+      0.4427492606675116,
+      0.6903305872412334
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -10 to 0 | y | stop not in top two": {
+    "auroc": 0.5593869731800766,
+    "ci": [
+      0.4299271832941034,
+      0.687738189105723
+    ],
+    "n": {
+      "failure": 56,
+      "success": 171
+    }
+  },
+  "blocks | -10 to 0 | z | all steps": {
+    "auroc": 0.5348542458808618,
+    "ci": [
+      0.4224704267004647,
+      0.6425855513307985
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -10 to 0 | z | stop not in top two": {
+    "auroc": 0.5277419354838709,
+    "ci": [
+      0.40599462365591377,
+      0.6426129032258048
+    ],
+    "n": {
+      "failure": 69,
+      "success": 201
+    }
+  },
+  "blocks | -10 to 0 | roll | all steps": {
+    "auroc": 0.5449936628643853,
+    "ci": [
+      0.43387727080692856,
+      0.6527249683143219
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -10 to 0 | roll | stop not in top two": {
+    "auroc": 0.636,
+    "ci": [
+      0.4855165235159856,
+      0.7987073612516219
+    ],
+    "n": {
+      "failure": 35,
+      "success": 122
+    }
+  },
+  "blocks | -10 to 0 | pitch | all steps": {
+    "auroc": 0.5158428390367554,
+    "ci": [
+      0.39670468948035487,
+      0.632446134347275
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -10 to 0 | pitch | stop not in top two": {
+    "auroc": 0.5124113475177305,
+    "ci": [
+      0.3757321322657176,
+      0.6487272063896404
+    ],
+    "n": {
+      "failure": 59,
+      "success": 170
+    }
+  },
+  "blocks | -10 to 0 | yaw | all steps": {
+    "auroc": 0.5171102661596958,
+    "ci": [
+      0.38910012674271227,
+      0.6358312209547948
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  },
+  "blocks | -10 to 0 | yaw | stop not in top two": {
+    "auroc": 0.48663101604278075,
+    "ci": [
+      0.3545837488227799,
+      0.6243445796460173
+    ],
+    "n": {
+      "failure": 55,
+      "success": 181
+    }
+  },
+  "blocks | -10 to 0 | gripper | all steps": {
+    "auroc": 0.4404309252217998,
+    "ci": [
+      0.3286728981833544,
+      0.5604272285593571
+    ],
+    "n": {
+      "failure": 70,
+      "success": 202
+    }
+  }
+}
