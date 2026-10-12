@@ -528,12 +528,10 @@ def final_stall_start(stalled, n: int, gap: int) -> int | None:
 
 
 def classify(x, info, flag_intervals, boxes, reference, params=DEFAULT_PARAMS) -> Prediction:
-    """Rule order: grounding flags; inaction from the first policy step; else the earliest
-    unrecovered event, labeled by its kind; else inaction if a stall runs to the cap."""
+    """Rule order: inaction from the first policy step; else the earliest of a grounding flag
+    and the first unrecovered event; else inaction if a stall runs to the cap."""
     grounding = list(flag_intervals["wrong_object"]) + list(flag_intervals["wrong_target"])
-    if grounding:
-        onset = min(a for a, _ in grounding)
-        return Prediction("grounding", onset, False, "wrong_object or wrong_target fired")
+    grounding_onset = min((a for a, _ in grounding), default=None)
     start, n = info["num_wait_steps"], len(x["finger_pad_pos"])
     # `stalled` is judged from the step after the wait, so a stall from the first policy
     # step starts at start + 1.
@@ -551,8 +549,12 @@ def classify(x, info, flag_intervals, boxes, reference, params=DEFAULT_PARAMS) -
         + _defective_placements(w, reference, params)
     )
     for event in sorted(events, key=lambda e: e.step):
+        if grounding_onset is not None and grounding_onset <= event.step:
+            break
         if not _recovered(event, w, params, attempts):
             return _label(event, w, params)
+    if grounding_onset is not None:
+        return Prediction("grounding", grounding_onset, False, "wrong_object or wrong_target fired")
     stall = final_stall_start(flag_intervals.get("stalled", []), n, params.inaction_gap)
     if stall is not None:
         return Prediction("inaction", stall, False, "stalled to the cap with no unrecovered error")

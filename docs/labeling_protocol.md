@@ -391,13 +391,13 @@ re-passed when a change affects them.
 Assigns each failure a `mechanism` from world state, or abstains. Developed on the pilot 20,
 scored against the held-out labels. Rules approved so far:
 
-- **Rule order.** (1) `wrong_object` or `wrong_target` fired: `grounding`. (2) `stalled` from
-  the first policy step to the cap: `inaction`, onset 10. (3) Otherwise find the initiator,
-  the earliest error not recovered from. (4) The phase at the initiator, not the episode's
-  final phase, gives the `control` sub-label: none `grasp`, grasped `transport`, carried
-  `place`. (5) At a failed grasp attempt, the between-the-fingers test splits `perception`
-  from `control: grasp`. (6) No initiator, and a stall runs to the cap (stall runs at most
-  20 steps apart merged): `inaction` at the stall's start.
+- **Rule order.** (1) `stalled` from the first policy step to the cap: `inaction`, onset 10.
+  (2) Otherwise find the initiator, the earliest error not recovered from; a `wrong_object` or
+  `wrong_target` firing is an error at its onset, labeled `grounding`. (3) The phase at the
+  initiator, not the episode's final phase, gives the `control` sub-label: none `grasp`,
+  grasped `transport`, carried `place`. (4) At a failed grasp attempt, the between-the-fingers
+  test splits `perception` from `control: grasp`. (5) No initiator, and a stall runs to the cap
+  (stall runs at most 20 steps apart merged): `inaction` at the stall's start.
 - **Recovered.** Progress resumed on the error's own subgoal: it counts later, or its object
   reaches a higher phase (held, then held over the target). Progress on another subgoal does
   not recover it (`t04-i017`: the second mug's placement does not undo the first mug's
@@ -457,11 +457,10 @@ scored against the held-out labels. Rules approved so far:
   placements. Decided after the held-out labels are committed, once the count of fixture
   errors is known; it would be scored on the held-out set only with the caveat that
   `t03-i008` prompted it.
-- **Known flaw: grounding before the initiator.** Rule order (1) returns `grounding` whenever
-  `wrong_object` or `wrong_target` fires, even after an earlier unrecovered error, against the
-  earliest-initiator principle (held-out `t04-i019`: a plate grasp ~370 steps after a failed
-  mug grasp). To be fixed, test-first on non-held-out cases, before the classifier is
-  re-frozen.
+- **Grounding in event order** (fixed 2026-10-11): `grounding` was returned whenever
+  `wrong_object` or `wrong_target` fired, even after an earlier unrecovered error. Held-out
+  `t04-i019` (a plate grasp ~370 steps after a failed mug grasp) prompted the fix; no
+  non-held-out failure fires either flag, so no development prediction changes.
 
 ## Freeze
 

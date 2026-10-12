@@ -261,6 +261,15 @@ def test_grounding_flags_come_first():
     assert (pred.mechanism, pred.onset_step) == ("grounding", 50)
 
 
+def test_an_earlier_unrecovered_error_precedes_a_later_grounding_flag():
+    x, info, boxes = _scene()
+    _reach(x, 20, 60, at_xy=(0.06, 0.0))
+    _close(x, 61)
+    _lift(x, 80, carry=False)
+    late = {"wrong_object": [(150, 160)], "wrong_target": []}
+    assert _classify(x, info, boxes, late).mechanism == "perception"
+
+
 def test_a_close_beside_the_object_is_perception_at_the_bottom():
     x, info, boxes = _scene()
     _reach(x, 20, 60, at_xy=(0.06, 0.0))
