@@ -89,3 +89,14 @@ python scripts/separability_gate.py outputs/baseline --out outputs/baseline/gate
 **P1: not supported**: the primary CI includes 0.5, and its point estimate is below it.
 
 Interpretation: not yet written.
+
+## Exploratory, after the freeze: motion check (2026-10-12)
+
+Does arm speed in the same window explain the motion-dim result? Speed is the end effector's,
+from world state (`scripts/gate_motion_check.py`, `docs/results/baseline/gate/motion_check.md`).
+
+- Speed does not separate: translation AUROC 0.433 [0.346, 0.526], rotation 0.577
+  [0.485, 0.667] (same-task, 95%).
+- Per-unit exp(H) correlates weakly with speed (|r| 0.13–0.28).
+- With the linear speed effect removed, same-task AUROCs (99.17% CIs) barely move: x 0.624
+  [0.518, 0.730], y 0.636 [0.526, 0.748], pitch 0.620 [0.510, 0.728]. Each still excludes 0.5.

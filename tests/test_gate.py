@@ -135,3 +135,22 @@ def test_the_bootstrap_resamples_whole_episodes():
         draw = gate.resample_episodes(units, np.random.default_rng(seed))
         assert sum(u.episode_id == "s" for u in draw) == 2
         assert sum(u.group == "failure" for u in draw) == 2
+
+
+def test_window_speed_is_the_mean_step_displacement_times_the_rate():
+    pos = np.zeros((10, 3))
+    pos[:, 0] = np.arange(10) * 0.01
+    assert gate.window_speed(pos, np.array([2, 3, 4]), hz=20) == pytest.approx(0.2)
+
+
+def test_window_rotation_speed_measures_the_angle_between_steps():
+    angles = np.arange(10) * 0.05
+    quats = np.stack([np.zeros(10), np.zeros(10), np.sin(angles / 2), np.cos(angles / 2)], axis=1)
+    assert gate.window_rotation_speed(quats, np.array([1, 2]), hz=20) == pytest.approx(1.0)
+
+
+def test_residuals_remove_the_linear_part_explained_by_the_covariate():
+    x = np.array([0.0, 1.0, 2.0, 3.0])
+    y = 2 * x + np.array([0.1, -0.1, 0.1, -0.1])
+    assert gate.residualize(y, x) == pytest.approx(y - np.polyval(np.polyfit(x, y, 1), x))
+    assert abs(np.corrcoef(gate.residualize(y, x), x)[0, 1]) < 1e-9

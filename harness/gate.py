@@ -156,3 +156,22 @@ def bootstrap_ci(units, statistic, level: float, n_boot: int, seed: int) -> tupl
     tail = (1 - level) / 2 * 100
     lo, hi = np.percentile(stats, [tail, 100 - tail])
     return float(lo), float(hi)
+
+
+def window_speed(pos, window: np.ndarray, hz: float) -> float:
+    """Mean displacement per step from each window step to the next, in units per second."""
+    pos = np.asarray(pos, dtype=float)
+    return float(np.linalg.norm(pos[window + 1] - pos[window], axis=-1).mean() * hz)
+
+
+def window_rotation_speed(quats_xyzw, window: np.ndarray, hz: float) -> float:
+    """Mean rotation angle per step from each window step to the next, in rad/s."""
+    q = np.asarray(quats_xyzw, dtype=float)
+    dot = np.abs(np.sum(q[window + 1] * q[window], axis=-1))
+    return float((2 * np.arccos(np.clip(dot, 0.0, 1.0))).mean() * hz)
+
+
+def residualize(y, x) -> np.ndarray:
+    """`y` minus its least-squares line on `x`."""
+    y, x = np.asarray(y, dtype=float), np.asarray(x, dtype=float)
+    return y - np.polyval(np.polyfit(x, y, 1), x)
