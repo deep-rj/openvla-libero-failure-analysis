@@ -3,6 +3,37 @@
 Language-conditioned VLA agent (OpenVLA + LoRA) evaluated on LIBERO-Long, with an eval
 harness, failure taxonomy, and robustness study on top.
 
+## Results
+
+**Baseline.** 130/250 = 52.0% success (Wilson 95% interval 45.8–58.1%), 10 tasks × 25 init
+states, seed 0; the OpenVLA paper reports 53.7 ± 1.3% for this checkpoint. Details:
+`docs/results/baseline/`, `docs/block1_findings.md`.
+
+**Failure taxonomy.** Every one of the 120 failures carries a milestone (subgoals completed,
+`k`, computed from replayed simulator state) and a mechanism (the earliest error never
+recovered from). Rules: `docs/labeling_protocol.md`. Per-episode table:
+`docs/results/baseline/labeling/failure_mechanisms.csv`.
+
+| Mechanism | Failures | Hand-labeled | Classifier |
+|---|---|---|---|
+| `control: grasp` | 41 | 14 | 27 |
+| `perception` | 38 | 22 | 16 |
+| `control: place` | 22 | 12 | 10 |
+| `control: transport` | 11 | 5 | 6 |
+| `inaction` | 7 | 2 | 5 |
+| no identifiable onset | 1 | 1 | 0 |
+
+`grounding` and `external`: 0. Milestones: `k` = 0 for 52 failures, 1 for 60, 2 for 8.
+
+**Mechanism classifier agreement.** A rule-based classifier over world state (no model
+outputs) labels the 64 failures without a hand label. Scored once, frozen, against 30
+held-out hand labels: **agreement 20/29 decided (69%), 1/30 abstained**; onsets within ±10
+steps for 18/29. Per class (agree/decided): `perception` 12/16, `control: grasp` 3/4,
+`control: transport` 2/3, `control: place` 1/4, `inaction` 2/2. On the 20 development labels
+it agrees 20/20, which is optimistic by construction. Four rules were prompted by held-out
+episodes during labeling, so agreement on them is not independent; the report lists them
+with the four disagreement patterns: `docs/results/baseline/labeling/mechanism_heldout_report.md`.
+
 ## Repo layout
 
 ```
