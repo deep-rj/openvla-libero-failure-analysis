@@ -223,7 +223,10 @@ initiator is recorded in tags and flags, never as a mechanism.
   between the two is labeled as judged, with "Close call with control" or "Close call with
   perception" in the notes.
   At a fixture, `perception` when the arm meets it outside the successes' contact range
-  (`t03-i008`: pushing the drawer with the finger pads above every success's push height).
+  (`t03-i008`: pushing the drawer with the finger pads above every success's push height). A
+  fixture attempt at the successes' contact spot that fails to move the fixture (touching it
+  without turning or pushing it through) is `control: grasp`, the fixture counterpart of a
+  close that does not lift (`t02-i007`, `t02-i008`, `t02-i014`).
 - **Off-tolerance releases.** A release that leaves the object resting on the target object but
   outside LIBERO's tolerance is `control: place`. One that leaves it off the target (beside it,
   on a receptacle's rim) is labeled by the error that put it there (`control: transport`, or
@@ -380,6 +383,12 @@ re-passed when a change affects them.
   classifier still has no fixture detector). Consequence for the broadened `inaction`: a
   fixture-stage error followed by a stall to the cap reads as `inaction` to the classifier, so
   `t02-i007` and `t02-i014` (stalled mid knob turn) join the video check before re-freezing.
+- Development abstentions (2026-10-11): the 6 classifier abstentions among the 70 unlabeled
+  non-held-out failures are hand-labeled (`abstention_labels.csv`), so every failure carries a
+  mechanism. New rule: a fixture attempt at the successes' contact spot that fails to move the
+  fixture is `control: grasp` (the three knob stalls; numbers: 0.2-1.7 cm outside the
+  successes' contact box, at their height, against a 3.5 x 2.5 cm success spread). First
+  `no_onset` case: `t08-i005` (a recovered miss, then a 13 s stall, out of time holding the pot).
 - Classifier video check (2026-10-11), the 7 non-held-out episodes the broadened `inaction`
   newly claimed (hand reads, not labels): `t04-i006` and `t04-i010` perception, `t04-i016`
   borderline perception: grasp attempts on the yellow-white mug the classifier missed, its
@@ -475,6 +484,11 @@ scored against the held-out labels. Rules approved so far:
   placements. Decided after the held-out labels are committed, once the count of fixture
   errors is known; it would be scored on the held-out set only with the caveat that
   `t03-i008` prompted it.
+- **Known gaps found on the development abstentions** (hand-labeled in
+  `abstention_labels.csv`): no placement detector for region targets (`t08-i004`: a pot set
+  down past the cook region's edge abstains instead of `control: place`); an open descent
+  that never rises and never stalls by the flag's threshold is not an attempt (`t00-i022`,
+  `perception` by hand). Candidates for a fix round, scored only on new labels.
 - **Grounding in event order** (fixed 2026-10-11): `grounding` was returned whenever
   `wrong_object` or `wrong_target` fired, even after an earlier unrecovered error. Held-out
   `t04-i019` (a plate grasp ~370 steps after a failed mug grasp) prompted the fix; no
