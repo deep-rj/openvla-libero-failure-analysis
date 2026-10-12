@@ -11,6 +11,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from harness import mechanism
+from harness.pilot_report import merged_bin_logits
 
 GRIPPER_DIM = 6
 
@@ -175,3 +176,22 @@ def residualize(y, x) -> np.ndarray:
     """`y` minus its least-squares line on `x`."""
     y, x = np.asarray(y, dtype=float), np.asarray(x, dtype=float)
     return y - np.polyval(np.polyfit(x, y, 1), x)
+
+
+def bin_probs(slice_logits) -> np.ndarray:
+    """[..., 255] probabilities over merged bins, as in `pilot_report.derive_step_metrics`."""
+    bins = merged_bin_logits(slice_logits)
+    weights = np.exp(bins - bins.max(axis=-1, keepdims=True))
+    return weights / weights.sum(axis=-1, keepdims=True)
+
+
+def stop_rank(probs, zero_bin: int) -> np.ndarray:
+    """Per step: 0 if the no-motion bin is the top choice, 1 if second, 2 otherwise."""
+    order = np.argsort(np.asarray(probs), axis=-1)
+    return np.where(order[..., -1] == zero_bin, 0, np.where(order[..., -2] == zero_bin, 1, 2))
+
+
+def subset_mean(values, window: np.ndarray, keep) -> float | None:
+    """Mean of `values` over the window steps where `keep` holds; None if there are none."""
+    steps = window[np.asarray(keep)[window]]
+    return float(np.asarray(values)[steps].mean()) if len(steps) else None

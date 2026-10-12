@@ -72,7 +72,8 @@ python scripts/separability_gate.py outputs/baseline --out outputs/baseline/gate
 ## Result (2026-10-12, freeze `f117928`)
 
 70 failures, 202 success grasps. Files: `docs/results/baseline/gate/` (`gate_report.md`,
-`gate_results.json`, `anchors.csv`, `curves.png`).
+`gate_results.json`, `anchors.csv`). Plots are gitignored; the scripts write them to `--out`
+(`curves.png`).
 
 | Metric | CI level | Same-task AUROC [CI] | Pooled AUROC [CI] |
 |---|---|---|---|
@@ -100,3 +101,16 @@ from world state (`scripts/gate_motion_check.py`, `docs/results/baseline/gate/mo
 - Per-unit exp(H) correlates weakly with speed (|r| 0.13–0.28).
 - With the linear speed effect removed, same-task AUROCs (99.17% CIs) barely move: x 0.624
   [0.518, 0.730], y 0.636 [0.526, 0.748], pitch 0.620 [0.510, 0.728]. Each still excludes 0.5.
+
+## Exploratory, after the freeze: no-motion check (2026-10-12)
+
+Per step and motion dim, the no-motion bin (raw action 0) is the top choice, the runner-up, or
+neither (`scripts/gate_stop_check.py`, `docs/results/baseline/gate/stop_check.md`; plot
+`stop_curves.png` in `--out`). Same-task AUROC with 99.17% CIs; 24 tests.
+
+- The share of window steps with stop chosen, or stop runner-up, separates on no dim. Stop is
+  the runner-up in 0–17% of runs at any step.
+- exp(H) on steps where stop is *not* in the top two separates on y 0.625 [0.530, 0.725],
+  roll 0.701 [0.597, 0.800], pitch 0.630 [0.516, 0.741] and yaw 0.649 [0.540, 0.753].
+- exp(H) on steps where stop *is* in the top two separates only on z: 0.654 [0.525, 0.769],
+  on 53 failures and 177 success units with such steps.

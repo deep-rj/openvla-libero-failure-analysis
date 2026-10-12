@@ -154,3 +154,15 @@ def test_residuals_remove_the_linear_part_explained_by_the_covariate():
     y = 2 * x + np.array([0.1, -0.1, 0.1, -0.1])
     assert gate.residualize(y, x) == pytest.approx(y - np.polyval(np.polyfit(x, y, 1), x))
     assert abs(np.corrcoef(gate.residualize(y, x), x)[0, 1]) < 1e-9
+
+
+def test_stop_rank_is_where_the_no_motion_bin_sits_among_the_top_two():
+    probs = np.array([[0.1, 0.6, 0.3], [0.5, 0.2, 0.3], [0.2, 0.3, 0.5]])
+    assert gate.stop_rank(probs, zero_bin=1).tolist() == [0, 2, 1]
+
+
+def test_window_mean_over_a_subset_skips_units_with_no_qualifying_step():
+    values = np.array([1.0, 2.0, 3.0, 4.0])
+    window = np.array([0, 1, 2])
+    assert gate.subset_mean(values, window, np.array([True, False, True, True])) == 2.0
+    assert gate.subset_mean(values, window, np.array([False, False, False, True])) is None
