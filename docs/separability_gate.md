@@ -69,6 +69,23 @@ python scripts/gate_anchors.py outputs/baseline \
 python scripts/separability_gate.py outputs/baseline --out outputs/baseline/gate
 ```
 
-## Result
+## Result (2026-10-12, freeze `f117928`)
 
-Not run.
+70 failures, 202 success grasps. Files: `docs/results/baseline/gate/` (`gate_report.md`,
+`gate_results.json`, `anchors.csv`, `curves.png`).
+
+| Metric | CI level | Same-task AUROC [CI] | Pooled AUROC [CI] |
+|---|---|---|---|
+| **gripper exp(H)** (primary) | 95% | 0.438 [0.350, 0.527] | 0.462 [0.388, 0.536] |
+| x exp(H) | 99.17% | 0.632 [0.530, 0.738] | 0.536 [0.451, 0.625] |
+| y exp(H) | 99.17% | 0.629 [0.520, 0.739] | 0.530 [0.435, 0.626] |
+| z exp(H) | 99.17% | 0.589 [0.470, 0.703] | 0.581 [0.490, 0.669] |
+| roll exp(H) | 99.17% | 0.563 [0.443, 0.679] | 0.530 [0.440, 0.623] |
+| pitch exp(H) | 99.17% | 0.620 [0.511, 0.728] | 0.595 [0.508, 0.682] |
+| yaw exp(H) | 99.17% | 0.586 [0.469, 0.699] | 0.534 [0.447, 0.617] |
+| gripper near-tie rate (secondary) | 95% | 0.439 [0.371, 0.507] | 0.469 [0.414, 0.523] |
+
+**Gate: pass** under the pre-registered rule: the same-task CIs of x, y and pitch exclude 0.5.
+**P1: not supported**: the primary CI includes 0.5, and its point estimate is below it.
+
+Interpretation: not yet written.

@@ -27,6 +27,7 @@ EXPLORATORY_LEVEL = 1 - 0.05 / len(EXPLORATORY)
 CURVE_BEFORE, CURVE_AFTER = 50, 20
 N_BOOT, SEED = 10_000, 0
 COLORS = {"failure": "#eb6834", "success": "#2a78d6"}
+PLURAL = {"failure": "failures", "success": "successes"}
 INK, MUTED, GRID, SURFACE = "#1f1f1e", "#6b6a64", "#e4e3de", "#fcfcfb"
 
 
@@ -99,7 +100,7 @@ def plot(loaded, path: Path) -> None:
             n = np.sum(~np.isnan(curves), axis=0)
             mean = np.nanmean(curves, axis=0)
             lo, hi = np.nanpercentile(curves, [25, 75], axis=0)
-            label = f"{group}s (n = {len(curves)})"
+            label = f"{PLURAL[group]} (n = {len(curves)})"
             ax.fill_between(span, lo, hi, color=COLORS[group], alpha=0.15, linewidth=0)
             ax.plot(span, np.where(n > 0, mean, np.nan), color=COLORS[group], lw=2, label=label)
         ax.axvline(0, color=MUTED, lw=1, ls="--")
@@ -113,6 +114,7 @@ def plot(loaded, path: Path) -> None:
         if k % 4 == 0:
             ax.set_ylabel("exp(H), effective bins", color=MUTED, fontsize=9)
         if k >= 3:
+            ax.tick_params(labelbottom=True)
             ax.set_xlabel("steps from the grasp descent's bottom", color=MUTED, fontsize=9)
     handles, labels = axes.flat[0].get_legend_handles_labels()
     axes.flat[-1].legend(handles, labels, loc="center", frameon=False, labelcolor=INK)
