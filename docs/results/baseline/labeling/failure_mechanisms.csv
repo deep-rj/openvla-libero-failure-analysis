@@ -1,0 +1,121 @@
+episode_id,k_completed,phase,mechanism,onset_step,no_onset,source
+libero_10-t00-i002-s0-none,1,none,control: grasp,192,,classifier
+libero_10-t00-i003-s0-none,1,none,perception,228,0,heldout
+libero_10-t00-i006-s0-none,1,none,perception,358,0,heldout
+libero_10-t00-i009-s0-none,1,none,perception,217,,classifier
+libero_10-t00-i010-s0-none,1,none,perception,298,0,heldout
+libero_10-t00-i011-s0-none,1,none,inaction,165,,classifier
+libero_10-t00-i013-s0-none,0,grasped,control: grasp,107,0,pilot
+libero_10-t00-i015-s0-none,1,grasped,control: grasp,222,,classifier
+libero_10-t00-i016-s0-none,0,none,perception,76,,classifier
+libero_10-t00-i020-s0-none,0,none,control: grasp,117,,classifier
+libero_10-t00-i022-s0-none,0,none,perception,68,0,abstention
+libero_10-t00-i024-s0-none,0,none,perception,15,0,pilot
+libero_10-t01-i005-s0-none,0,none,perception,65,0,heldout
+libero_10-t01-i010-s0-none,0,none,control: grasp,165,0,pilot
+libero_10-t01-i012-s0-none,1,none,control: grasp,240,0,heldout
+libero_10-t01-i017-s0-none,1,none,control: grasp,437,,classifier
+libero_10-t01-i022-s0-none,1,none,control: grasp,238,0,pilot
+libero_10-t01-i024-s0-none,1,grasped,control: transport,220,0,heldout
+libero_10-t02-i005-s0-none,1,grasped,control: transport,273,,classifier
+libero_10-t02-i006-s0-none,1,none,perception,185,0,heldout
+libero_10-t02-i007-s0-none,0,engaged,control: grasp,88,0,abstention
+libero_10-t02-i008-s0-none,0,none,control: grasp,236,0,abstention
+libero_10-t02-i009-s0-none,1,none,perception,215,0,pilot
+libero_10-t02-i013-s0-none,1,none,inaction,195,0,heldout
+libero_10-t02-i014-s0-none,0,engaged,control: grasp,53,0,abstention
+libero_10-t02-i016-s0-none,1,none,perception,219,,classifier
+libero_10-t02-i020-s0-none,1,none,perception,230,0,heldout
+libero_10-t02-i023-s0-none,1,none,perception,300,0,pilot
+libero_10-t02-i024-s0-none,1,none,control: grasp,169,,classifier
+libero_10-t03-i000-s0-none,1,partial,perception,432,,classifier
+libero_10-t03-i001-s0-none,0,none,control: grasp,81,,classifier
+libero_10-t03-i002-s0-none,0,grasped,control: grasp,429,,classifier
+libero_10-t03-i006-s0-none,0,none,perception,115,0,heldout
+libero_10-t03-i008-s0-none,1,partial,perception,270,0,heldout
+libero_10-t03-i009-s0-none,0,none,control: grasp,95,0,pilot
+libero_10-t03-i011-s0-none,1,partial,control: place,155,0,pilot
+libero_10-t03-i013-s0-none,0,none,perception,86,,classifier
+libero_10-t03-i015-s0-none,1,engaged,control: place,182,,classifier
+libero_10-t03-i016-s0-none,0,none,inaction,10,,classifier
+libero_10-t03-i018-s0-none,1,partial,perception,273,,classifier
+libero_10-t03-i020-s0-none,0,grasped,control: grasp,105,,classifier
+libero_10-t03-i021-s0-none,0,none,control: grasp,85,,classifier
+libero_10-t03-i022-s0-none,0,none,perception,80,0,heldout
+libero_10-t03-i023-s0-none,0,none,perception,73,,classifier
+libero_10-t04-i000-s0-none,1,grasped,control: place,240,0,heldout
+libero_10-t04-i001-s0-none,1,grasped,control: place,204,,classifier
+libero_10-t04-i002-s0-none,0,grasped,control: grasp,76,0,pilot
+libero_10-t04-i003-s0-none,1,grasped,control: place,295,,classifier
+libero_10-t04-i004-s0-none,1,carried,control: place,83,,classifier
+libero_10-t04-i006-s0-none,1,none,perception,234,,classifier
+libero_10-t04-i007-s0-none,1,grasped,control: place,104,,classifier
+libero_10-t04-i008-s0-none,0,carried,control: place,85,0,heldout
+libero_10-t04-i010-s0-none,1,none,perception,245,,classifier
+libero_10-t04-i012-s0-none,0,none,control: grasp,38,,classifier
+libero_10-t04-i015-s0-none,1,none,perception,275,,classifier
+libero_10-t04-i016-s0-none,1,none,perception,213,,classifier
+libero_10-t04-i017-s0-none,1,carried,control: place,108,0,pilot
+libero_10-t04-i019-s0-none,1,none,control: grasp,200,0,heldout
+libero_10-t04-i021-s0-none,1,grasped,control: place,72,,classifier
+libero_10-t04-i022-s0-none,1,grasped,control: place,203,,classifier
+libero_10-t04-i023-s0-none,0,grasped,control: transport,75,,classifier
+libero_10-t05-i002-s0-none,0,carried,control: place,447,,classifier
+libero_10-t05-i009-s0-none,0,carried,control: place,175,0,pilot
+libero_10-t05-i011-s0-none,0,grasped,control: place,172,0,heldout
+libero_10-t05-i018-s0-none,0,none,control: grasp,11,,classifier
+libero_10-t05-i019-s0-none,0,carried,control: place,210,0,heldout
+libero_10-t05-i020-s0-none,0,carried,control: place,185,0,heldout
+libero_10-t05-i022-s0-none,0,carried,control: place,165,0,pilot
+libero_10-t06-i000-s0-none,1,grasped,control: transport,354,,classifier
+libero_10-t06-i002-s0-none,0,carried,control: place,91,,classifier
+libero_10-t06-i006-s0-none,1,none,perception,250,0,heldout
+libero_10-t06-i011-s0-none,0,carried,control: place,84,,classifier
+libero_10-t06-i012-s0-none,1,none,perception,228,,classifier
+libero_10-t06-i013-s0-none,0,carried,control: place,112,0,pilot
+libero_10-t06-i014-s0-none,1,none,perception,190,0,heldout
+libero_10-t06-i016-s0-none,1,none,perception,200,0,heldout
+libero_10-t06-i020-s0-none,0,carried,control: place,140,0,pilot
+libero_10-t06-i021-s0-none,0,none,perception,88,,classifier
+libero_10-t07-i000-s0-none,1,grasped,control: grasp,115,,classifier
+libero_10-t07-i001-s0-none,1,grasped,control: grasp,248,,classifier
+libero_10-t07-i002-s0-none,0,none,control: grasp,181,,classifier
+libero_10-t07-i004-s0-none,0,none,inaction,10,,classifier
+libero_10-t07-i005-s0-none,0,none,inaction,10,,classifier
+libero_10-t07-i007-s0-none,1,none,control: grasp,180,0,pilot
+libero_10-t07-i008-s0-none,0,none,control: grasp,68,,classifier
+libero_10-t07-i012-s0-none,1,none,inaction,427,,classifier
+libero_10-t07-i013-s0-none,0,none,perception,40,0,pilot
+libero_10-t07-i016-s0-none,1,none,control: grasp,238,,classifier
+libero_10-t07-i018-s0-none,1,none,perception,190,0,heldout
+libero_10-t07-i019-s0-none,0,grasped,control: grasp,104,,classifier
+libero_10-t07-i020-s0-none,1,none,control: grasp,179,,classifier
+libero_10-t07-i021-s0-none,1,none,perception,233,0,heldout
+libero_10-t07-i023-s0-none,0,grasped,control: grasp,158,0,heldout
+libero_10-t08-i001-s0-none,2,none,perception,270,0,heldout
+libero_10-t08-i002-s0-none,2,none,control: grasp,426,,classifier
+libero_10-t08-i003-s0-none,2,none,control: grasp,442,,classifier
+libero_10-t08-i004-s0-none,1,carried,control: place,200,0,abstention
+libero_10-t08-i005-s0-none,1,grasped,,,1,abstention
+libero_10-t08-i006-s0-none,1,none,perception,110,0,pilot
+libero_10-t08-i007-s0-none,2,none,perception,273,,classifier
+libero_10-t08-i008-s0-none,1,none,control: grasp,129,,classifier
+libero_10-t08-i009-s0-none,1,none,perception,249,,classifier
+libero_10-t08-i010-s0-none,1,none,control: grasp,80,0,pilot
+libero_10-t08-i013-s0-none,1,none,control: grasp,145,0,heldout
+libero_10-t08-i015-s0-none,1,none,control: grasp,239,,classifier
+libero_10-t08-i018-s0-none,2,none,perception,335,0,heldout
+libero_10-t08-i019-s0-none,2,grasped,control: grasp,247,,classifier
+libero_10-t08-i021-s0-none,1,none,control: grasp,132,,classifier
+libero_10-t08-i023-s0-none,2,carried,control: transport,218,,classifier
+libero_10-t08-i024-s0-none,2,grasped,control: transport,517,,classifier
+libero_10-t09-i001-s0-none,0,grasped,control: transport,280,,classifier
+libero_10-t09-i005-s0-none,0,none,perception,125,,classifier
+libero_10-t09-i007-s0-none,0,none,inaction,10,0,heldout
+libero_10-t09-i011-s0-none,0,grasped,control: transport,160,0,heldout
+libero_10-t09-i013-s0-none,0,grasped,control: transport,225,0,heldout
+libero_10-t09-i014-s0-none,0,none,control: grasp,389,,classifier
+libero_10-t09-i015-s0-none,0,grasped,control: transport,390,0,pilot
+libero_10-t09-i019-s0-none,0,grasped,control: grasp,131,,classifier
+libero_10-t09-i020-s0-none,0,grasped,control: transport,205,0,pilot
+libero_10-t09-i022-s0-none,1,none,control: grasp,271,,classifier

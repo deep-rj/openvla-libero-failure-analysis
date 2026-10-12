@@ -118,3 +118,29 @@ def render_dev_report(report: dict) -> str:
         lines += ["", "| episode | onset offset |", "|---|---|"]
         lines += [f"| {ep} | {o:+d} |" for ep, o in sorted(report["onset_offsets"].items())]
     return "\n".join(lines) + "\n"
+
+
+FAILURE_COLUMNS = (
+    "episode_id", "k_completed", "phase", "mechanism", "onset_step", "no_onset", "source"
+)
+
+
+def failure_mechanisms(failures, computed: dict, hand: dict, predicted: dict) -> list[dict]:
+    """One row per failure: computed milestone, and the mechanism from the first hand-label set
+    (name -> {episode_id: row}) that has the episode, else the classifier's prediction."""
+    rows = []
+    for ep in failures:
+        row = {"episode_id": ep, "k_completed": computed[ep]["k_completed"],
+               "phase": computed[ep]["phase"]}
+        source = next((name for name, labels in hand.items() if ep in labels), None)
+        if source is not None:
+            label = hand[source][ep]
+            row |= {"mechanism": label["mechanism"], "onset_step": label["first_error_step"],
+                    "no_onset": label["no_onset"], "source": source}
+        else:
+            p = predicted[ep]
+            row |= {"mechanism": p.mechanism,
+                    "onset_step": "" if p.onset_step is None else str(p.onset_step),
+                    "no_onset": "", "source": "classifier abstained" if p.abstained else "classifier"}
+        rows.append(row)
+    return rows

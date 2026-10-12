@@ -95,3 +95,28 @@ def test_predictions_round_trip_through_the_csv(tmp_path):
     }
     mr.write_predictions(out, predictions)
     assert mr.read_predictions(out) == predictions
+
+
+def test_failure_mechanisms_prefer_hand_labels_and_mark_their_source():
+    computed = {"a": {"k_completed": "1", "phase": "none"}, "b": {"k_completed": "0", "phase": "grasped"}}
+    hand = {"pilot": {"a": {"mechanism": "perception", "first_error_step": "40", "no_onset": "0"}}}
+    predicted = {
+        "a": Prediction("control: grasp", 41, False, ""),
+        "b": Prediction("control: place", 90, False, ""),
+    }
+    rows = mr.failure_mechanisms(["a", "b"], computed, hand, predicted)
+    assert rows[0] == {
+        "episode_id": "a", "k_completed": "1", "phase": "none", "mechanism": "perception",
+        "onset_step": "40", "no_onset": "0", "source": "pilot",
+    }
+    assert (rows[1]["mechanism"], rows[1]["onset_step"], rows[1]["source"]) == (
+        "control: place", "90", "classifier"
+    )
+
+
+def test_an_unlabeled_abstention_has_no_mechanism():
+    rows = mr.failure_mechanisms(
+        ["c"], {"c": {"k_completed": "0", "phase": "none"}}, {},
+        {"c": Prediction("", None, True, "no unrecovered error found")},
+    )
+    assert (rows[0]["mechanism"], rows[0]["source"]) == ("", "classifier abstained")
