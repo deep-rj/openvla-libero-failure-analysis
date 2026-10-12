@@ -285,6 +285,8 @@ and below any physical effect.
 
 ### Predictions for the separability gate
 
+Amended and withdrawn on 2026-10-12, before any outcome split: `docs/separability_gate.md`.
+
 Each statistic is per episode, failed (n = 120) against successful (n = 130), tested by the
 AUROC 95% CI.
 
