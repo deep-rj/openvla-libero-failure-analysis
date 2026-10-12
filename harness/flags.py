@@ -30,6 +30,7 @@ class FlagParams:
     joint_limit_fraction: float = 0.02
     joint_limit_steps: int = 10
     engaged_seconds: float = 5.0  # an object moving at the cap counts if gripped this recently
+    regrasp_min_steps: int = 3  # holds shorter than this are contact blips, not grasps
 
 
 DEFAULT_FLAGS = FlagParams()
@@ -157,13 +158,14 @@ def wrong_target(
     return _merge(found)
 
 
-def regression(count: np.ndarray, n: int) -> Intervals:
-    """A counted subgoal later stopped counting for at least `n` steps."""
+def regression(count: np.ndarray, placed: np.ndarray, n: int) -> Intervals:
+    """A counted subgoal's placement later stopped holding for at least `n` steps; judged on
+    the predicate, since the counting debounce stretches a 1-step dropout to `n` steps."""
     found = []
     for g in range(count.shape[1]):
         if count[:, g].any():
             first = int(np.argmax(count[:, g]))
-            found += _runs(~count[first:, g], n, offset=first)
+            found += _runs(~placed[first:, g], n, offset=first)
     return _merge(found)
 
 
@@ -188,9 +190,13 @@ def dropped(z, held, over_target, fall_m: float, window: int) -> Intervals:
     return out
 
 
-def regrasps(held: np.ndarray, start: int) -> Intervals:
-    """Grasp onsets at or after `start`, after the first; a hold already on at `start` is
-    the first."""
+def regrasps(held: np.ndarray, start: int, min_steps: int = 1) -> Intervals:
+    """Onsets, at or after `start`, of holds lasting at least `min_steps`, after the first; a
+    hold already on at `start` is the first."""
+    held = held.copy()
+    for a, b in _runs(held, 1):
+        if b - a < min_steps:
+            held[a:b] = False
     onsets = [start] if held[start] else []
     onsets += list(np.flatnonzero(held[start + 1 :] & ~held[start:-1]) + start + 1)
     return [_point(t) for t in onsets[1:]]
@@ -350,7 +356,7 @@ def compute_flags(
             )
             for g, s in place
         ),
-        "regression": regression(count, ms_params.debounce),
+        "regression": regression(count, placed, ms_params.debounce),
         "order_violation": order_violation(stable, count, deps),
         "dropped": _union(
             dropped(
@@ -375,7 +381,9 @@ def compute_flags(
             )
             for o in range(n_objects)
         ),
-        "regrasp_count": _union(regrasps(held[:, o], start) for o in goal_objects),
+        "regrasp_count": _union(
+            regrasps(held[:, o], start, params.regrasp_min_steps) for o in goal_objects
+        ),
         "stalled": stalled(eef, hz, start, v_min, params.stall_seconds),
         "oscillation": oscillation(
             eef, start, window, params.oscillation_reversals, params.oscillation_min_travel

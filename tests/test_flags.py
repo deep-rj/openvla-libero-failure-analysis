@@ -118,14 +118,25 @@ def test_carrying_over_another_receptacle_is_not_wrong_target():
     assert not flags.wrong_target(cand, held, speed, WAIT, rest_speed=0.01, dwell=10)
 
 
-def test_regression_needs_a_counted_subgoal_to_stop_counting_for_n_steps():
+def test_regression_needs_a_counted_placement_to_stop_holding_for_n_steps():
     count = np.zeros((60, 1), dtype=bool)
     count[20:40, 0] = True
-    assert flags.regression(count, n=10)
-    count[40:45, 0] = True
-    count[45:52, 0] = False
-    count[52:, 0] = True
-    assert not flags.regression(count, n=10)
+    placed = count.copy()
+    assert flags.regression(count, placed, n=10)
+    count[40:, 0] = True
+    placed[40:45, 0] = True
+    placed[52:, 0] = True
+    assert not flags.regression(count, placed, n=10)
+
+
+def test_a_one_step_predicate_dropout_is_not_a_regression():
+    count = np.zeros((60, 1), dtype=bool)
+    count[20:, 0] = True
+    count[30:40, 0] = False  # the debounce stretches a 1-step dropout to 10 steps
+    placed = np.zeros((60, 1), dtype=bool)
+    placed[10:, 0] = True
+    placed[30, 0] = False
+    assert not flags.regression(count, placed, n=10)
 
 
 def test_order_violation_when_a_dependent_holds_before_its_prerequisite():
@@ -164,6 +175,13 @@ def test_regrasps_are_the_grasp_onsets_after_the_first():
     held[30:35] = True
     held[40:45] = True
     assert flags.regrasps(held, WAIT) == [(30, 31), (40, 41)]
+
+
+def test_a_hold_of_a_step_or_two_is_not_a_grasp_onset():
+    held = np.zeros(60, dtype=bool)
+    held[18:20] = True  # contact blip before the real hold
+    held[24:40] = True
+    assert flags.regrasps(held, WAIT, min_steps=3) == []
 
 
 def test_intervals_format_as_python_slices_and_points():

@@ -158,11 +158,11 @@ point event; empty means not fired), so its count is the number of entries.
 |---|---|---|
 | `wrong_object` | an object not named in the goal is grasped and moved more than D from its settled pose | D = 2 cm |
 | `wrong_target` | a goal object, released and at rest for a dwell, satisfies its goal predicate against another receptacle | < 1 cm/s for 10 steps |
-| `regression` | a counted subgoal later stops counting for N steps | N |
+| `regression` | a counted subgoal's placement later stops holding (predicate false or object grasped) for N steps; judged on the predicate, since the counting debounce stretches a 1-step dropout to N steps | N |
 | `order_violation` | a dependent subgoal's predicate holds while its prerequisite does not count | N |
 | `dropped` | a goal object is released away from its target and falls at least 3 cm within 10 steps; setting it down is not a drop | 3 cm, 10 steps |
 | `collision_disturbance` | an object moves more than D while not held; each firing runs from the step the displacement passes D until the object rests. Excluded: the 10 steps before a grasp onset (closing fingers drag an object about 2 cm before it lifts), an unbroken contact run that ends in a grasp onset (a grip held before lift), the 10 steps after a release, and motion inside its goal container (a bowl in a closing drawer) | D = 2 cm |
-| `regrasp_count` | grasp onsets on goal objects beyond the first per object, as point events | — |
+| `regrasp_count` | grasp onsets on goal objects beyond the first per object, as point events; holds shorter than 3 steps are contact blips and ignored | 3 steps |
 | `stalled` | the arm stops: end-effector speed below v for at least 2 s; v = max(3 × median wait-step speed, 5 mm/s) | v, 2 s |
 | `oscillation` | at least 6 direction reversals of at least 2 cm along one axis within 4 s. A path-to-displacement ratio does not work: reaching down and lifting has a high ratio (it flagged 112 of 130 successes). Named for what it measures: in control engineering "dither" is a deliberately injected signal, and the robot-learning term for the likely cause, mode switching, is internal to the policy | 6, 2 cm, 4 s |
 | `gripper_chatter` | at least 3 empty closes (finger width below 2 cm) within 2 s with nothing held | 3, 2 s |
@@ -534,6 +534,14 @@ Not validated on the pilot (no firings in the 20): `wrong_object`, `wrong_target
   plate or the caddy is no longer a grasp (`t03-i011`, `t05-i009`, `t06-i020`; 16 other onsets
   removed, 8 checked on video, none a grasp). Known undercount: a release and regrip while the
   object stays supported is one hold (`t06-i013`, ~278-285).
+- `regression` and `regrasp_count` (fixed after the held-out labels, from their
+  `computed_check`): `regression` fired on a 1-step `On` dropout as the mug was nudged
+  (`t06-i014`), because the counting debounce turns it into 10 steps off; it is now judged on
+  the predicate. `regrasp_count` fired on a 1-step contact blip before the real hold
+  (`t04-i008`); holds under 3 steps are now ignored. On all 250 episodes, 5 values change:
+  those two, `t06-i012` loses a regression (its mug's `On` flickered for ~1.4 s while jostled,
+  no dropout of 10 steps, and ended on the plate), and two regression intervals shorten
+  (`t01-i017`, success `t09-i012`). The classifier uses neither flag.
 - `phase`: fixed. It is the furthest phase reached on any subgoal still open when `k` was last
   at its maximum, whenever that progress was made (`t04-i017`: carried). 7 of 120 failures
   change, all from `none`; checked on video.
