@@ -149,5 +149,8 @@ bootstrap draws, 99.17% CIs, 130 tests.
 - No 10-step block stands out consistently. 6 of 65 block CIs exclude 0.5, scattered across
   dims and blocks.
 - The gripper is 0.43–0.44 for every cumulative window.
+- Shorter windows average fewer steps, so their AUROCs are noisier and pulled toward 0.5 even
+  if the per-step effect were constant. The rise with length alone does not show where the
+  signal lives; the blocks bear on that.
 
 ![Same-task AUROC by window](results/baseline/gate/window_sweep.png)
