@@ -117,6 +117,15 @@ def test_fell_needs_a_drop_within_the_window():
     assert not mechanism.fell(np.full(40, 0.20), 20, 0.03, 10)
 
 
+def test_an_object_back_on_its_support_after_a_low_lift_fell():
+    z = np.full(40, 0.03)
+    z[10:20] = 0.05
+    z[20:] = 0.031
+    assert mechanism.fell_back(z, 12, 20, 10, 0.005)
+    z[20:] = 0.045
+    assert not mechanism.fell_back(z, 12, 20, 10, 0.005)
+
+
 def test_first_shift_ignores_the_settle_after_onset_and_over_target_steps():
     off = np.zeros((50, 3))
     off[12:14, 0] = 0.008  # squeeze while settling
@@ -496,3 +505,62 @@ def test_an_unrecovered_error_before_a_final_stall_stays_the_initiator():
     _lift(x, 80, carry=False)
     stalled = dict(NO_FLAGS, stalled=[(120, 200)])
     assert _classify(x, info, boxes, stalled).mechanism == "perception"
+
+
+STOVE = {
+    "kind": "fixture",
+    "object_index": -1,
+    "target": "flat_stove_1",
+    "candidates": [],
+    "joint_qpos_addr": 0,
+    "threshold": 0.5,
+    "depends_on": [],
+}
+KNOB_AT = (0.20, 0.10, 0.30)
+
+
+def _fixture_scene(n=200):
+    x, info, boxes = _scene(n=n)
+    info["subgoals"].append(dict(STOVE))
+    x["fixture_q"] = np.column_stack([x["fixture_q"][:, 0], np.zeros(n)])
+    for key in ("goal_holds", "over_target"):
+        x[key] = np.zeros((n, 2), dtype=bool)
+    x["candidate_holds"] = np.zeros((n, 2, 1), dtype=bool)
+    return x, info, boxes
+
+
+def _park_at(x, t0, at):
+    pads = x["finger_pad_pos"]
+    pads[t0:, :, 1], pads[t0:, :, 2] = at[1], at[2]
+    pads[t0:, 0, 0], pads[t0:, 1, 0] = at[0] - 0.04, at[0] + 0.04
+
+
+def test_success_reference_records_where_the_fingers_first_move_a_fixture():
+    x, info, _ = _fixture_scene()
+    info["final_success"] = True
+    _park_at(x, 50, KNOB_AT)
+    x["fixture_q"][100:, 1] = np.linspace(0.0, 1.0, 100)
+    ref = mechanism.success_reference([(_sync(x), info)])
+    lo, hi = ref[(0, "fixture", 1)]["contact"]
+    assert lo == pytest.approx(KNOB_AT) and hi == pytest.approx(KNOB_AT)
+
+
+def _knob_reference():
+    return {(0, "fixture", 1): {"contact": (np.array(KNOB_AT), np.array(KNOB_AT))}}
+
+
+def test_a_final_stall_at_an_unfinished_fixture_abstains():
+    x, info, boxes = _fixture_scene()
+    _park_at(x, 50, (KNOB_AT[0] + 0.02, KNOB_AT[1], KNOB_AT[2]))
+    stalled = dict(NO_FLAGS, stalled=[(60, 200)])
+    pred = mechanism.classify(_sync(x), info, stalled, boxes, reference=_knob_reference())
+    assert pred.abstained and "fixture" in pred.reason
+
+
+def test_a_final_stall_at_a_finished_fixture_is_inaction():
+    x, info, boxes = _fixture_scene()
+    _park_at(x, 50, KNOB_AT)
+    x["goal_holds"][:, 1] = True
+    stalled = dict(NO_FLAGS, stalled=[(60, 200)])
+    pred = mechanism.classify(_sync(x), info, stalled, boxes, reference=_knob_reference())
+    assert pred.mechanism == "inaction"

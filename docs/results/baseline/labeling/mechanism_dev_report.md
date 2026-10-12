@@ -5,7 +5,7 @@ are optimistic; the held-out labels are the test.
 
 - Agreement: 20/20 decided.
 - Abstentions: 0/20 abstained.
-- Onset offsets (predicted minus hand, steps): within ±10 for 5/20; sorted: [-47, -39, -31, -29, -20, -16, -16, -13, -12, -7, -2, 0, 1, 8, 12, 18, 21, 45, 48, 325].
+- Onset offsets (predicted minus hand, steps): within ±10 for 5/20; sorted: [-47, -39, -31, -29, -20, -16, -16, -13, -12, -7, -2, 0, 1, 8, 12, 18, 19, 21, 48, 325].
 
 | hand label | predicted | n |
 |---|---|---|
@@ -20,7 +20,7 @@ are optimistic; the held-out labels are the test.
 | libero_10-t00-i024-s0-none | +325 |
 | libero_10-t01-i010-s0-none | -16 |
 | libero_10-t01-i022-s0-none | +18 |
-| libero_10-t02-i009-s0-none | +45 |
+| libero_10-t02-i009-s0-none | +19 |
 | libero_10-t02-i023-s0-none | -2 |
 | libero_10-t03-i009-s0-none | -12 |
 | libero_10-t03-i011-s0-none | -29 |

@@ -380,6 +380,21 @@ re-passed when a change affects them.
   classifier still has no fixture detector). Consequence for the broadened `inaction`: a
   fixture-stage error followed by a stall to the cap reads as `inaction` to the classifier, so
   `t02-i007` and `t02-i014` (stalled mid knob turn) join the video check before re-freezing.
+- Classifier video check (2026-10-11), the 7 non-held-out episodes the broadened `inaction`
+  newly claimed (hand reads, not labels): `t04-i006` and `t04-i010` perception, `t04-i016`
+  borderline perception: grasp attempts on the yellow-white mug the classifier missed, its
+  pads 13.1-13.4 cm from the mug's origin against a 12 cm attempt radius. `t02-i007`,
+  `t02-i008`, `t02-i014`: the gripper went down to the knob at the successes' contact spot
+  (0.2-1.7 cm outside their box, at their height) and stopped there, open, never turning it.
+  `t07-i012`: clean `inaction`. Changes: (1) attempt radius `near_m` 12 to 15 cm (15 and 18
+  cm give identical predictions): 3 `inaction` and 3 abstentions become `perception`
+  (`t04-i015`, `t06-i021`, `t09-i019` unchecked at first), three onsets move earlier, no
+  pilot mechanism changes (`t02-i009` onset 260 to 234, hand 215). (2) A final stall at an
+  unfinished fixture's success contact box (3 cm) abstains: `t02-i007`, `t02-i008`,
+  `t02-i014`; held-out `t02-i013` (stove already on) stays `inaction`, and was known when the
+  guard was designed. (3) Slip fall test: `t09-i019` (hand read: lifted, then slipped) gripped
+  the mug, lifted it ~2 cm and lost it, short of the 3 cm fall; a return to its support now
+  counts. Only `t09-i019` changes (to `control: grasp`). Pilot agreement stays 20/20.
 - Held-out labeling (2026-10-11), from held-out `t01-i024` and `t04-i000`: an off-tolerance
   release is `place` when the object rests on the target, otherwise labeled by the error that
   put it off the target; the computed `phase` does not decide the `control` sub-label for hand
@@ -405,10 +420,11 @@ scored against the held-out labels. Rules approved so far:
   fingers (`t01-i010`, "pre: recovered miss"); a later open descent over it is not enough
   (`t08-i006`). Errors on non-goal objects (collisions) are recovered by progress on any
   subgoal.
-- **Abstention.** No initiator found and no stall to the cap: reported as an abstention with
-  that reason, separate from close calls. On the 70 unlabeled non-held-out failures: 6 (14
-  before `inaction` was broadened), by pattern an object held to the cap without placing and
-  fixture-stage errors (no fixture detector).
+- **Abstention.** No initiator found and no stall to the cap, or a final stall that starts with
+  the pad midpoint within 3 cm of the box where successes first move a fixture that is not
+  yet done (a fixture-stage attempt the classifier cannot judge): reported as an abstention
+  with that reason, separate from close calls. On the 70 unlabeled non-held-out failures: 6,
+  by pattern an object held to the cap without placing and fixture-stage errors.
 - **Between the fingers.** Some part of the target object's collision geometry (boxes, from
   `object_geometry.json`, placed by `object_pos` and `object_quat`) lies in the box between
   the finger pads (`finger_pad_pos`, `grip_quat`, `finger_pad_half_size`). Score: pad-face
@@ -424,8 +440,10 @@ scored against the held-out labels. Rules approved so far:
 - **Slips are `control: grasp` in any phase.** A drop where the object leaves the hand (5 mm
   from the pad midpoint) before the fingers open (pad gap +2 mm) is a slip, unless a collision
   initiator precedes it (`t09-i020`). Fingers opening first or on the same step is a release,
-  labeled by its phase (`t04-i004`). Matches both pilot slips (`t00-i013`, `t04-i002`) and two
-  checked on video (`t03-i002`, `t07-i019`). At 20 Hz, ties and 2-step margins occur; the
+  labeled by its phase (`t04-i004`). The object must then fall at least 3 cm, or come back to
+  within 5 mm of its support (its lowest height over the 20 steps before the hold), so a slip
+  just after a low lift counts (`t09-i019`, lifted ~2 cm). Matches both pilot slips
+  (`t00-i013`, `t04-i002`) and three checked on video (`t03-i002`, `t07-i019`, `t09-i019`). At 20 Hz, ties and 2-step margins occur; the
   cutoffs go through the sensitivity check.
 - **Completed-subgoal initiators.** A placement whose end state is outside the successes'
   range (tilted, raised, off-center) and blocks a dependent subgoal is a `control: place`
@@ -437,8 +455,8 @@ scored against the held-out labels. Rules approved so far:
 - **Sensitivity** (each numeric parameter at x0.5 and x1.5, pilot 20 and the 70 unlabeled
   non-held-out failures): the defaults agree with all 20 pilot labels. Three flip a pilot
   value in one direction only, with at least 50% margin in the other: `cover_cutoff` 0.3
-  (0.15 turns `t07-i013` into `control`), `near_m` 12 cm (6 cm drops the four "beside the
-  object" `perception` attempts), `shift_m` 5 mm (2.5 mm turns `t06-i020` into
+  (0.15 turns `t07-i013` into `control`), `near_m` (then 12 cm; 6 cm drops the four "beside
+  the object" `perception` attempts; since raised to 15 cm, see "Rule changes"), `shift_m` 5 mm (2.5 mm turns `t06-i020` into
   `transport`). No other parameter flips a pilot value or changes more than 3 of the 70.
 - **Onsets.** Slip: the step the object leaves the hand. `perception` and `control: grasp`: the
   bottom of the descent of the first failed attempt. `transport`: the first step the held

@@ -22,7 +22,7 @@ class MechanismParams:
     close_rate_m: float = 0.004  # pad gap shrink over 2 steps that starts a close
     close_end_rate_m: float = 0.002
     close_end_cap: int = 20
-    near_m: float = 0.12  # pad midpoint to object origin for an attempt on that object
+    near_m: float = 0.15  # pad midpoint to object origin for an attempt on that object
     grasp_follow: int = 30  # steps after a close within which a grasp onset means success
     descent_window: int = 60  # steps before a close searched for its bottom
     descent_m: float = 0.03
@@ -39,6 +39,10 @@ class MechanismParams:
     rest_band_m: float = 0.01  # within this of its last height, a placed object is at rest
     defect_delay: int = 10  # steps after a placement first holds when its state is read
     inaction_gap: int = 20  # steps of motion between stall runs still read as one stall
+    support_window: int = 20  # steps before a hold whose lowest height is the object's support
+    support_tol_m: float = 0.005  # within this of its support, a dropped object is back on it
+    fixture_engage: float = 0.05  # share of the way to the goal at which a fixture has moved
+    fixture_near_m: float = 0.03  # pad midpoint to a fixture's success contact box
 
 
 DEFAULT_PARAMS = MechanismParams()
@@ -147,6 +151,15 @@ def fell(z, run_end: int, fall_m: float, window: int) -> bool:
     if run_end >= len(z):
         return False
     return bool(z[run_end - 1] - z[run_end : run_end + window].min() >= fall_m)
+
+
+def fell_back(z, run_start: int, run_end: int, window: int, tol: float, support: int = 20) -> bool:
+    """The object, after a hold, is back within `tol` of its support: the lowest height over
+    the `support` steps before the hold."""
+    if run_end >= len(z):
+        return False
+    rest = z[max(0, run_start - support) : run_start + 1].min()
+    return bool(z[run_end : run_end + window].min() <= rest + tol)
 
 
 def first_shift(offset, run_start: int, run_end: int, over, params=DEFAULT_PARAMS):
@@ -303,8 +316,9 @@ def _release_kind(w: _World, i: int, run, params: MechanismParams) -> str:
     a, e = run
     dist = np.linalg.norm(w.mid - w.x["object_pos"][:, i], axis=1)
     leave, opened = leave_and_open(dist, w.gap, a, e, params)
-    falls = fell(
-        w.x["object_pos"][:, i, 2], e, flags.DEFAULT_FLAGS.fall_m, flags.DEFAULT_FLAGS.dwell
+    z, dwell = w.x["object_pos"][:, i, 2], flags.DEFAULT_FLAGS.dwell
+    falls = fell(z, e, flags.DEFAULT_FLAGS.fall_m, dwell) or fell_back(
+        z, a, e, dwell, params.support_tol_m, params.support_window
     )
     if leave is not None and (opened is None or leave < opened) and falls:
         return "slip"
@@ -423,25 +437,61 @@ def _placement_state(w: _World, g: int, params: MechanismParams):
     }
 
 
+def fixture_contact(x, info, g: int, params: MechanismParams = DEFAULT_PARAMS):
+    """Pad midpoint at the first step fixture subgoal `g` has moved `fixture_engage` of the way
+    to its goal; None if it never does."""
+    start, threshold = info["num_wait_steps"], info["subgoals"][g]["threshold"]
+    q = x["fixture_q"][:, g]
+    span = abs(threshold - q[start])
+    if not np.isfinite(span) or span == 0:
+        return None
+    moved = np.flatnonzero(np.abs(q[start:] - q[start]) >= params.fixture_engage * span)
+    if not len(moved):
+        return None
+    return x["finger_pad_pos"][start + moved[0]].mean(axis=0)
+
+
 def success_reference(episodes, params: MechanismParams = DEFAULT_PARAMS) -> dict:
-    """(task_id, object name) -> tilt and height ranges over successful placements."""
+    """(task_id, object name) -> tilt and height ranges over successful placements;
+    (task_id, "fixture", g) -> the box of pad midpoints where successes first move fixture g."""
     values: dict = {}
+    contacts: dict = {}
     for x, info in episodes:
         if not info["final_success"]:
             continue
+        for g, sub in enumerate(info["subgoals"]):
+            if sub["kind"] == "fixture":
+                at = fixture_contact(x, info, g, params)
+                if at is not None:
+                    contacts.setdefault((info["task_id"], "fixture", g), []).append(at)
         w = _World(x, info)
         for g, i in w.place:
             state = _placement_state(w, g, params)
             if state is not None:
                 key = (info["task_id"], w.names[i])
                 values.setdefault(key, []).append((state["tilt"], state["height"]))
-    return {
+    out = {
         key: {
             "tilt": (min(v[0] for v in vals), max(v[0] for v in vals)),
             "height": (min(v[1] for v in vals), max(v[1] for v in vals)),
         }
         for key, vals in values.items()
     }
+    for key, pts in contacts.items():
+        out[key] = {"contact": (np.min(pts, axis=0), np.max(pts, axis=0))}
+    return out
+
+
+def _unfinished_fixture_at(w: _World, t: int, reference: dict, params: MechanismParams):
+    """A fixture subgoal not holding at `t` whose success contact box the pads are near."""
+    for g, sub in enumerate(w.subgoals):
+        ref = reference.get((w.info["task_id"], "fixture", g))
+        if sub["kind"] != "fixture" or ref is None or w.x["goal_holds"][t, g]:
+            continue
+        lo, hi = ref["contact"]
+        if np.linalg.norm(w.mid[t] - np.clip(w.mid[t], lo, hi)) <= params.fixture_near_m:
+            return g
+    return None
 
 
 def _defective_placements(w: _World, reference: dict, params: MechanismParams) -> list[Event]:
@@ -557,5 +607,8 @@ def classify(x, info, flag_intervals, boxes, reference, params=DEFAULT_PARAMS) -
         return Prediction("grounding", grounding_onset, False, "wrong_object or wrong_target fired")
     stall = final_stall_start(flag_intervals.get("stalled", []), n, params.inaction_gap)
     if stall is not None:
+        g = _unfinished_fixture_at(w, stall, reference, params)
+        if g is not None:
+            return Prediction("", None, True, f"stalled at unfinished fixture subgoal {g}")
         return Prediction("inaction", stall, False, "stalled to the cap with no unrecovered error")
     return Prediction("", None, True, "no unrecovered error found")
