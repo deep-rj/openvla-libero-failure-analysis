@@ -30,11 +30,6 @@ def test_no_command_within_tolerance_matches_nothing():
     assert detector.nearest_command([40, 80], anchor=60, tol=10) is None
 
 
-def test_width_is_the_sum_of_both_finger_travels():
-    q = np.array([[0.04, -0.039], [0.002, -0.001]])
-    np.testing.assert_allclose(detector.finger_width(q), [0.079, 0.003])
-
-
 def test_an_empty_close_fires_at_the_first_step_below_the_threshold():
     w = _closing(200, command=50, settle=0.001)
     # linspace(0.08, 0.001, 20) first drops below 3 mm at index 19

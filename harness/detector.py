@@ -12,7 +12,7 @@ import numpy as np
 @dataclass(frozen=True)
 class WidthBaseline:
     threshold_m: float = 0.003
-    reopen_m: float = 0.002
+    reopen_m: float = 0.005
     match_tol: int = 10
 
 
@@ -28,11 +28,6 @@ def close_commands(gripper_cmd: np.ndarray) -> list[int]:
 def nearest_command(commands: list[int], anchor: int, tol: int) -> int | None:
     near = [c for c in commands if abs(c - anchor) <= tol]
     return min(near, key=lambda c: abs(c - anchor)) if near else None
-
-
-def finger_width(gripper_qpos: np.ndarray) -> np.ndarray:
-    """Panda finger joints move in opposite signs; their difference is the opening in m."""
-    return gripper_qpos[:, 0] - gripper_qpos[:, 1]
 
 
 def attempt_end(width: np.ndarray, command: int, reopen_m: float) -> int:

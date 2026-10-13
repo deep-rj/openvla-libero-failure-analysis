@@ -22,18 +22,24 @@ before init states 25–49 are run, and is evaluated on them once.
 - **Lead time is measured against the width baseline.** Not against onset: a grasp failure's onset
   is the bottom of its descent by protocol, so onset minus anchor is 0 (median). Not against a
   no-return point: none is labeled, since LIBERO failures end at the step cap.
-- **An attempt runs from a close command until the fingers reopen**: width more than 2 mm above
-  its narrowest since the command. Not until the next open command: 37% of close commands are
+- **An attempt runs from a close command at a goal object (within 15 cm, none held) until the
+  fingers reopen**: width more than 5 mm above its narrowest since the command. At 2 mm, fingers
+  spreading on an object that shifts in the grasp end the attempt before the hold registers (6
+  success anchors labeled failed; 2 at 5 mm). Not until the next open command: 37% of close commands are
   followed by an open after one step, and the gripper target moves only 0.25 of its range per
   step (robosuite integrates the command's sign at 0.01 per substep, 25 substeps), so a one-step
   open barely moves the fingers.
 - **Target: this attempt fails, whether or not the policy recovers later.** LIBERO failures are
-  timeouts, so a failed attempt the policy recovers from still costs budget. Attempts the policy
-  aborts before the fingers meet are excluded.
+  timeouts, so a failed attempt the policy recovers from still costs budget. An attempt succeeds
+  if a hold on a goal object begins before the fingers reopen and does not end in a slip (the
+  classifier's rule: the object leaves before the fingers open, and falls); otherwise it fails.
+  Attempts whose fingers reopen before closing past 7 cm (the protocol's open width) are
+  excluded as aborted. That exclusion drops 5 hand-labeled failures where aborting a good grasp
+  was the error (`t01-i010`: reopened with the cream cheese between the fingers).
 - **Width baseline: fires when the width falls below 3 mm within the attempt**
   (`harness/detector.py`). Tuned on the baseline 250, frozen with the detector and evaluated once
-  on init states 25–49. 4 mm catches 2 more failures at the same false alarm but sits 0.3 mm
-  below the narrowest successful bowl-rim grasp; 3 mm keeps 1.3 mm.
+  on init states 25–49. 4 mm catches 2 more failures at the same false alarms but sits 0.1 mm
+  below the narrowest successful bowl-rim grasp; 3 mm keeps 1.1 mm.
 
 ## Exploration log
 
@@ -69,17 +75,29 @@ threshold. 60 failures and 198 successes have a command within 10 steps of the a
 closes from open, width is flat into the command step and narrows from the next step, consistent
 with step k's observation preceding action k.
 
-- At 3 mm it fires on 26 of 60 failures and 1 of 198 successes, a median 16 steps (0.8 s sim)
-  after the command; 20 of the 26 within 14–20 steps, the rest up to 56 as the fingers creep
-  closed. Lower thresholds fire later and on fewer failures (1 mm: 12 of 60, 36 steps).
-- Above 4 mm, successful thin grasps enter: bowl rims (narrowest 4.3 mm), the porcelain mug handle
-  (5.7 mm). 6 mm fires on 23 successes.
-- The false alarm at every threshold from 1 to 4 mm is one butter grasp (`t01-i008`): the
-  fingers close empty, the butter stays put, and by step 260 it sits 15 cm above the end effector
-  after a physics glitch. The episode counts as a success.
+- At 3 mm it fires on 27 of 60 failures and 2 of 198 successes, a median 16 steps (0.8 s sim)
+  after the command; 20 of the 27 within 14–20 steps, the rest up to 56 as the fingers creep
+  closed. Lower thresholds fire later and on fewer failures (1 mm: 13 of 60, 37 steps).
+- Above 4 mm, successful thin grasps enter: bowl rims (narrowest 4.1 mm), the porcelain mug handle
+  (5.7 mm). 6 mm fires on 25 successes.
+- The two false alarms at every threshold from 1 to 4 mm: a butter grasp (`t01-i008`) whose
+  fingers close empty, with the butter later sitting 15 cm above the end effector after a physics
+  glitch, the episode counting as a success; and a mug (`t09-i017`) held by its handle at 19 mm
+  for steps 104–146, after which the fingers close to 1 mm without reopening.
 - 22 failures stay at 15 mm or wider and are invisible to width.
-- Minimum width over the attempt has same-task AUROC 0.66 (99.17% CI 0.53 to 0.79), against
+- Minimum width over the attempt has same-task AUROC 0.65 (99.17% CI 0.52 to 0.79), against
   0.62–0.63 for exp(H) in the gate. Bounding the attempt matters: over a fixed 60 steps, later
   re-closes are credited to the attempt and the AUROC is 0.76.
 - Failures release the close quickly: the close command holds a median 5.5 steps in failures
   against 54.5 in successes. A post-hoc signal; not pursued.
+
+### Attempt labels (2026-10-13)
+
+Every attempt in the baseline 250 (`scripts/block4_attempts.py`,
+`docs/results/baseline/block4/attempts.csv`), checked against the gate anchors through the attempt
+nearest each closing anchor.
+
+- Failure anchors (61): 46 failed, 9 slips, 5 aborted, 1 with no attempt, none successful.
+  Success anchors (202): 192 successful, 4 slips, 2 failed, 4 with no attempt.
+- Over all attempts: 973 failed and 27 slips against 471 successful; 178 aborted. Failed
+  episodes hold 827 of the failed attempts, about 7.5 per failed episode with attempts.

@@ -23,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import separability_gate as sg
 
-from harness import detector, gate, metadata, schema
+from harness import detector, gate, metadata, milestones, schema
 
 SWEEP_M = (0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.010, 0.015, 0.020, 0.030)
 N_BOOT = 2000
@@ -38,7 +38,7 @@ def load(run_dir: Path, anchors_csv: Path, params: detector.WidthBaseline) -> li
         if cached is None or cached[0] != ep:
             a, _ = schema.read_episode(run_dir / "episodes" / f"{ep}.h5")
             commands = detector.close_commands(a["executed_action"][:, 6])
-            cached = (ep, commands, detector.finger_width(a["gripper_qpos"]))
+            cached = (ep, commands, milestones.finger_width(a["gripper_qpos"]))
         _, commands, width = cached
         anchor = int(r["anchor_step"])
         command = detector.nearest_command(commands, anchor, params.match_tol)
