@@ -1,5 +1,6 @@
 """Exploratory window sweep after the gate: same-task AUROC of mean exp(H) per dim over windows
-ending at the grasp descent's bottom (last 10..50 steps) and over disjoint 10-step blocks.
+ending at the grasp descent's bottom (last 10..200 steps, and all) and over disjoint 10-step
+blocks.
 Each on all steps, and on motion dims also on steps where the no-motion bin is not in the top two.
 
 Reads <out>/anchors.csv; writes <out>/window_sweep.json, window_sweep.md, window_sweep.png.
@@ -20,7 +21,7 @@ import separability_gate as sg
 
 from harness import gate, metadata
 
-LENGTHS = (10, 20, 30, 40, 50)
+LENGTHS = (10, 20, 30, 40, 50, 75, 100, 150, 200, None)  # None: every step since the start
 BLOCK = 10
 BLOCK_MIN = 5  # non-wait steps a 10-step block needs
 N_BOOT = 2000
@@ -30,7 +31,11 @@ VARIANTS = {"all steps": "#1f1f1e", "stop not in top two": "#1baf7a"}
 def windows(kind: str):
     """(label, steps before the anchor where the window ends, length, minimum length)."""
     if kind == "cumulative":
-        return [(f"last {n}", 0, n, min(n, gate.DEFAULT_PARAMS.min_window)) for n in LENGTHS]
+        floor = gate.DEFAULT_PARAMS.min_window
+        return [
+            ("all", 0, 10_000, floor) if n is None else (f"last {n}", 0, n, min(n, floor))
+            for n in LENGTHS
+        ]
     return [(f"{-e - BLOCK} to {-e}", e, BLOCK, BLOCK_MIN) for e in (40, 30, 20, 10, 0)]
 
 
@@ -78,7 +83,7 @@ def plot(results: dict, path: Path) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    fig, axes = plt.subplots(2, 7, figsize=(20, 6.5), sharey=True, facecolor=sg.SURFACE)
+    fig, axes = plt.subplots(2, 7, figsize=(24, 7), sharey=True, facecolor=sg.SURFACE)
     markers = {"all steps": ("o", "-"), "stop not in top two": ("s", "--")}
     for row, kind in enumerate(("cumulative", "blocks")):
         labels = [w[0] for w in windows(kind)]

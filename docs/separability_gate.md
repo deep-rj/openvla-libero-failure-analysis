@@ -100,7 +100,8 @@ signal predicted in advance, shows no warning before the grasp.
 The exploratory checks below do not strengthen the case for a pre-grasp warning. Arm speed does
 not explain the difference, and it sits on steps where the policy weighs different motions
 rather than motion against stopping (roll 0.70 on those steps). It grows with the window
-length instead of peaking near the grasp, and no 10-step block stands out. That reads as a
+length up to 40–75 steps and fades beyond, instead of peaking near the grasp, and no 10-step
+block stands out. That reads as a
 small, persistent offset over the approach rather than a warning that builds before the grasp.
 All of this was found after looking at the data and is a lead, not evidence.
 
@@ -139,13 +140,17 @@ neither (`scripts/gate_stop_check.py`, `docs/results/baseline/gate/stop_check.md
 
 ## Exploratory, after the freeze: window sweep (2026-10-12)
 
-Is 50 steps the right window? Same-task AUROC of mean exp(H) over the last 10–50 steps before
-the anchor, and over disjoint 10-step blocks, on all steps and on steps with stop not in the top
-two (`scripts/gate_window_sweep.py`, `docs/results/baseline/gate/window_sweep.md`). 2,000
-bootstrap draws, 99.17% CIs, 130 tests.
+Is 50 steps the right window? Same-task AUROC of mean exp(H) over the last 10, 20, 30, 40, 50,
+75, 100, 150 and 200 steps before the anchor and over every step since the start, and over
+disjoint 10-step blocks, on all steps and on steps with stop not in the top two
+(`scripts/gate_window_sweep.py`, `docs/results/baseline/gate/window_sweep.md`). 2,000 bootstrap
+draws, 99.17% CIs, 195 tests.
 
-- The AUROC rises with window length. Over the last 10 steps no dim separates (0.49–0.64); over
-  the last 50, x, y, pitch, roll and yaw do, depending on the filter.
+- The AUROC rises with window length to a peak at 40–75 steps (2–3.75 s), then falls. Over the
+  last 10 steps no dim separates (0.49–0.64); over the whole episode before the anchor only
+  stop-filtered roll does (0.63 [0.52, 0.75]), and the rest sit at 0.52–0.60.
+- Stop-filtered roll is the most stable: 0.63–0.71 from 30 steps to the whole episode, peaking
+  at 0.71 over the last 40.
 - No 10-step block stands out consistently. 6 of 65 block CIs exclude 0.5, scattered across
   dims and blocks.
 - The gripper is 0.43–0.44 for every cumulative window.
