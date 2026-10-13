@@ -110,16 +110,38 @@ longer context and the no-motion filter yields a usable detector. Signals are ex
 baseline 250 episodes; the frozen detector is evaluated once on init states 25–49 (250 new
 episodes, ~8.5 GPU-h).
 
+## Change after the freeze: anchor fix (2026-10-12)
+
+A video spot check of 5 success anchors, chosen for risk, found one wrong. After a missed
+attempt the arm stayed low, so the lowest point since the previous close was the miss's bottom
+(`t00-i018`: 307), not the working grasp's (350). The anchor is now the bottom of its own
+descent: back from the close until the arm has risen 2 cm (`gate.descent_bottom`). This moves 3
+of 202 success anchors (`t00-i018` 307→350, `t02-i002` 133→193, `t02-i022` 103→163, all checked
+on video) and no failure anchor. Everything is re-run with the fix; the sections below report
+the re-run.
+
+| Metric | CI level | Same-task AUROC [CI] | Pooled AUROC [CI] |
+|---|---|---|---|
+| **gripper exp(H)** (primary) | 95% | 0.438 [0.350, 0.527] | 0.463 [0.389, 0.536] |
+| x exp(H) | 99.17% | 0.627 [0.523, 0.732] | 0.534 [0.448, 0.622] |
+| y exp(H) | 99.17% | 0.621 [0.511, 0.730] | 0.527 [0.431, 0.623] |
+| z exp(H) | 99.17% | 0.583 [0.465, 0.696] | 0.580 [0.490, 0.667] |
+| roll exp(H) | 99.17% | 0.560 [0.439, 0.677] | 0.529 [0.439, 0.622] |
+| pitch exp(H) | 99.17% | 0.619 [0.510, 0.725] | 0.596 [0.509, 0.682] |
+| yaw exp(H) | 99.17% | 0.587 [0.469, 0.701] | 0.534 [0.448, 0.618] |
+
+The gate outcome and P1 are unchanged.
+
 ## Exploratory, after the freeze: motion check (2026-10-12)
 
 Does arm speed in the same window explain the motion-dim result? Speed is the end effector's,
 from world state (`scripts/gate_motion_check.py`, `docs/results/baseline/gate/motion_check.md`).
 
-- Speed does not separate: translation AUROC 0.433 [0.346, 0.526], rotation 0.577
-  [0.485, 0.667] (same-task, 95%).
-- Per-unit exp(H) correlates weakly with speed (|r| 0.13–0.28).
-- With the linear speed effect removed, same-task AUROCs (99.17% CIs) barely move: x 0.624
-  [0.518, 0.730], y 0.636 [0.526, 0.748], pitch 0.620 [0.510, 0.728]. Each still excludes 0.5.
+- Speed does not separate: translation AUROC 0.418 [0.332, 0.512], rotation 0.582
+  [0.489, 0.671] (same-task, 95%).
+- Per-unit exp(H) correlates weakly with speed (|r| 0.12–0.31).
+- With the linear speed effect removed, same-task AUROCs (99.17% CIs) barely move: x 0.612
+  [0.507, 0.719], y 0.627 [0.516, 0.738], pitch 0.616 [0.506, 0.724]. Each still excludes 0.5.
 
 ## Exploratory, after the freeze: no-motion check (2026-10-12)
 
@@ -129,9 +151,9 @@ neither (`scripts/gate_stop_check.py`, `docs/results/baseline/gate/stop_check.md
 
 - The share of window steps with stop chosen, or stop runner-up, separates on no dim. Stop is
   the runner-up in 0–17% of runs at any step.
-- exp(H) on steps where stop is *not* in the top two separates on y 0.625 [0.530, 0.725],
-  roll 0.701 [0.597, 0.800], pitch 0.630 [0.516, 0.741] and yaw 0.649 [0.540, 0.753].
-- exp(H) on steps where stop *is* in the top two separates only on z: 0.654 [0.525, 0.769],
+- exp(H) on steps where stop is *not* in the top two separates on y 0.616 [0.518, 0.718],
+  roll 0.701 [0.598, 0.799], pitch 0.630 [0.517, 0.739] and yaw 0.648 [0.538, 0.752].
+- exp(H) on steps where stop *is* in the top two separates only on z: 0.656 [0.531, 0.770],
   on 53 failures and 177 success units with such steps.
 
 ![Where the no-motion bin ranks per step](results/baseline/gate/stop_curves.png)
@@ -147,8 +169,8 @@ disjoint 10-step blocks, on all steps and on steps with stop not in the top two
 draws, 99.17% CIs, 195 tests.
 
 - The AUROC rises with window length to a peak at 40–75 steps (2–3.75 s), then falls. Over the
-  last 10 steps no dim separates (0.49–0.64); over the whole episode before the anchor only
-  stop-filtered roll does (0.63 [0.52, 0.75]), and the rest sit at 0.52–0.60.
+  last 10 steps no dim separates (0.49–0.63); over the whole episode before the anchor only
+  stop-filtered roll does (0.63 [0.51, 0.75]), and the rest sit at 0.51–0.60.
 - Stop-filtered roll is the most stable: 0.63–0.71 from 30 steps to the whole episode, peaking
   at 0.71 over the last 40.
 - No 10-step block stands out consistently. 6 of 65 block CIs exclude 0.5, scattered across
