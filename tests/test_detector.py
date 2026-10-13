@@ -2,7 +2,7 @@ import numpy as np
 
 from harness import detector
 
-PARAMS = detector.WidthBaseline(threshold_m=0.003, horizon=60, match_tol=10)
+PARAMS = detector.WidthBaseline(threshold_m=0.003, reopen_m=0.002, match_tol=10)
 
 
 def _closing(n: int, command: int, settle: float, steps: int = 20) -> np.ndarray:
@@ -46,9 +46,31 @@ def test_a_close_on_an_object_never_fires():
     assert detector.empty_close_step(w, command=50, params=PARAMS) is None
 
 
-def test_a_close_that_finishes_after_the_horizon_does_not_fire():
-    w = _closing(200, command=50, settle=0.001, steps=80)
+def test_a_slow_close_with_no_reopening_fires_however_late():
+    w = _closing(300, command=50, settle=0.0005, steps=80)
+    # linspace(0.08, 0.0005, 80) first drops below 3 mm at index 77
+    assert detector.empty_close_step(w, command=50, params=PARAMS) == 127
+
+
+def test_an_empty_close_after_the_fingers_reopen_belongs_to_another_attempt():
+    w = np.full(200, 0.08)
+    w[50:60] = np.linspace(0.08, 0.005, 10)
+    w[60:80] = np.linspace(0.005, 0.08, 20)
+    w[80:100] = np.linspace(0.08, 0.001, 20)
+    w[100:] = 0.001
     assert detector.empty_close_step(w, command=50, params=PARAMS) is None
+
+
+def test_an_attempt_ends_when_the_fingers_open_past_their_narrowest_by_the_margin():
+    w = _closing(200, command=50, settle=0.03)
+    w[100:] = 0.03 + 0.001 * np.arange(1, 101)
+    assert detector.attempt_end(w, command=50, reopen_m=0.002) == 102
+
+
+def test_finger_jitter_within_the_margin_does_not_end_an_attempt():
+    w = _closing(200, command=50, settle=0.03)
+    w[100:110] = 0.0315
+    assert detector.attempt_end(w, command=50, reopen_m=0.002) == 200
 
 
 def test_a_narrow_width_before_the_command_does_not_fire():

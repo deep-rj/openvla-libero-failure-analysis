@@ -1,9 +1,10 @@
 """Block 4 reference baseline on the baseline run: an empty close read from finger width alone.
 
 At each closing gate anchor, the policy's close command nearest the anchor is the trigger; the
-baseline fires at the first step within the horizon whose finger width is below the threshold.
+baseline fires at the first step of that attempt, which ends when the fingers reopen, whose finger
+width is below the threshold.
 Reports catches, false alarms and delay after the command over a threshold sweep, the narrowest
-successful grasp per object, and the same-task AUROC of minimum width over the horizon.
+successful grasp per object, and the same-task AUROC of minimum width over the attempt.
 
 Reads <anchors>; writes <out>/width_baseline.json and width_baseline.md.
 """
@@ -48,10 +49,13 @@ def load(run_dir: Path, anchors_csv: Path, params: detector.WidthBaseline) -> li
             "group": r["group"],
             "anchor_step": anchor,
             "command_step": command,
-            "width": None if command is None else width[command : command + params.horizon + 1],
+            "width": None
+            if command is None
+            else width[command : detector.attempt_end(width, command, params.reopen_m)],
         }
         if command is not None:
             row["min_width_m"] = float(row["width"].min())
+            row["attempt_len"] = len(row["width"])
             row["delay"] = _delay(row, params)
         out.append(row)
     return out
@@ -66,7 +70,7 @@ def sweep(rows: list[dict], params: detector.WidthBaseline) -> list[dict]:
     matched = [r for r in rows if r["command_step"] is not None]
     out = []
     for th in SWEEP_M:
-        p = detector.WidthBaseline(th, params.horizon, params.match_tol)
+        p = detector.WidthBaseline(th, params.reopen_m, params.match_tol)
         entry = {"threshold_m": th}
         for group in ("failure", "success"):
             delays = [_delay(r, p) for r in matched if r["group"] == group]
@@ -106,8 +110,10 @@ def render(results: dict, params: detector.WidthBaseline, sha: str) -> str:
         "# Width baseline (Block 4 reference)",
         "",
         f"Trigger: the close command nearest each closing gate anchor (within "
-        f"{params.match_tol} steps). Fires at the first step in the next {params.horizon} with "
-        f"finger width below the threshold; chosen threshold {params.threshold_m * 1000:.0f} mm. "
+        f"{params.match_tol} steps). Fires at the first step of the attempt with finger width "
+        f"below the threshold; the attempt ends when the width exceeds its narrowest since the "
+        f"command by more than {params.reopen_m * 1000:.0f} mm. Chosen threshold "
+        f"{params.threshold_m * 1000:.0f} mm. "
         f"No close command near the anchor: {r['failure']} failures, {r['success']} successes. "
         f"Harness `{sha[:7]}`.",
         "",
@@ -125,7 +131,7 @@ def render(results: dict, params: detector.WidthBaseline, sha: str) -> str:
         )
     lines += [
         "",
-        f"Same-task AUROC of minimum width over the horizon (narrower above): {a['auroc']:.2f}, "
+        f"Same-task AUROC of minimum width over the attempt (narrower above): {a['auroc']:.2f}, "
         f"{sg.EXPLORATORY_LEVEL:.2%} CI {a['ci'][0]:.2f} to {a['ci'][1]:.2f}, {N_BOOT} draws, seed "
         f"{sg.SEED}.",
         "",

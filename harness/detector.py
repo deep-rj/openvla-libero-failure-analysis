@@ -12,7 +12,7 @@ import numpy as np
 @dataclass(frozen=True)
 class WidthBaseline:
     threshold_m: float = 0.003
-    horizon: int = 60
+    reopen_m: float = 0.002
     match_tol: int = 10
 
 
@@ -35,7 +35,17 @@ def finger_width(gripper_qpos: np.ndarray) -> np.ndarray:
     return gripper_qpos[:, 0] - gripper_qpos[:, 1]
 
 
+def attempt_end(width: np.ndarray, command: int, reopen_m: float) -> int:
+    """First step after `command` whose width exceeds its narrowest since `command` by more than
+    `reopen_m`, or len(width). Reads the fingers, not the command: one-step open commands are
+    common and barely move them."""
+    narrowest = np.minimum.accumulate(width[command:])
+    reopened = np.flatnonzero(width[command:] > narrowest + reopen_m)
+    return command + int(reopened[0]) if len(reopened) else len(width)
+
+
 def empty_close_step(width: np.ndarray, command: int, params: WidthBaseline) -> int | None:
-    """First step in [command, command + horizon] with the fingers closed below the threshold."""
-    below = np.flatnonzero(width[command : command + params.horizon + 1] < params.threshold_m)
+    """First step of the attempt begun at `command` with the fingers closed below the threshold."""
+    end = attempt_end(width, command, params.reopen_m)
+    below = np.flatnonzero(width[command:end] < params.threshold_m)
     return command + int(below[0]) if len(below) else None
