@@ -173,3 +173,19 @@ def test_far_mass_is_the_probability_at_least_k_bins_from_the_top_bin():
     probs[0, [5, 6, 20]] = [0.6, 0.3, 0.1]
     probs[1, [5, 14, 15]] = [0.5, 0.2, 0.3]
     assert gate.far_mass(probs, k=10) == pytest.approx([0.1, 0.3])
+
+
+def test_the_anchor_is_the_bottom_of_its_own_descent_not_a_lower_point_left_by_a_miss():
+    x, info, _ = _scene(n=300)
+    _reach(x, 20, 60, at_xy=(0.06, 0.0))
+    _close(x, 61)
+    pads = x["finger_pad_pos"]
+    pads[61:90, :, 2] = 0.03
+    pads[90:110, :, 2] = np.linspace(0.03, 0.10, 20)[:, None]
+    _open(x, 95)
+    _reach(x, 110, 130, at_xy=(0.0, 0.0), bottom_z=0.05)
+    _close(x, 131, to_half_gap=0.016)
+    _lift(x, 150, carry=True)
+    x = _sync(x)
+    anchor = gate.success_anchor(x, info, gate.grasp_descents(x, info), g=0)
+    assert abs(anchor.bottom - 130) <= 1

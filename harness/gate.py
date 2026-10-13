@@ -1,8 +1,8 @@
 """Separability gate: pre-grasp windows of model-output metrics, aligned on grasp descents.
 
 Failures and successes are aligned on the same event, the bottom of a grasp descent at a goal
-object (the classifier's onset rule for `perception` and `control: grasp`). Pure functions;
-pre-registration in `docs/separability_gate.md`.
+object. Unlike the classifier's onset rule, the bottom excludes a lower point left by an earlier
+attempt. Pure functions; pre-registration in `docs/separability_gate.md`.
 """
 
 from collections import defaultdict
@@ -36,9 +36,21 @@ class Descent:
     close: int | None  # None for a descent that never closed
 
 
+def descent_bottom(z, close: int, lo: int, rise: float) -> int:
+    """Lowest point of the last descent before `close`: back from the close until z has risen
+    `rise` above the lowest point so far, no earlier than `lo`. A lower point left by an earlier
+    attempt, before the arm rose again, is not this descent's bottom."""
+    best = t = close
+    while t - 1 >= lo and z[t - 1] < z[best] + rise:
+        t -= 1
+        if z[t] < z[best]:
+            best = t
+    return best
+
+
 def grasp_descents(x, info, params=mechanism.DEFAULT_PARAMS) -> list[Descent]:
     """Closes and open descents at the nearest goal object within `near_m` while no goal
-    object is held, failed or not; bottoms by the classifier's rule."""
+    object is held, failed or not."""
     w = mechanism._World(x, info)
     closes = mechanism.close_onsets(w.gap, w.start, params.close_rate_m)
     z = w.mid[:, 2]
@@ -52,7 +64,7 @@ def grasp_descents(x, info, params=mechanism.DEFAULT_PARAMS) -> list[Descent]:
         i = at_goal(c)
         if i is not None:
             lo = max(prev, c - params.descent_window)
-            out.append(Descent(lo + int(np.argmin(z[lo : c + 1])), i, c))
+            out.append(Descent(descent_bottom(z, c, lo, params.rise_m), i, c))
         prev = c
     for _, bottom in mechanism.open_descents(z, closes, w.start, params):
         i = at_goal(bottom)
