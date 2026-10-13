@@ -1,0 +1,353 @@
+{
+  "every attempt | x | all steps": {
+    "auroc": 0.49674093781177253,
+    "ci": [
+      0.4006316141671611,
+      0.5958644768275472
+    ],
+    "n_failure": 1000,
+    "n_success": 471
+  },
+  "every attempt | x | stop not in top two": {
+    "auroc": 0.6149473205487759,
+    "ci": [
+      0.49964026114815535,
+      0.7054131821941816
+    ],
+    "n_failure": 887,
+    "n_success": 469
+  },
+  "every attempt | y | all steps": {
+    "auroc": 0.5520452278017958,
+    "ci": [
+      0.43257463897097576,
+      0.6812307337626263
+    ],
+    "n_failure": 1000,
+    "n_success": 471
+  },
+  "every attempt | y | stop not in top two": {
+    "auroc": 0.6339175512219205,
+    "ci": [
+      0.5304744230734475,
+      0.7371542174328729
+    ],
+    "n_failure": 936,
+    "n_success": 471
+  },
+  "every attempt | z | all steps": {
+    "auroc": 0.6800133022946458,
+    "ci": [
+      0.5702730287929805,
+      0.763983611804551
+    ],
+    "n_failure": 1000,
+    "n_success": 471
+  },
+  "every attempt | z | stop not in top two": {
+    "auroc": 0.7351679040937266,
+    "ci": [
+      0.6375546455967032,
+      0.8027259120779335
+    ],
+    "n_failure": 972,
+    "n_success": 471
+  },
+  "every attempt | roll | all steps": {
+    "auroc": 0.5579647489191886,
+    "ci": [
+      0.4687718107853868,
+      0.6480577807720858
+    ],
+    "n_failure": 1000,
+    "n_success": 471
+  },
+  "every attempt | roll | stop not in top two": {
+    "auroc": 0.6283426616915423,
+    "ci": [
+      0.5403352817849132,
+      0.7116967012287612
+    ],
+    "n_failure": 888,
+    "n_success": 457
+  },
+  "every attempt | pitch | all steps": {
+    "auroc": 0.6444629198536748,
+    "ci": [
+      0.5355031246749367,
+      0.7371158928866525
+    ],
+    "n_failure": 1000,
+    "n_success": 471
+  },
+  "every attempt | pitch | stop not in top two": {
+    "auroc": 0.702839050866328,
+    "ci": [
+      0.6225188315500467,
+      0.7642025952329328
+    ],
+    "n_failure": 960,
+    "n_success": 468
+  },
+  "every attempt | yaw | all steps": {
+    "auroc": 0.5375789823744596,
+    "ci": [
+      0.4392286308045316,
+      0.6381210637090993
+    ],
+    "n_failure": 1000,
+    "n_success": 471
+  },
+  "every attempt | yaw | stop not in top two": {
+    "auroc": 0.6594425011719736,
+    "ci": [
+      0.5741368088926737,
+      0.7445388064588696
+    ],
+    "n_failure": 942,
+    "n_success": 463
+  },
+  "every attempt | gripper | all steps": {
+    "auroc": 0.678732956434985,
+    "ci": [
+      0.5830220227419617,
+      0.7618750863860915
+    ],
+    "n_failure": 1000,
+    "n_success": 471
+  },
+  "first per object | x | all steps": {
+    "auroc": 0.5661124307205068,
+    "ci": [
+      0.45318592836687444,
+      0.6794024443961876
+    ],
+    "n_failure": 88,
+    "n_success": 266
+  },
+  "first per object | x | stop not in top two": {
+    "auroc": 0.5589865399841647,
+    "ci": [
+      0.4448841256228108,
+      0.6665431864337298
+    ],
+    "n_failure": 88,
+    "n_success": 266
+  },
+  "first per object | y | all steps": {
+    "auroc": 0.557403008709422,
+    "ci": [
+      0.4463150616379151,
+      0.6586246971829879
+    ],
+    "n_failure": 88,
+    "n_success": 266
+  },
+  "first per object | y | stop not in top two": {
+    "auroc": 0.5463182897862233,
+    "ci": [
+      0.43856746242354894,
+      0.6504802153477328
+    ],
+    "n_failure": 88,
+    "n_success": 266
+  },
+  "first per object | z | all steps": {
+    "auroc": 0.5130641330166271,
+    "ci": [
+      0.4121190580344123,
+      0.6218230843612111
+    ],
+    "n_failure": 88,
+    "n_success": 266
+  },
+  "first per object | z | stop not in top two": {
+    "auroc": 0.4948535233570863,
+    "ci": [
+      0.40039577136452414,
+      0.5969448153896126
+    ],
+    "n_failure": 88,
+    "n_success": 266
+  },
+  "first per object | roll | all steps": {
+    "auroc": 0.5312747426761678,
+    "ci": [
+      0.4281043398314161,
+      0.6377670941298819
+    ],
+    "n_failure": 88,
+    "n_success": 266
+  },
+  "first per object | roll | stop not in top two": {
+    "auroc": 0.6001669449081803,
+    "ci": [
+      0.4940740164711459,
+      0.6997728479492119
+    ],
+    "n_failure": 85,
+    "n_success": 264
+  },
+  "first per object | pitch | all steps": {
+    "auroc": 0.5558194774346793,
+    "ci": [
+      0.4471574748058597,
+      0.6647243850166011
+    ],
+    "n_failure": 88,
+    "n_success": 266
+  },
+  "first per object | pitch | stop not in top two": {
+    "auroc": 0.5557324840764332,
+    "ci": [
+      0.448656544213082,
+      0.6717627936175937
+    ],
+    "n_failure": 88,
+    "n_success": 265
+  },
+  "first per object | yaw | all steps": {
+    "auroc": 0.5225653206650831,
+    "ci": [
+      0.41208787756635634,
+      0.633343920053149
+    ],
+    "n_failure": 88,
+    "n_success": 266
+  },
+  "first per object | yaw | stop not in top two": {
+    "auroc": 0.5735294117647058,
+    "ci": [
+      0.4671997491734371,
+      0.6781527529291328
+    ],
+    "n_failure": 87,
+    "n_success": 264
+  },
+  "first per object | gripper | all steps": {
+    "auroc": 0.610055423594616,
+    "ci": [
+      0.5166668158341925,
+      0.7098864161624163
+    ],
+    "n_failure": 88,
+    "n_success": 266
+  },
+  "nearest the gate anchors | x | all steps": {
+    "auroc": 0.6217054263565891,
+    "ci": [
+      0.48817857923497254,
+      0.7502700617283949
+    ],
+    "n_failure": 63,
+    "n_success": 192
+  },
+  "nearest the gate anchors | x | stop not in top two": {
+    "auroc": 0.6012461059190031,
+    "ci": [
+      0.47766934590427096,
+      0.7245172622567654
+    ],
+    "n_failure": 63,
+    "n_success": 191
+  },
+  "nearest the gate anchors | y | all steps": {
+    "auroc": 0.6124031007751938,
+    "ci": [
+      0.5012640809011776,
+      0.7301971664005268
+    ],
+    "n_failure": 63,
+    "n_success": 192
+  },
+  "nearest the gate anchors | y | stop not in top two": {
+    "auroc": 0.6201550387596899,
+    "ci": [
+      0.5104840909090909,
+      0.727182458064811
+    ],
+    "n_failure": 63,
+    "n_success": 192
+  },
+  "nearest the gate anchors | z | all steps": {
+    "auroc": 0.5875968992248062,
+    "ci": [
+      0.47376431870434793,
+      0.6962449179269294
+    ],
+    "n_failure": 63,
+    "n_success": 192
+  },
+  "nearest the gate anchors | z | stop not in top two": {
+    "auroc": 0.5534883720930233,
+    "ci": [
+      0.4324522330536202,
+      0.6653136966041281
+    ],
+    "n_failure": 63,
+    "n_success": 192
+  },
+  "nearest the gate anchors | roll | all steps": {
+    "auroc": 0.5906976744186047,
+    "ci": [
+      0.4719755443295739,
+      0.6990319520820046
+    ],
+    "n_failure": 63,
+    "n_success": 192
+  },
+  "nearest the gate anchors | roll | stop not in top two": {
+    "auroc": 0.7053140096618358,
+    "ci": [
+      0.5970750498256103,
+      0.8016486613828729
+    ],
+    "n_failure": 62,
+    "n_success": 187
+  },
+  "nearest the gate anchors | pitch | all steps": {
+    "auroc": 0.5968992248062015,
+    "ci": [
+      0.4830743551619976,
+      0.7145199084070889
+    ],
+    "n_failure": 63,
+    "n_success": 192
+  },
+  "nearest the gate anchors | pitch | stop not in top two": {
+    "auroc": 0.6015503875968993,
+    "ci": [
+      0.48472845485911686,
+      0.7199172893653885
+    ],
+    "n_failure": 63,
+    "n_success": 192
+  },
+  "nearest the gate anchors | yaw | all steps": {
+    "auroc": 0.5891472868217055,
+    "ci": [
+      0.4574847703023808,
+      0.7129854440037395
+    ],
+    "n_failure": 63,
+    "n_success": 192
+  },
+  "nearest the gate anchors | yaw | stop not in top two": {
+    "auroc": 0.6305031446540881,
+    "ci": [
+      0.5185805206184941,
+      0.7484936428966273
+    ],
+    "n_failure": 63,
+    "n_success": 190
+  },
+  "nearest the gate anchors | gripper | all steps": {
+    "auroc": 0.517829457364341,
+    "ci": [
+      0.39996877479028464,
+      0.6388236306794819
+    ],
+    "n_failure": 63,
+    "n_success": 192
+  }
+}

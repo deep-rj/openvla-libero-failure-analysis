@@ -147,15 +147,16 @@ def same_task_auroc(units) -> float:
     return sum(w for w, _ in totals) / sum(p for _, p in totals)
 
 
-def resample_episodes(units, rng) -> list[Unit]:
+def resample_episodes(units, rng, stratum=None) -> list[Unit]:
     """Episodes drawn with replacement within each (task, outcome); an episode's units travel
-    together, since a success's grasps of different objects share a trajectory."""
+    together, since a success's grasps of different objects share a trajectory. Outcome is the
+    first unit's group unless `stratum` maps an episode id to one."""
     by_episode = defaultdict(list)
     for u in units:
         by_episode[u.episode_id].append(u)
     strata = defaultdict(list)
     for ep, us in by_episode.items():
-        strata[(us[0].task_id, us[0].group)].append(ep)
+        strata[(us[0].task_id, us[0].group if stratum is None else stratum(ep))].append(ep)
     out = []
     for eps in strata.values():
         for k in rng.integers(0, len(eps), len(eps)):
@@ -163,9 +164,11 @@ def resample_episodes(units, rng) -> list[Unit]:
     return out
 
 
-def bootstrap_ci(units, statistic, level: float, n_boot: int, seed: int) -> tuple[float, float]:
+def bootstrap_ci(
+    units, statistic, level: float, n_boot: int, seed: int, stratum=None
+) -> tuple[float, float]:
     rng = np.random.default_rng(seed)
-    stats = [statistic(resample_episodes(units, rng)) for _ in range(n_boot)]
+    stats = [statistic(resample_episodes(units, rng, stratum)) for _ in range(n_boot)]
     tail = (1 - level) / 2 * 100
     lo, hi = np.percentile(stats, [tail, 100 - tail])
     return float(lo), float(hi)

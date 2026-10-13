@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
-from harness.gate import Descent
+from test_mechanism import _close, _lift, _reach, _scene, _sync
 
 from harness import gate
-from test_mechanism import _close, _lift, _reach, _scene, _sync
+from harness.gate import Descent
 
 WAIT = 10
 
@@ -117,7 +117,9 @@ def test_the_same_task_auroc_only_compares_units_in_the_same_stratum():
 def test_the_bootstrap_ci_is_seeded_and_brackets_the_estimate():
     rng = np.random.default_rng(0)
     units = [_unit(f"f{i}", i % 2, "can", "failure", v) for i, v in enumerate(rng.normal(1, 1, 40))]
-    units += [_unit(f"s{i}", i % 2, "can", "success", v) for i, v in enumerate(rng.normal(0, 1, 60))]
+    units += [
+        _unit(f"s{i}", i % 2, "can", "success", v) for i, v in enumerate(rng.normal(0, 1, 60))
+    ]
     lo, hi = gate.bootstrap_ci(units, gate.same_task_auroc, level=0.95, n_boot=500, seed=1)
     assert (lo, hi) == gate.bootstrap_ci(units, gate.same_task_auroc, 0.95, n_boot=500, seed=1)
     assert lo < gate.same_task_auroc(units) < hi
@@ -135,6 +137,21 @@ def test_the_bootstrap_resamples_whole_episodes():
         draw = gate.resample_episodes(units, np.random.default_rng(seed))
         assert sum(u.episode_id == "s" for u in draw) == 2
         assert sum(u.group == "failure" for u in draw) == 2
+
+
+def test_the_bootstrap_can_stratify_episodes_by_a_given_key():
+    # "a" failed but its first unit is a success; stratified by episode outcome it is drawn with
+    # the other failed episode, so the lone successful episode "b" is drawn exactly once.
+    units = [
+        _unit("a", 0, "can", "success", 0.0),
+        _unit("a", 0, "can", "failure", 1.0),
+        _unit("b", 0, "can", "success", 0.0),
+        _unit("c", 0, "can", "failure", 1.0),
+    ]
+    outcome = {"a": "failed", "b": "succeeded", "c": "failed"}
+    for seed in range(10):
+        draw = gate.resample_episodes(units, np.random.default_rng(seed), stratum=outcome.get)
+        assert sum(u.episode_id == "b" for u in draw) == 1
 
 
 def test_window_speed_is_the_mean_step_displacement_times_the_rate():

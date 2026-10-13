@@ -101,3 +101,23 @@ nearest each closing anchor.
   Success anchors (202): 192 successful, 4 slips, 2 failed, 4 with no attempt.
 - Over all attempts: 973 failed and 27 slips against 471 successful; 178 aborted. Failed
   episodes hold 827 of the failed attempts, about 7.5 per failed episode with attempts.
+
+### Attempt-level separability (2026-10-13)
+
+The gate's exp(H) test with attempts as units (`scripts/block4_attempt_separability.py`,
+`docs/results/baseline/block4/attempt_separability.md`): window mean over the 50 policy steps
+before the close command, failed and slipped attempts against successful ones, bootstrap over
+episodes within (task, episode outcome).
+
+- The attempts nearest the gate anchors reproduce the gate: x 0.62, y 0.61, stop-filtered roll
+  0.71.
+- Over every attempt (1000 failed, 471 successful) z and pitch separate more than in the gate
+  (z 0.68, 0.74 stop-filtered; pitch 0.64, 0.70), and the gripper reaches 0.68.
+- At the first attempt per goal object per episode (88 failed, 266 successful) nothing but the
+  gripper separates (0.61; motion dims 0.49–0.60).
+- The attempt's index on its object, alone, has AUROC 0.83 (0.73 to 0.88; 1,000 draws): failed
+  attempts are mostly retries. Within retries (912 failed, 205 successful) z and pitch still
+  separate (stop-filtered z 0.70, pitch 0.68); the gripper does not (0.56). Within successful
+  episodes, z is 0.73 (0.56 to 0.84).
+- Not yet separated from retry history: a retry's 50-step window can include the previous
+  attempt's lift and reopen.
