@@ -1,4 +1,13 @@
 {
+  "every attempt | attempt index": {
+    "auroc": 0.8271200532091786,
+    "ci": [
+      0.7097387713176494,
+      0.8834631060719971
+    ],
+    "n_failure": 1000,
+    "n_success": 471
+  },
   "every attempt | x | all steps": {
     "auroc": 0.49674093781177253,
     "ci": [
@@ -232,6 +241,240 @@
     ],
     "n_failure": 88,
     "n_success": 266
+  },
+  "first per object, failures in failed episodes only | x | all steps": {
+    "auroc": 0.5568181818181818,
+    "ci": [
+      0.4372761402372919,
+      0.6777373747234152
+    ],
+    "n_failure": 73,
+    "n_success": 266
+  },
+  "first per object, failures in failed episodes only | x | stop not in top two": {
+    "auroc": 0.5672348484848485,
+    "ci": [
+      0.45044594973695334,
+      0.6825838769804282
+    ],
+    "n_failure": 73,
+    "n_success": 266
+  },
+  "first per object, failures in failed episodes only | y | all steps": {
+    "auroc": 0.5625,
+    "ci": [
+      0.4399806186997609,
+      0.6734762219124469
+    ],
+    "n_failure": 73,
+    "n_success": 266
+  },
+  "first per object, failures in failed episodes only | y | stop not in top two": {
+    "auroc": 0.5274621212121212,
+    "ci": [
+      0.41163990364642655,
+      0.6310419710882368
+    ],
+    "n_failure": 73,
+    "n_success": 266
+  },
+  "first per object, failures in failed episodes only | z | all steps": {
+    "auroc": 0.48674242424242425,
+    "ci": [
+      0.37769032077778075,
+      0.588284509452412
+    ],
+    "n_failure": 73,
+    "n_success": 266
+  },
+  "first per object, failures in failed episodes only | z | stop not in top two": {
+    "auroc": 0.47821969696969696,
+    "ci": [
+      0.36417740000689686,
+      0.5839779832042047
+    ],
+    "n_failure": 73,
+    "n_success": 266
+  },
+  "first per object, failures in failed episodes only | roll | all steps": {
+    "auroc": 0.5321969696969697,
+    "ci": [
+      0.42081875030180105,
+      0.6395690182007677
+    ],
+    "n_failure": 73,
+    "n_success": 266
+  },
+  "first per object, failures in failed episodes only | roll | stop not in top two": {
+    "auroc": 0.599406528189911,
+    "ci": [
+      0.4889827497845179,
+      0.7133528891341835
+    ],
+    "n_failure": 71,
+    "n_success": 264
+  },
+  "first per object, failures in failed episodes only | pitch | all steps": {
+    "auroc": 0.584280303030303,
+    "ci": [
+      0.4699651444977798,
+      0.6978354946820419
+    ],
+    "n_failure": 73,
+    "n_success": 266
+  },
+  "first per object, failures in failed episodes only | pitch | stop not in top two": {
+    "auroc": 0.5795996186844614,
+    "ci": [
+      0.45862893582595116,
+      0.7030299561631529
+    ],
+    "n_failure": 73,
+    "n_success": 265
+  },
+  "first per object, failures in failed episodes only | yaw | all steps": {
+    "auroc": 0.5359848484848485,
+    "ci": [
+      0.4168255087481889,
+      0.6595423024542093
+    ],
+    "n_failure": 73,
+    "n_success": 266
+  },
+  "first per object, failures in failed episodes only | yaw | stop not in top two": {
+    "auroc": 0.5809617271835132,
+    "ci": [
+      0.4672416386986006,
+      0.7010710808179162
+    ],
+    "n_failure": 72,
+    "n_success": 264
+  },
+  "first per object, failures in failed episodes only | gripper | all steps": {
+    "auroc": 0.6245265151515151,
+    "ci": [
+      0.5111573603583258,
+      0.7280366290983603
+    ],
+    "n_failure": 73,
+    "n_success": 266
+  },
+  "retries | x | all steps": {
+    "auroc": 0.4594687586017066,
+    "ci": [
+      0.348107705011582,
+      0.5751288718710212
+    ],
+    "n_failure": 912,
+    "n_success": 205
+  },
+  "retries | x | stop not in top two": {
+    "auroc": 0.565836868646442,
+    "ci": [
+      0.42239139637346584,
+      0.6892780411111566
+    ],
+    "n_failure": 799,
+    "n_success": 203
+  },
+  "retries | y | all steps": {
+    "auroc": 0.5593861822185522,
+    "ci": [
+      0.3934470289614609,
+      0.7173831968850106
+    ],
+    "n_failure": 912,
+    "n_success": 205
+  },
+  "retries | y | stop not in top two": {
+    "auroc": 0.6017647909735281,
+    "ci": [
+      0.455766475746189,
+      0.7226957452717966
+    ],
+    "n_failure": 848,
+    "n_success": 205
+  },
+  "retries | z | all steps": {
+    "auroc": 0.6407239196256538,
+    "ci": [
+      0.5074447957194436,
+      0.7618127260979957
+    ],
+    "n_failure": 912,
+    "n_success": 205
+  },
+  "retries | z | stop not in top two": {
+    "auroc": 0.6985118629790819,
+    "ci": [
+      0.5704234106142778,
+      0.8017599186636617
+    ],
+    "n_failure": 884,
+    "n_success": 205
+  },
+  "retries | roll | all steps": {
+    "auroc": 0.5607624552711258,
+    "ci": [
+      0.4448308308219857,
+      0.669471945240242
+    ],
+    "n_failure": 912,
+    "n_success": 205
+  },
+  "retries | roll | stop not in top two": {
+    "auroc": 0.5782583478332919,
+    "ci": [
+      0.46323326905205825,
+      0.6928758205962766
+    ],
+    "n_failure": 803,
+    "n_success": 193
+  },
+  "retries | pitch | all steps": {
+    "auroc": 0.6353564547206165,
+    "ci": [
+      0.484593133244096,
+      0.7686932744192593
+    ],
+    "n_failure": 912,
+    "n_success": 205
+  },
+  "retries | pitch | stop not in top two": {
+    "auroc": 0.6755922469490309,
+    "ci": [
+      0.554562061797818,
+      0.7640884631359086
+    ],
+    "n_failure": 872,
+    "n_success": 203
+  },
+  "retries | yaw | all steps": {
+    "auroc": 0.5522295623451693,
+    "ci": [
+      0.408971267123564,
+      0.6736371538622044
+    ],
+    "n_failure": 912,
+    "n_success": 205
+  },
+  "retries | yaw | stop not in top two": {
+    "auroc": 0.6390603824725192,
+    "ci": [
+      0.508628344451204,
+      0.7510153858846141
+    ],
+    "n_failure": 855,
+    "n_success": 199
+  },
+  "retries | gripper | all steps": {
+    "auroc": 0.5552573630608313,
+    "ci": [
+      0.3976724215867936,
+      0.6838822887900476
+    ],
+    "n_failure": 912,
+    "n_success": 205
   },
   "nearest the gate anchors | x | all steps": {
     "auroc": 0.6217054263565891,

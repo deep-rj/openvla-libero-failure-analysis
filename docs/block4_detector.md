@@ -40,6 +40,23 @@ before init states 25–49 are run, and is evaluated on them once.
   (`harness/detector.py`). Tuned on the baseline 250, frozen with the detector and evaluated once
   on init states 25–49. 4 mm catches 2 more failures at the same false alarms but sits 0.1 mm
   below the narrowest successful bowl-rim grasp; 3 mm keeps 1.1 mm.
+- **Target attempts: first attempts on each goal object**, failed or slipped (whether or not
+  the episode recovers) against successful. Retries are predicted by the attempt count alone
+  (AUROC 0.83), a consequence of the first failure rather than a forecast of it, so they are out
+  of scope.
+- **Features: v1 gripper exp(H) alone; v2 adds stop-filtered roll exp(H).** The only first-attempt
+  signals (gripper 0.62; roll 0.60, the gate's strongest). Two features at most for 88 failed
+  first attempts. v1 is the primary claim, v2 secondary. Each is a window mean and a threshold;
+  time-series features (trend, peak) are a later v3, tried only if v1 shows signal, with
+  cross-validation since they fit weights.
+- **Window: the best of a declared grid on the baseline 250**, frozen with the detector. The test
+  set gives the unbiased estimate.
+- **Metrics:** same-task AUROC for signal; failures caught and lead time at a fixed false-alarm
+  rate on successful first attempts for the deployable alarm.
+- **Success on init states 25–49:** the v1 AUROC CI excludes 0.5, and detector OR width
+  baseline catches more failed first attempts than the width baseline alone at the same total
+  false-alarm rate. With about 80–90 failed first attempts expected, a true AUROC of 0.62 is
+  confirmed with roughly 60–80% probability.
 
 ## Exploration log
 
@@ -115,7 +132,7 @@ episodes within (task, episode outcome).
   (z 0.68, 0.74 stop-filtered; pitch 0.64, 0.70), and the gripper reaches 0.68.
 - At the first attempt per goal object per episode (88 failed, 266 successful) nothing but the
   gripper separates (0.61; motion dims 0.49–0.60).
-- The attempt's index on its object, alone, has AUROC 0.83 (0.73 to 0.88; 1,000 draws): failed
+- The attempt's index on its object, alone, has AUROC 0.83 (0.71 to 0.88): failed
   attempts are mostly retries. Within retries (912 failed, 205 successful) z and pitch still
   separate (stop-filtered z 0.70, pitch 0.68); the gripper does not (0.56). Within successful
   episodes, z is 0.73 (0.56 to 0.84).
@@ -123,6 +140,18 @@ episodes within (task, episode outcome).
   attempt's lift and reopen.
 - First attempts only, split by episode outcome (exploratory, 13 tests): failed first attempts in
   failed episodes (73) against successful first attempts (266) separate on no motion dim
-  (0.48–0.60, every CI includes 0.5); the gripper is 0.62 (0.52 to 0.73). Failed first attempts
+  (0.48–0.60, every CI includes 0.5); the gripper is 0.62 (0.51 to 0.73). Failed first attempts
   in successful episodes number 15, too few to read. The gate's 0.62–0.63 at initiator anchors
   does not reappear on first attempts; the gate's success units include grasps after misses.
+
+### Window sweep, first attempts (2026-10-13)
+
+All failed and slipped first attempts (88) against successful ones (266)
+(`scripts/block4_window_sweep.py`, `docs/results/baseline/block4/window_sweep.md`).
+
+- Gripper exp(H) is flat from 10 to 50 steps (0.60–0.62) and peaks at 30 (0.62, 0.52 to 0.72):
+  its signal sits in the last steps before the close. Frozen window: 30.
+- Stop-filtered roll rises with length to 0.63 at 75–150 steps (0.63, 0.53 to 0.73 at 100). At
+  100 steps 172 of 353 windows are cut by the episode start: first attempts come early, so long
+  windows cover the approach from the start. Frozen window: 100.
+

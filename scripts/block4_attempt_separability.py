@@ -1,7 +1,9 @@
 """The gate's exp(H) test at attempt level: window mean of per-dim exp(H) over the policy steps
 before each attempt's close command, failed and slipped attempts against successful ones, on all
 steps and on steps where the no-motion bin is not in the top two. Subsets: every attempt; the
-first attempt per goal object per episode; the attempts nearest the gate anchors.
+first attempt per goal object per episode, with all its failures or only those in failed
+episodes; retries (attempt 2+ on the object); the attempts nearest the gate anchors. Also the
+attempt's index on its object as a score on every attempt.
 
 Reads <attempts>; writes <out>/attempt_separability.json and attempt_separability.md.
 """
@@ -26,7 +28,14 @@ N_BOOT = 2000
 WINDOW = gate.DEFAULT_PARAMS.window
 MOTION = len(sg.DIM_NAMES) - 1
 VARIANTS = ("all steps", "stop not in top two")
-SUBSETS = ("every attempt", "first per object", "nearest the gate anchors")
+SUBSETS = (
+    "every attempt",
+    "first per object",
+    "first per object, failures in failed episodes only",
+    "retries",
+    "nearest the gate anchors",
+)
+INDEX = ("attempt index", "")
 
 
 def load(run_dir: Path, attempts_csv: Path, zero_bins) -> list[dict]:
@@ -65,12 +74,16 @@ def load(run_dir: Path, attempts_csv: Path, zero_bins) -> list[dict]:
 
 
 def subsets(loaded, anchors_csv: Path) -> dict[str, list[dict]]:
-    first, seen = [], set()
+    count = {}
     for u in loaded:
         key = (u["row"]["episode_id"], u["row"]["object"])
-        if key not in seen:
-            seen.add(key)
-            first.append(u)
+        count[key] = count.get(key, 0) + 1
+        u["values"][INDEX] = float(count[key])
+    first = [u for u in loaded if u["values"][INDEX] == 1]
+    first_fatal = [
+        u for u in first if u["row"]["outcome"] == "success" or u["row"]["episode_success"] == "0"
+    ]
+    retries = [u for u in loaded if u["values"][INDEX] > 1]
     with open(anchors_csv, newline="") as f:
         anchors = [a for a in csv.DictReader(f) if not a["excluded"] and a["anchor_closed"] == "1"]
     by_ep = {}
@@ -85,7 +98,7 @@ def subsets(loaded, anchors_csv: Path) -> dict[str, list[dict]]:
             detector.DEFAULT_WIDTH.match_tol,
         )
         nearest += [u for u in us if int(u["row"]["command_step"]) == c][:1]
-    return dict(zip(SUBSETS, (loaded, first, nearest), strict=True))
+    return dict(zip(SUBSETS, (loaded, first, first_fatal, retries, nearest), strict=True))
 
 
 def to_units(us, key) -> list[gate.Unit]:
@@ -106,21 +119,26 @@ def analyse(groups: dict[str, list[dict]]) -> dict:
     outcome = {u["row"]["episode_id"]: u["row"]["episode_success"] for us in groups.values()
                for u in us}  # fmt: skip
     out = {}
+
+    def test(us, key):
+        units = to_units(us, key)
+        lo, hi = gate.bootstrap_ci(
+            units, gate.same_task_auroc, sg.EXPLORATORY_LEVEL, N_BOOT, sg.SEED, outcome.get
+        )
+        return {
+            "auroc": gate.same_task_auroc(units),
+            "ci": [lo, hi],
+            "n_failure": sum(u.group == "failure" for u in units),
+            "n_success": sum(u.group == "success" for u in units),
+        }
+
+    out[f"{SUBSETS[0]} | {INDEX[0]}"] = test(groups[SUBSETS[0]], INDEX)
     for subset, us in groups.items():
         for d, name in enumerate(sg.DIM_NAMES):
             for variant in VARIANTS:
                 if variant == VARIANTS[1] and d >= MOTION:
                     continue
-                units = to_units(us, (name, variant))
-                lo, hi = gate.bootstrap_ci(
-                    units, gate.same_task_auroc, sg.EXPLORATORY_LEVEL, N_BOOT, sg.SEED, outcome.get
-                )
-                out[f"{subset} | {name} | {variant}"] = {
-                    "auroc": gate.same_task_auroc(units),
-                    "ci": [lo, hi],
-                    "n_failure": sum(u.group == "failure" for u in units),
-                    "n_success": sum(u.group == "success" for u in units),
-                }
+                out[f"{subset} | {name} | {variant}"] = test(us, (name, variant))
     return out
 
 
@@ -134,8 +152,14 @@ def render(results: dict, sha: str) -> str:
         f"failures above successes, {sg.EXPLORATORY_LEVEL:.2%} CIs, bootstrap over episodes "
         f"within (task, episode outcome), {N_BOOT} draws, seed {sg.SEED}. Harness `{sha[:7]}`.",
     ]
+    r = results[f"{SUBSETS[0]} | {INDEX[0]}"]
+    lines += [
+        "",
+        f"Attempt index on its object as the score, every attempt: {r['auroc']:.2f} "
+        f"({r['ci'][0]:.2f} to {r['ci'][1]:.2f}).",
+    ]
     for subset in SUBSETS:
-        first = next(r for k, r in results.items() if k.startswith(subset))
+        first = results[f"{subset} | {sg.DIM_NAMES[0]} | {VARIANTS[0]}"]
         lines += [
             "",
             f"**{subset}** ({first['n_failure']} failed, {first['n_success']} successful)",
