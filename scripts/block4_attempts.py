@@ -1,5 +1,5 @@
-"""Labels every grasp attempt in a run (`harness.attempts`) and checks the labels against the gate
-anchors: a closing failure anchor should fall on a failed attempt, a success anchor on a
+"""Labels every grasp attempt in a run (`harness.attempts`) and, given the gate anchors, checks the
+labels against them: a closing failure anchor should fall on a failed attempt, a success anchor on a
 successful one.
 
 Reads <run>/world and <run>/episodes; writes <out>/attempts.csv and attempts.md.
@@ -88,7 +88,7 @@ def check_anchors(rows: list[dict], anchors_csv: Path, tol: int) -> Counter:
     return out
 
 
-def render(rows: list[dict], check: Counter, sha: str) -> str:
+def render(rows: list[dict], check: Counter | None, sha: str) -> str:
     counts = Counter((r["episode_success"], r["outcome"]) for r in rows)
     lines = [
         "# Grasp attempts (Block 4 labels)",
@@ -106,6 +106,8 @@ def render(rows: list[dict], check: Counter, sha: str) -> str:
         n_ep = len({r["episode_id"] for r in rows if r["episode_success"] == s})
         cells = " | ".join(str(counts[(s, o)]) for o in ("success", "slip", "failure", "aborted"))
         lines.append(f"| {name} ({n_ep} with attempts) | {cells} |")
+    if check is None:
+        return "\n".join(lines) + "\n"
     lines += [
         "",
         "**Check against the gate anchors** (closing anchors; the attempt nearest the anchor, "
@@ -125,7 +127,7 @@ def render(rows: list[dict], check: Counter, sha: str) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("run_dir", type=Path)
-    parser.add_argument("--anchors", type=Path, required=True)
+    parser.add_argument("--anchors", type=Path, help="gate anchors to check the labels against")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
 
@@ -134,7 +136,7 @@ def main() -> None:
         for m in manifest.read_rows(args.run_dir / "manifest.csv")
         for r in episode_attempts(args.run_dir, m)
     ]
-    check = check_anchors(rows, args.anchors, detector.DEFAULT_WIDTH.match_tol)
+    check = args.anchors and check_anchors(rows, args.anchors, detector.DEFAULT_WIDTH.match_tol)
     sha = metadata.git_state(Path(__file__).resolve().parent.parent)["sha"] or ""
     args.out.mkdir(parents=True, exist_ok=True)
     with open(args.out / "attempts.csv", "w", newline="") as f:

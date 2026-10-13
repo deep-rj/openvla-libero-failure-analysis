@@ -8,6 +8,19 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from harness import gate
+
+
+@dataclass(frozen=True)
+class DetectorSpec:
+    gripper_window: int = 30
+    roll_window: int = 100
+    budget: float = 0.2  # share of successful first attempts allowed to alarm
+    min_window: int = 10
+
+
+DEFAULT_SPEC = DetectorSpec()
+
 
 @dataclass(frozen=True)
 class WidthBaseline:
@@ -44,3 +57,38 @@ def empty_close_step(width: np.ndarray, command: int, params: WidthBaseline) -> 
     end = attempt_end(width, command, params.reopen_m)
     below = np.flatnonzero(width[command:end] < params.threshold_m)
     return command + int(below[0]) if len(below) else None
+
+
+def window_mean(values, is_wait, command: int, length: int, keep=None, min_window: int = 10):
+    """Mean of `values` over the policy steps in the `length` steps before `command`, where `keep`
+    holds; None if the window has fewer than min(length, min_window) steps or keeps none."""
+    window = gate.pre_window(is_wait, command, length, min(length, min_window))
+    if window is None:
+        return None
+    return gate.subset_mean(values, window, np.ones(len(values), bool) if keep is None else keep)
+
+
+def percentile_rank(reference: np.ndarray, x: float) -> float:
+    """Share of `reference` (sorted) at or below `x`."""
+    return float(np.searchsorted(reference, x, side="right") / len(reference))
+
+
+def budget_threshold(success_scores: np.ndarray, budget: float) -> float:
+    """A threshold above which at most `budget` of `success_scores` lie."""
+    ordered = np.sort(success_scores)[::-1]
+    return float(ordered[int(np.floor(budget * len(ordered)))])
+
+
+def v2_score(gripper: float, roll: float | None, gripper_ref, roll_ref) -> float:
+    """Mean percentile rank against successful first attempts; the gripper's alone when roll has
+    no stop-filtered steps in its window."""
+    ranks = [percentile_rank(gripper_ref, gripper)]
+    if roll is not None:
+        ranks.append(percentile_rank(roll_ref, roll))
+    return float(np.mean(ranks))
+
+
+def excess_over_chance(alarm: np.ndarray, failed: np.ndarray) -> float:
+    """Catch rate on failures minus false-alarm rate on successes: what a random alarm firing as
+    often on successes would not achieve."""
+    return float(alarm[failed].mean() - alarm[~failed].mean())

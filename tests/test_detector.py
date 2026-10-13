@@ -72,3 +72,51 @@ def test_a_narrow_width_before_the_command_does_not_fire():
     w = np.full(200, 0.04)
     w[:50] = 0.001
     assert detector.empty_close_step(w, command=50, params=PARAMS) is None
+
+
+def test_the_window_mean_covers_the_policy_steps_before_the_command():
+    values = np.arange(20, dtype=float)
+    is_wait = np.zeros(20, dtype=bool)
+    is_wait[:3] = True
+    # steps 7..9 before command 10
+    assert detector.window_mean(values, is_wait, command=10, length=3) == 8.0
+    # wait steps 0..2 are skipped: steps 3..4 remain
+    assert detector.window_mean(values, is_wait, command=5, length=5, min_window=2) == 3.5
+
+
+def test_a_window_shorter_than_the_minimum_has_no_mean():
+    is_wait = np.zeros(20, dtype=bool)
+    assert detector.window_mean(np.ones(20), is_wait, command=4, length=30, min_window=10) is None
+
+
+def test_the_window_mean_can_keep_a_subset_of_steps():
+    values = np.arange(10, dtype=float)
+    keep = np.array([True, False] * 5)
+    assert detector.window_mean(values, np.zeros(10, bool), 10, 4, keep=keep, min_window=1) == 7.0
+
+
+def test_the_percentile_rank_is_the_share_of_reference_values_at_or_below():
+    ref = np.array([1.0, 2.0, 3.0, 4.0])
+    assert [detector.percentile_rank(ref, x) for x in (0.5, 2.0, 2.5, 9.0)] == [0, 0.5, 0.5, 1]
+
+
+def test_the_budget_threshold_lets_at_most_the_budget_of_successes_alarm():
+    successes = np.arange(10, dtype=float)
+    t = detector.budget_threshold(successes, budget=0.2)
+    assert (successes > t).sum() == 2
+
+
+def test_the_v2_score_averages_the_two_percentile_ranks():
+    g_ref, r_ref = np.array([1.0, 2.0, 3.0, 4.0]), np.array([10.0, 20.0, 30.0, 40.0])
+    assert detector.v2_score(3.0, 15.0, g_ref, r_ref) == (0.75 + 0.25) / 2
+
+
+def test_the_v2_score_falls_back_to_the_gripper_when_roll_has_no_window():
+    g_ref, r_ref = np.array([1.0, 2.0, 3.0, 4.0]), np.array([10.0, 20.0])
+    assert detector.v2_score(3.0, None, g_ref, r_ref) == 0.75
+
+
+def test_excess_over_chance_is_the_catch_rate_minus_the_false_alarm_rate():
+    alarm = np.array([True, True, False, False, True, False, False, False])
+    failed = np.array([True, True, True, True, False, False, False, False])
+    assert detector.excess_over_chance(alarm, failed) == 0.5 - 0.25
