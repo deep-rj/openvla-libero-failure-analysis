@@ -121,3 +121,8 @@ episodes within (task, episode outcome).
   episodes, z is 0.73 (0.56 to 0.84).
 - Not yet separated from retry history: a retry's 50-step window can include the previous
   attempt's lift and reopen.
+- First attempts only, split by episode outcome (exploratory, 13 tests): failed first attempts in
+  failed episodes (73) against successful first attempts (266) separate on no motion dim
+  (0.48–0.60, every CI includes 0.5); the gripper is 0.62 (0.52 to 0.73). Failed first attempts
+  in successful episodes number 15, too few to read. The gate's 0.62–0.63 at initiator anchors
+  does not reappear on first attempts; the gate's success units include grasps after misses.
