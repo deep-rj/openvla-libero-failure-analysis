@@ -195,3 +195,11 @@ def subset_mean(values, window: np.ndarray, keep) -> float | None:
     """Mean of `values` over the window steps where `keep` holds; None if there are none."""
     steps = window[np.asarray(keep)[window]]
     return float(np.asarray(values)[steps].mean()) if len(steps) else None
+
+
+def far_mass(probs, k: int) -> np.ndarray:
+    """Per step: probability on bins at least `k` bins from the top bin."""
+    probs = np.asarray(probs)
+    top = probs.argmax(axis=-1)[..., None]
+    far = np.abs(np.arange(probs.shape[-1]) - top) >= k
+    return np.where(far, probs, 0.0).sum(axis=-1)

@@ -166,3 +166,10 @@ def test_window_mean_over_a_subset_skips_units_with_no_qualifying_step():
     window = np.array([0, 1, 2])
     assert gate.subset_mean(values, window, np.array([True, False, True, True])) == 2.0
     assert gate.subset_mean(values, window, np.array([False, False, False, True])) is None
+
+
+def test_far_mass_is_the_probability_at_least_k_bins_from_the_top_bin():
+    probs = np.zeros((2, 30))
+    probs[0, [5, 6, 20]] = [0.6, 0.3, 0.1]
+    probs[1, [5, 14, 15]] = [0.5, 0.2, 0.3]
+    assert gate.far_mass(probs, k=10) == pytest.approx([0.1, 0.3])
