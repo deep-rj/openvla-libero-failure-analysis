@@ -1,0 +1,2789 @@
+{
+  "params": {
+    "threshold_m": 0.003,
+    "horizon": 60,
+    "match_tol": 10
+  },
+  "unmatched": {
+    "failure": 1,
+    "success": 4
+  },
+  "sweep": [
+    {
+      "threshold_m": 0.001,
+      "failure_n": 60,
+      "failure_fired": 14,
+      "failure_delay_median": 37.5,
+      "success_n": 198,
+      "success_fired": 1,
+      "success_delay_median": 49.0
+    },
+    {
+      "threshold_m": 0.002,
+      "failure_n": 60,
+      "failure_fired": 25,
+      "failure_delay_median": 21.0,
+      "success_n": 198,
+      "success_fired": 1,
+      "success_delay_median": 28.0
+    },
+    {
+      "threshold_m": 0.003,
+      "failure_n": 60,
+      "failure_fired": 34,
+      "failure_delay_median": 18.0,
+      "success_n": 198,
+      "success_fired": 1,
+      "success_delay_median": 16.0
+    },
+    {
+      "threshold_m": 0.004,
+      "failure_n": 60,
+      "failure_fired": 37,
+      "failure_delay_median": 19.0,
+      "success_n": 198,
+      "success_fired": 1,
+      "success_delay_median": 13.0
+    },
+    {
+      "threshold_m": 0.005,
+      "failure_n": 60,
+      "failure_fired": 39,
+      "failure_delay_median": 16.0,
+      "success_n": 198,
+      "success_fired": 5,
+      "success_delay_median": 14.0
+    },
+    {
+      "threshold_m": 0.006,
+      "failure_n": 60,
+      "failure_fired": 41,
+      "failure_delay_median": 15.0,
+      "success_n": 198,
+      "success_fired": 23,
+      "success_delay_median": 13.0
+    },
+    {
+      "threshold_m": 0.01,
+      "failure_n": 60,
+      "failure_fired": 41,
+      "failure_delay_median": 12.0,
+      "success_n": 198,
+      "success_fired": 32,
+      "success_delay_median": 11.0
+    },
+    {
+      "threshold_m": 0.015,
+      "failure_n": 60,
+      "failure_fired": 45,
+      "failure_delay_median": 11.0,
+      "success_n": 198,
+      "success_fired": 49,
+      "success_delay_median": 10.0
+    },
+    {
+      "threshold_m": 0.02,
+      "failure_n": 60,
+      "failure_fired": 45,
+      "failure_delay_median": 11.0,
+      "success_n": 198,
+      "success_fired": 70,
+      "success_delay_median": 9.0
+    },
+    {
+      "threshold_m": 0.03,
+      "failure_n": 60,
+      "failure_fired": 48,
+      "failure_delay_median": 9.5,
+      "success_n": 198,
+      "success_fired": 96,
+      "success_delay_median": 8.0
+    }
+  ],
+  "auroc_min_width": {
+    "auroc": 0.7613981762917933,
+    "ci": [
+      0.6285077811244979,
+      0.8840361445783133
+    ]
+  },
+  "narrowest_success": {
+    "akita_black_bowl_1": {
+      "n": 10,
+      "min_m": 0.004334478728579979,
+      "median_m": 0.005759110963549016
+    },
+    "alphabet_soup_1": {
+      "n": 22,
+      "min_m": 0.039362916080628106,
+      "median_m": 0.062399155281478935
+    },
+    "black_book_1": {
+      "n": 17,
+      "min_m": 0.029362327471943336,
+      "median_m": 0.029363504799176866
+    },
+    "butter_1": {
+      "n": 19,
+      "min_m": 0.0009996839664932083,
+      "median_m": 0.03879856256976616
+    },
+    "chocolate_pudding_1": {
+      "n": 15,
+      "min_m": 0.012566309747685724,
+      "median_m": 0.045958888934801566
+    },
+    "cream_cheese_1": {
+      "n": 29,
+      "min_m": 0.01771137200179464,
+      "median_m": 0.042136770972346374
+    },
+    "moka_pot_1": {
+      "n": 21,
+      "min_m": 0.011420290596786457,
+      "median_m": 0.015817471657150625
+    },
+    "moka_pot_2": {
+      "n": 8,
+      "min_m": 0.011702514122735362,
+      "median_m": 0.02165620000700902
+    },
+    "porcelain_mug_1": {
+      "n": 23,
+      "min_m": 0.005668594983297989,
+      "median_m": 0.0057206034388241865
+    },
+    "tomato_sauce_1": {
+      "n": 13,
+      "min_m": 0.037265169191811484,
+      "median_m": 0.06087019212760292
+    },
+    "white_yellow_mug_1": {
+      "n": 21,
+      "min_m": 0.009785281173998982,
+      "median_m": 0.018274879853720886
+    }
+  },
+  "anchors": [
+    {
+      "episode_id": "libero_10-t00-i000-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 72,
+      "command_step": 72,
+      "min_width_m": 0.05955846811164113,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i000-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 232,
+      "command_step": 232,
+      "min_width_m": 0.05435233129977302,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i001-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 68,
+      "command_step": 68,
+      "min_width_m": 0.06282518171935632,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i001-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 280,
+      "command_step": 280,
+      "min_width_m": 0.06087019212760292,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i002-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "failure",
+      "anchor_step": 192,
+      "command_step": 192,
+      "min_width_m": 0.07096634368201322,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i003-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "failure",
+      "anchor_step": 230,
+      "command_step": 226,
+      "min_width_m": 0.0025237882493931874,
+      "delay": 33
+    },
+    {
+      "episode_id": "libero_10-t00-i004-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 159,
+      "command_step": 159,
+      "min_width_m": 0.06294232946202127,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i004-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 314,
+      "command_step": 314,
+      "min_width_m": 0.06297080359462637,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i005-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 67,
+      "command_step": 67,
+      "min_width_m": 0.0628964576887348,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i005-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 204,
+      "command_step": 204,
+      "min_width_m": 0.060782391110257725,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i006-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "failure",
+      "anchor_step": 359,
+      "command_step": 359,
+      "min_width_m": 0.001755977809582575,
+      "delay": 14
+    },
+    {
+      "episode_id": "libero_10-t00-i007-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 59,
+      "command_step": 59,
+      "min_width_m": 0.039362916080628106,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i007-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 182,
+      "command_step": 182,
+      "min_width_m": 0.061731345055653766,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i008-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 69,
+      "command_step": 68,
+      "min_width_m": 0.055344805477635595,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i008-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 209,
+      "command_step": 209,
+      "min_width_m": 0.037265169191811484,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i009-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "failure",
+      "anchor_step": 217,
+      "command_step": 217,
+      "min_width_m": 0.0016884731873929447,
+      "delay": 20
+    },
+    {
+      "episode_id": "libero_10-t00-i010-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "failure",
+      "anchor_step": 296,
+      "command_step": 296,
+      "min_width_m": 0.0009997044905450305,
+      "delay": 14
+    },
+    {
+      "episode_id": "libero_10-t00-i012-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 159,
+      "command_step": 159,
+      "min_width_m": 0.061259981197316564,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i012-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 308,
+      "command_step": 308,
+      "min_width_m": 0.06307878561857402,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i013-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "failure",
+      "anchor_step": 86,
+      "command_step": 86,
+      "min_width_m": 0.0034774266726713124,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i014-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 83,
+      "command_step": 82,
+      "min_width_m": 0.039578653099799216,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i014-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 241,
+      "command_step": 241,
+      "min_width_m": 0.0444847993474039,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i015-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "failure",
+      "anchor_step": 193,
+      "command_step": 193,
+      "min_width_m": 0.001292438312579506,
+      "delay": 35
+    },
+    {
+      "episode_id": "libero_10-t00-i016-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "failure",
+      "anchor_step": 76,
+      "command_step": 76,
+      "min_width_m": 0.002032190393447129,
+      "delay": 14
+    },
+    {
+      "episode_id": "libero_10-t00-i017-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 82,
+      "command_step": 82,
+      "min_width_m": 0.062448872927743634,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i017-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 468,
+      "command_step": 468,
+      "min_width_m": 0.06431032077212057,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i018-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 56,
+      "command_step": 56,
+      "min_width_m": 0.06246172222950508,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i018-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 350,
+      "command_step": 349,
+      "min_width_m": 0.06323203725211037,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i019-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 82,
+      "command_step": 81,
+      "min_width_m": 0.05099601464315742,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i019-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 322,
+      "command_step": 326,
+      "min_width_m": 0.06358760589341032,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i021-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 65,
+      "command_step": 65,
+      "min_width_m": 0.06303819023892288,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i021-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 214,
+      "command_step": 214,
+      "min_width_m": 0.053293155576583415,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i023-s0-none",
+      "task_id": 0,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 78,
+      "command_step": 78,
+      "min_width_m": 0.06303614211826004,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t00-i023-s0-none",
+      "task_id": 0,
+      "object": "tomato_sauce_1",
+      "group": "success",
+      "anchor_step": 214,
+      "command_step": 214,
+      "min_width_m": 0.06056860028591756,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i000-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 70,
+      "command_step": 70,
+      "min_width_m": 0.04204430628936379,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i000-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 208,
+      "command_step": 207,
+      "min_width_m": 0.038844920968350946,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i001-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 78,
+      "command_step": 78,
+      "min_width_m": 0.01771137200179464,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i001-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 221,
+      "command_step": 220,
+      "min_width_m": 0.03879090565180882,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i002-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 56,
+      "command_step": 57,
+      "min_width_m": 0.04207850690896557,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i002-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 197,
+      "command_step": 197,
+      "min_width_m": 0.03879856256976616,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i003-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 83,
+      "command_step": 83,
+      "min_width_m": 0.04221199041628232,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i003-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 223,
+      "command_step": 223,
+      "min_width_m": 0.03877799360297862,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i004-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 63,
+      "command_step": 63,
+      "min_width_m": 0.042050136751184825,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i004-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 186,
+      "command_step": 187,
+      "min_width_m": 0.038807364413055795,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i005-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "failure",
+      "anchor_step": 68,
+      "command_step": 74,
+      "min_width_m": 0.005191931435933951,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i006-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 89,
+      "command_step": 90,
+      "min_width_m": 0.042157910017169994,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i006-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 263,
+      "command_step": 262,
+      "min_width_m": 0.03891847465739007,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i007-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 72,
+      "command_step": 69,
+      "min_width_m": 0.042204140411672114,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i007-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 222,
+      "command_step": 222,
+      "min_width_m": 0.038785115263035116,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i008-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 63,
+      "command_step": 62,
+      "min_width_m": 0.04204737396635003,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i008-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 202,
+      "command_step": 202,
+      "min_width_m": 0.0009996839664932083,
+      "delay": 16
+    },
+    {
+      "episode_id": "libero_10-t01-i009-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 65,
+      "command_step": 65,
+      "min_width_m": 0.042091115304459054,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i009-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 205,
+      "command_step": 205,
+      "min_width_m": 0.03877225551333105,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i010-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "failure",
+      "anchor_step": 160,
+      "command_step": 161,
+      "min_width_m": 0.07349613483356784,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i011-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 67,
+      "command_step": 67,
+      "min_width_m": 0.04220609631707502,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i011-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 241,
+      "command_step": 241,
+      "min_width_m": 0.038797737526022634,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i013-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 68,
+      "command_step": 68,
+      "min_width_m": 0.042090768495546854,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i013-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 224,
+      "command_step": 224,
+      "min_width_m": 0.038869462916272274,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i014-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 76,
+      "command_step": 75,
+      "min_width_m": 0.0422228225708825,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i014-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 194,
+      "command_step": 196,
+      "min_width_m": 0.03878677224512824,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i015-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 61,
+      "command_step": 63,
+      "min_width_m": 0.042045600002602754,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i015-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 250,
+      "command_step": 249,
+      "min_width_m": 0.03880732968396211,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i016-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 64,
+      "command_step": 63,
+      "min_width_m": 0.042136770972346374,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i016-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 207,
+      "command_step": 206,
+      "min_width_m": 0.03880822309566963,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i017-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "failure",
+      "anchor_step": 451,
+      "command_step": 451,
+      "min_width_m": 0.05315097638144381,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i018-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 60,
+      "command_step": 61,
+      "min_width_m": 0.042139003820971,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i018-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 207,
+      "command_step": 209,
+      "min_width_m": 0.038839998606793276,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i019-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 71,
+      "command_step": 70,
+      "min_width_m": 0.04217213499728921,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i019-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 201,
+      "command_step": 200,
+      "min_width_m": 0.03881776078315598,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i020-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 69,
+      "command_step": 69,
+      "min_width_m": 0.04212875910299393,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i020-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 193,
+      "command_step": 193,
+      "min_width_m": 0.03877957843118271,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i021-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 87,
+      "command_step": 86,
+      "min_width_m": 0.042210309315294084,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i021-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 275,
+      "command_step": 274,
+      "min_width_m": 0.03877125969286396,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i023-s0-none",
+      "task_id": 1,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 58,
+      "command_step": 58,
+      "min_width_m": 0.04218440767166664,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t01-i023-s0-none",
+      "task_id": 1,
+      "object": "butter_1",
+      "group": "success",
+      "anchor_step": 193,
+      "command_step": 189,
+      "min_width_m": 0.03942734532411488,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i000-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 221,
+      "command_step": 220,
+      "min_width_m": 0.01406952378710509,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i001-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 224,
+      "command_step": null
+    },
+    {
+      "episode_id": "libero_10-t02-i002-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 193,
+      "command_step": 193,
+      "min_width_m": 0.011743076765391519,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i003-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 237,
+      "command_step": 237,
+      "min_width_m": 0.01153255863373188,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i004-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 249,
+      "command_step": 249,
+      "min_width_m": 0.015561178271880811,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i006-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "failure",
+      "anchor_step": 204,
+      "command_step": 204,
+      "min_width_m": 0.012098411166880188,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i009-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "failure",
+      "anchor_step": 234,
+      "command_step": 234,
+      "min_width_m": 0.023829744997141813,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i010-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 187,
+      "command_step": 187,
+      "min_width_m": 0.011420290596786457,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i011-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 212,
+      "command_step": 211,
+      "min_width_m": 0.015014230124608948,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i012-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 216,
+      "command_step": 215,
+      "min_width_m": 0.014068104576176618,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i015-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 210,
+      "command_step": 210,
+      "min_width_m": 0.021350058452238516,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i016-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "failure",
+      "anchor_step": 219,
+      "command_step": 219,
+      "min_width_m": 0.0009980162715166468,
+      "delay": 14
+    },
+    {
+      "episode_id": "libero_10-t02-i017-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 240,
+      "command_step": 239,
+      "min_width_m": 0.016904401091042125,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i018-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 215,
+      "command_step": 214,
+      "min_width_m": 0.021755409153944666,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i019-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 202,
+      "command_step": 202,
+      "min_width_m": 0.015817471657150625,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i020-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "failure",
+      "anchor_step": 232,
+      "command_step": 227,
+      "min_width_m": 0.002195285196042472,
+      "delay": 14
+    },
+    {
+      "episode_id": "libero_10-t02-i021-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 188,
+      "command_step": 188,
+      "min_width_m": 0.01481446525827029,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i022-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 163,
+      "command_step": 163,
+      "min_width_m": 0.015351410238536395,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t02-i023-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "failure",
+      "anchor_step": 298,
+      "command_step": 298,
+      "min_width_m": 0.00156723805024562,
+      "delay": 50
+    },
+    {
+      "episode_id": "libero_10-t02-i024-s0-none",
+      "task_id": 2,
+      "object": "moka_pot_1",
+      "group": "failure",
+      "anchor_step": 169,
+      "command_step": 169,
+      "min_width_m": 0.012352138379779259,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i001-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "failure",
+      "anchor_step": 81,
+      "command_step": 81,
+      "min_width_m": 0.0022053920353757865,
+      "delay": 28
+    },
+    {
+      "episode_id": "libero_10-t03-i002-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "failure",
+      "anchor_step": 396,
+      "command_step": 396,
+      "min_width_m": 0.0035547187540868608,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i003-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "success",
+      "anchor_step": 87,
+      "command_step": 87,
+      "min_width_m": 0.005734955564400159,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i004-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "success",
+      "anchor_step": 209,
+      "command_step": 209,
+      "min_width_m": 0.008188130008150425,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i005-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "success",
+      "anchor_step": 87,
+      "command_step": 86,
+      "min_width_m": 0.004642393484284239,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i006-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "failure",
+      "anchor_step": 114,
+      "command_step": 114,
+      "min_width_m": 0.02069097006094838,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i007-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "success",
+      "anchor_step": 77,
+      "command_step": 77,
+      "min_width_m": 0.010372664223581917,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i009-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "failure",
+      "anchor_step": 84,
+      "command_step": 83,
+      "min_width_m": 0.0017891409655062661,
+      "delay": 39
+    },
+    {
+      "episode_id": "libero_10-t03-i010-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "success",
+      "anchor_step": 94,
+      "command_step": 87,
+      "min_width_m": 0.006553293946704589,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i012-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "success",
+      "anchor_step": 79,
+      "command_step": 72,
+      "min_width_m": 0.005783266362697874,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i013-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "failure",
+      "anchor_step": 86,
+      "command_step": 86,
+      "min_width_m": 0.003553928997138945,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i014-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "success",
+      "anchor_step": 91,
+      "command_step": 91,
+      "min_width_m": 0.004753966377232001,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i017-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "success",
+      "anchor_step": 86,
+      "command_step": 84,
+      "min_width_m": 0.004334478728579979,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i019-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "success",
+      "anchor_step": 77,
+      "command_step": 77,
+      "min_width_m": 0.004756419453868799,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i020-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "failure",
+      "anchor_step": 75,
+      "command_step": 75,
+      "min_width_m": 0.0024442789940965874,
+      "delay": 59
+    },
+    {
+      "episode_id": "libero_10-t03-i021-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "failure",
+      "anchor_step": 85,
+      "command_step": 85,
+      "min_width_m": 0.004669713594990971,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i022-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "failure",
+      "anchor_step": 81,
+      "command_step": 81,
+      "min_width_m": 0.0009978107127107778,
+      "delay": 34
+    },
+    {
+      "episode_id": "libero_10-t03-i023-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "failure",
+      "anchor_step": 73,
+      "command_step": 73,
+      "min_width_m": 0.011232011905134892,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t03-i024-s0-none",
+      "task_id": 3,
+      "object": "akita_black_bowl_1",
+      "group": "success",
+      "anchor_step": 88,
+      "command_step": 87,
+      "min_width_m": 0.009388791278607297,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i002-s0-none",
+      "task_id": 4,
+      "object": "porcelain_mug_1",
+      "group": "failure",
+      "anchor_step": 44,
+      "command_step": 44,
+      "min_width_m": 0.0009994758757179449,
+      "delay": 35
+    },
+    {
+      "episode_id": "libero_10-t04-i005-s0-none",
+      "task_id": 4,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 101,
+      "command_step": 101,
+      "min_width_m": 0.0057206034388241865,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i005-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 310,
+      "command_step": 309,
+      "min_width_m": 0.010662537337809419,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i006-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "failure",
+      "anchor_step": 234,
+      "command_step": 234,
+      "min_width_m": 0.0009974908445665258,
+      "delay": 14
+    },
+    {
+      "episode_id": "libero_10-t04-i009-s0-none",
+      "task_id": 4,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 77,
+      "command_step": 77,
+      "min_width_m": 0.0057027144848650554,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i009-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 219,
+      "command_step": 219,
+      "min_width_m": 0.010761130034654703,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i010-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "failure",
+      "anchor_step": 245,
+      "command_step": 245,
+      "min_width_m": 0.0009994143246612908,
+      "delay": 16
+    },
+    {
+      "episode_id": "libero_10-t04-i011-s0-none",
+      "task_id": 4,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 51,
+      "command_step": 51,
+      "min_width_m": 0.019172531681325364,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i011-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 185,
+      "command_step": 185,
+      "min_width_m": 0.010784514817471322,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i012-s0-none",
+      "task_id": 4,
+      "object": "porcelain_mug_1",
+      "group": "failure",
+      "anchor_step": 38,
+      "command_step": 38,
+      "min_width_m": 0.0009975487371283003,
+      "delay": 18
+    },
+    {
+      "episode_id": "libero_10-t04-i013-s0-none",
+      "task_id": 4,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 41,
+      "command_step": 41,
+      "min_width_m": 0.005743590398035196,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i013-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 172,
+      "command_step": 174,
+      "min_width_m": 0.009904671412658064,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i014-s0-none",
+      "task_id": 4,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 46,
+      "command_step": 46,
+      "min_width_m": 0.005704850004935983,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i014-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 188,
+      "command_step": 188,
+      "min_width_m": 0.0106944953597452,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i015-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "failure",
+      "anchor_step": 275,
+      "command_step": 274,
+      "min_width_m": 0.0009994741552093373,
+      "delay": 16
+    },
+    {
+      "episode_id": "libero_10-t04-i016-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "failure",
+      "anchor_step": 213,
+      "command_step": 212,
+      "min_width_m": 0.0009996953783830745,
+      "delay": 16
+    },
+    {
+      "episode_id": "libero_10-t04-i018-s0-none",
+      "task_id": 4,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 74,
+      "command_step": 70,
+      "min_width_m": 0.005749941256883831,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i018-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 186,
+      "command_step": 186,
+      "min_width_m": 0.010482679792320586,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i019-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "failure",
+      "anchor_step": 200,
+      "command_step": 208,
+      "min_width_m": 0.002178362806031749,
+      "delay": 38
+    },
+    {
+      "episode_id": "libero_10-t04-i020-s0-none",
+      "task_id": 4,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 69,
+      "command_step": 64,
+      "min_width_m": 0.005708586626794936,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i020-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 205,
+      "command_step": 205,
+      "min_width_m": 0.009785281173998982,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i024-s0-none",
+      "task_id": 4,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 94,
+      "command_step": 94,
+      "min_width_m": 0.02137608216731253,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t04-i024-s0-none",
+      "task_id": 4,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 253,
+      "command_step": 253,
+      "min_width_m": 0.010527053712991351,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i000-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 73,
+      "command_step": 73,
+      "min_width_m": 0.029362530004694277,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i001-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 84,
+      "command_step": 82,
+      "min_width_m": 0.029362373960345738,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i003-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 64,
+      "command_step": 64,
+      "min_width_m": 0.0300911443985908,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i004-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 74,
+      "command_step": 76,
+      "min_width_m": 0.029363504799176866,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i005-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 67,
+      "command_step": 67,
+      "min_width_m": 0.02936262414862957,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i006-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 61,
+      "command_step": 61,
+      "min_width_m": 0.029362623262033517,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i007-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 61,
+      "command_step": 61,
+      "min_width_m": 0.029366538338267814,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i008-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 67,
+      "command_step": 67,
+      "min_width_m": 0.029362413423074416,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i012-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 58,
+      "command_step": 58,
+      "min_width_m": 0.02936393699060038,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i013-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 73,
+      "command_step": 73,
+      "min_width_m": 0.030244963707902802,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i014-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 78,
+      "command_step": 78,
+      "min_width_m": 0.029365012697984576,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i015-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 54,
+      "command_step": 54,
+      "min_width_m": 0.03020271956812256,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i016-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 73,
+      "command_step": 73,
+      "min_width_m": 0.029671753366898406,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i017-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 70,
+      "command_step": 70,
+      "min_width_m": 0.029362327471943336,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i021-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 73,
+      "command_step": 73,
+      "min_width_m": 0.029362811119086882,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i023-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 73,
+      "command_step": 73,
+      "min_width_m": 0.029362477315260406,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t05-i024-s0-none",
+      "task_id": 5,
+      "object": "black_book_1",
+      "group": "success",
+      "anchor_step": 73,
+      "command_step": 73,
+      "min_width_m": 0.029365085938177705,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i001-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 62,
+      "command_step": 61,
+      "min_width_m": 0.005724472988985642,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i001-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 188,
+      "command_step": 188,
+      "min_width_m": 0.04590824495220748,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i003-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 48,
+      "command_step": 48,
+      "min_width_m": 0.005702599263496269,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i003-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 213,
+      "command_step": 212,
+      "min_width_m": 0.046379283479836636,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i004-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 43,
+      "command_step": 43,
+      "min_width_m": 0.016914418503028952,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i004-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 173,
+      "command_step": 172,
+      "min_width_m": 0.046037838985332216,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i005-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 60,
+      "command_step": 60,
+      "min_width_m": 0.005668594983297989,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i005-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 249,
+      "command_step": 249,
+      "min_width_m": 0.04641694393358289,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i007-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 52,
+      "command_step": 52,
+      "min_width_m": 0.00570244357999047,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i007-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 203,
+      "command_step": 203,
+      "min_width_m": 0.045875726198077754,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i008-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 48,
+      "command_step": 48,
+      "min_width_m": 0.006878924085929738,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i008-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 219,
+      "command_step": 219,
+      "min_width_m": 0.045958888934801566,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i009-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 60,
+      "command_step": 59,
+      "min_width_m": 0.00570476141458902,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i009-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 190,
+      "command_step": 190,
+      "min_width_m": 0.012566309747685724,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i010-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 64,
+      "command_step": 64,
+      "min_width_m": 0.006360781609684398,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i010-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 331,
+      "command_step": 329,
+      "min_width_m": 0.04581947776718703,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i012-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "failure",
+      "anchor_step": 228,
+      "command_step": 227,
+      "min_width_m": 0.001016103537882282,
+      "delay": 16
+    },
+    {
+      "episode_id": "libero_10-t06-i014-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "failure",
+      "anchor_step": 194,
+      "command_step": 193,
+      "min_width_m": 0.000997058470769219,
+      "delay": 14
+    },
+    {
+      "episode_id": "libero_10-t06-i015-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 70,
+      "command_step": 70,
+      "min_width_m": 0.0057217493812807664,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i015-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 244,
+      "command_step": 243,
+      "min_width_m": 0.04661459224566287,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i016-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "failure",
+      "anchor_step": 199,
+      "command_step": 199,
+      "min_width_m": 0.0009974422109061507,
+      "delay": 14
+    },
+    {
+      "episode_id": "libero_10-t06-i017-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 47,
+      "command_step": 47,
+      "min_width_m": 0.0057203673977036015,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i017-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 196,
+      "command_step": 196,
+      "min_width_m": 0.04582660158174408,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i018-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 67,
+      "command_step": 60,
+      "min_width_m": 0.008149761389174167,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i018-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 267,
+      "command_step": 268,
+      "min_width_m": 0.04713419910716811,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i019-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 54,
+      "command_step": 54,
+      "min_width_m": 0.005703110009579797,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i019-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 217,
+      "command_step": 217,
+      "min_width_m": 0.04604376159681532,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i021-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "failure",
+      "anchor_step": 88,
+      "command_step": 88,
+      "min_width_m": 0.0009976069254819182,
+      "delay": 14
+    },
+    {
+      "episode_id": "libero_10-t06-i022-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 54,
+      "command_step": 54,
+      "min_width_m": 0.007012667314940285,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i022-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 180,
+      "command_step": 180,
+      "min_width_m": 0.045882976936175046,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i023-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 58,
+      "command_step": 57,
+      "min_width_m": 0.0056790165371203155,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i023-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 199,
+      "command_step": 198,
+      "min_width_m": 0.046656649739634896,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i024-s0-none",
+      "task_id": 6,
+      "object": "porcelain_mug_1",
+      "group": "success",
+      "anchor_step": 59,
+      "command_step": 59,
+      "min_width_m": 0.005705315307902673,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t06-i024-s0-none",
+      "task_id": 6,
+      "object": "chocolate_pudding_1",
+      "group": "success",
+      "anchor_step": 207,
+      "command_step": 207,
+      "min_width_m": 0.04589379937937946,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i000-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "failure",
+      "anchor_step": 83,
+      "command_step": 83,
+      "min_width_m": 0.0013712022114481456,
+      "delay": 38
+    },
+    {
+      "episode_id": "libero_10-t07-i001-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "failure",
+      "anchor_step": 196,
+      "command_step": 196,
+      "min_width_m": 0.002344550221202538,
+      "delay": 56
+    },
+    {
+      "episode_id": "libero_10-t07-i002-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "failure",
+      "anchor_step": 181,
+      "command_step": 180,
+      "min_width_m": 0.054826376896988,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i003-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 59,
+      "command_step": 59,
+      "min_width_m": 0.0585930027028169,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i003-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 191,
+      "command_step": 191,
+      "min_width_m": 0.04225717800321826,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i006-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 62,
+      "command_step": 61,
+      "min_width_m": 0.06309159785674529,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i006-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 202,
+      "command_step": 202,
+      "min_width_m": 0.042188798951748686,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i008-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "failure",
+      "anchor_step": 68,
+      "command_step": 67,
+      "min_width_m": 0.0011294527612574503,
+      "delay": 20
+    },
+    {
+      "episode_id": "libero_10-t07-i009-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 70,
+      "command_step": 69,
+      "min_width_m": 0.058956086135598836,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i009-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 273,
+      "command_step": 273,
+      "min_width_m": 0.042684471876871806,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i010-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 66,
+      "command_step": 66,
+      "min_width_m": 0.06337925278566509,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i010-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 181,
+      "command_step": 179,
+      "min_width_m": 0.04204865147178396,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i011-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 281,
+      "command_step": 280,
+      "min_width_m": 0.05509949678237573,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i011-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 409,
+      "command_step": 412,
+      "min_width_m": 0.04206997939151472,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i013-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "failure",
+      "anchor_step": 52,
+      "command_step": 52,
+      "min_width_m": 0.0014109340433037555,
+      "delay": 16
+    },
+    {
+      "episode_id": "libero_10-t07-i014-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 70,
+      "command_step": 69,
+      "min_width_m": 0.0637979915018728,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i014-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 210,
+      "command_step": 210,
+      "min_width_m": 0.041791005968533954,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i015-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 58,
+      "command_step": 58,
+      "min_width_m": 0.05870651462544098,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i015-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 164,
+      "command_step": 164,
+      "min_width_m": 0.04204845938583773,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i017-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 51,
+      "command_step": null
+    },
+    {
+      "episode_id": "libero_10-t07-i017-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 378,
+      "command_step": 377,
+      "min_width_m": 0.04278623291326915,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i018-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "failure",
+      "anchor_step": 191,
+      "command_step": 198,
+      "min_width_m": 0.054987505638491134,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i019-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "failure",
+      "anchor_step": 66,
+      "command_step": 66,
+      "min_width_m": 0.05252865793463361,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i020-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "failure",
+      "anchor_step": 179,
+      "command_step": 179,
+      "min_width_m": 0.0011562607782747605,
+      "delay": 15
+    },
+    {
+      "episode_id": "libero_10-t07-i021-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "failure",
+      "anchor_step": 232,
+      "command_step": 232,
+      "min_width_m": 0.0009996524275729187,
+      "delay": 14
+    },
+    {
+      "episode_id": "libero_10-t07-i022-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 72,
+      "command_step": 72,
+      "min_width_m": 0.062349437635214236,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i022-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 220,
+      "command_step": 220,
+      "min_width_m": 0.04249171998640938,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i023-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "failure",
+      "anchor_step": 189,
+      "command_step": 189,
+      "min_width_m": 0.0025853022902456745,
+      "delay": 42
+    },
+    {
+      "episode_id": "libero_10-t07-i024-s0-none",
+      "task_id": 7,
+      "object": "alphabet_soup_1",
+      "group": "success",
+      "anchor_step": 122,
+      "command_step": 125,
+      "min_width_m": 0.0637799658475674,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t07-i024-s0-none",
+      "task_id": 7,
+      "object": "cream_cheese_1",
+      "group": "success",
+      "anchor_step": 254,
+      "command_step": 253,
+      "min_width_m": 0.041907140496640544,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i000-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 413,
+      "command_step": 413,
+      "min_width_m": 0.021273212703934022,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i000-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "success",
+      "anchor_step": 136,
+      "command_step": 135,
+      "min_width_m": 0.05422531925204594,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i002-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "failure",
+      "anchor_step": 426,
+      "command_step": 435,
+      "min_width_m": 0.005329825829245518,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i003-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "failure",
+      "anchor_step": 442,
+      "command_step": 445,
+      "min_width_m": 0.06522800869237826,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i006-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "failure",
+      "anchor_step": 118,
+      "command_step": 118,
+      "min_width_m": 0.032282195909432265,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i007-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "failure",
+      "anchor_step": 273,
+      "command_step": 273,
+      "min_width_m": 0.002182504075768179,
+      "delay": 52
+    },
+    {
+      "episode_id": "libero_10-t08-i008-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "failure",
+      "anchor_step": 129,
+      "command_step": 129,
+      "min_width_m": 0.004408470277015069,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i009-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "failure",
+      "anchor_step": 249,
+      "command_step": 249,
+      "min_width_m": 0.0009996983502111403,
+      "delay": 18
+    },
+    {
+      "episode_id": "libero_10-t08-i010-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "failure",
+      "anchor_step": 101,
+      "command_step": 101,
+      "min_width_m": 0.035375589933100235,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i011-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 359,
+      "command_step": 359,
+      "min_width_m": 0.021322919768372608,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i011-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "success",
+      "anchor_step": 194,
+      "command_step": 194,
+      "min_width_m": 0.013983009067539902,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i012-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 341,
+      "command_step": 341,
+      "min_width_m": 0.02167549825135322,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i012-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "success",
+      "anchor_step": 112,
+      "command_step": 112,
+      "min_width_m": 0.06237814569663207,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i013-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "failure",
+      "anchor_step": 145,
+      "command_step": 144,
+      "min_width_m": 0.0443300342139826,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i014-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 395,
+      "command_step": 394,
+      "min_width_m": 0.02343512035309335,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i014-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "success",
+      "anchor_step": 112,
+      "command_step": 111,
+      "min_width_m": 0.021175708258945793,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i015-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "failure",
+      "anchor_step": 239,
+      "command_step": 239,
+      "min_width_m": 0.023467661740954385,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i016-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 304,
+      "command_step": 304,
+      "min_width_m": 0.022497036173723107,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i016-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "success",
+      "anchor_step": 119,
+      "command_step": 116,
+      "min_width_m": 0.021686733821439826,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i017-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 334,
+      "command_step": 333,
+      "min_width_m": 0.01406156700083172,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i017-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "success",
+      "anchor_step": 121,
+      "command_step": 121,
+      "min_width_m": 0.021625666192578212,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i020-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 384,
+      "command_step": 381,
+      "min_width_m": 0.021567110741523794,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i020-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "success",
+      "anchor_step": 163,
+      "command_step": 163,
+      "min_width_m": 0.03895940665422563,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i021-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "failure",
+      "anchor_step": 132,
+      "command_step": 132,
+      "min_width_m": 0.010289075282756882,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i022-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_1",
+      "group": "success",
+      "anchor_step": 322,
+      "command_step": 328,
+      "min_width_m": 0.047039275670765185,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t08-i022-s0-none",
+      "task_id": 8,
+      "object": "moka_pot_2",
+      "group": "success",
+      "anchor_step": 145,
+      "command_step": 140,
+      "min_width_m": 0.011702514122735362,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i000-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 97,
+      "command_step": 97,
+      "min_width_m": 0.018266833920704724,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i002-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 128,
+      "command_step": null
+    },
+    {
+      "episode_id": "libero_10-t09-i003-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 157,
+      "command_step": 157,
+      "min_width_m": 0.01869728367065748,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i004-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 103,
+      "command_step": 98,
+      "min_width_m": 0.018572544030622147,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i005-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "failure",
+      "anchor_step": 125,
+      "command_step": null
+    },
+    {
+      "episode_id": "libero_10-t09-i006-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 88,
+      "command_step": 87,
+      "min_width_m": 0.018490736998747516,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i008-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 106,
+      "command_step": 106,
+      "min_width_m": 0.01891592006207559,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i009-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 122,
+      "command_step": 122,
+      "min_width_m": 0.01853950660841147,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i010-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 122,
+      "command_step": 121,
+      "min_width_m": 0.018274879853720886,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i012-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 117,
+      "command_step": 117,
+      "min_width_m": 0.01841205683911691,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i014-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "failure",
+      "anchor_step": 389,
+      "command_step": 391,
+      "min_width_m": 0.07461170730923487,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i016-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 91,
+      "command_step": 90,
+      "min_width_m": 0.01841034194570714,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i017-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 92,
+      "command_step": 92,
+      "min_width_m": 0.01569820133538545,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i018-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 128,
+      "command_step": 127,
+      "min_width_m": 0.01838339253039169,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i019-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "failure",
+      "anchor_step": 106,
+      "command_step": 106,
+      "min_width_m": 0.0019369082875127439,
+      "delay": 32
+    },
+    {
+      "episode_id": "libero_10-t09-i021-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 182,
+      "command_step": 181,
+      "min_width_m": 0.018866253269623382,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i022-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "failure",
+      "anchor_step": 271,
+      "command_step": 272,
+      "min_width_m": 0.06754133460508405,
+      "delay": null
+    },
+    {
+      "episode_id": "libero_10-t09-i023-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 117,
+      "command_step": null
+    },
+    {
+      "episode_id": "libero_10-t09-i024-s0-none",
+      "task_id": 9,
+      "object": "white_yellow_mug_1",
+      "group": "success",
+      "anchor_step": 165,
+      "command_step": 165,
+      "min_width_m": 0.01837443477796619,
+      "delay": null
+    }
+  ]
+}
