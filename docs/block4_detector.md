@@ -44,19 +44,37 @@ before init states 25–49 are run, and is evaluated on them once.
   the episode recovers) against successful. Retries are predicted by the attempt count alone
   (AUROC 0.83), a consequence of the first failure rather than a forecast of it, so they are out
   of scope.
-- **Features: v1 gripper exp(H) alone; v2 adds stop-filtered roll exp(H).** The only first-attempt
-  signals (gripper 0.62; roll 0.60, the gate's strongest). Two features at most for 88 failed
-  first attempts. v1 is the primary claim, v2 secondary. Each is a window mean and a threshold;
-  time-series features (trend, peak) are a later v3, tried only if v1 shows signal, with
-  cross-validation since they fit weights.
-- **Window: the best of a declared grid on the baseline 250**, frozen with the detector. The test
-  set gives the unbiased estimate.
-- **Metrics:** same-task AUROC for signal; failures caught and lead time at a fixed false-alarm
-  rate on successful first attempts for the deployable alarm.
-- **Success on init states 25–49:** the v1 AUROC CI excludes 0.5, and detector OR width
-  baseline catches more failed first attempts than the width baseline alone at the same total
-  false-alarm rate. With about 80–90 failed first attempts expected, a true AUROC of 0.62 is
-  confirmed with roughly 60–80% probability.
+- **Features: v1 gripper exp(H) alone (primary); v2 adds stop-filtered roll exp(H)
+  (secondary).** The only first-attempt signals (gripper 0.62; roll 0.63, nearly uncorrelated
+  with it, r 0.13). v1 is a window mean; v2 is the mean of the two features' percentile ranks
+  against successful development first attempts, so neither feature's scale dominates and
+  nothing is fitted. Shape features (trend, peak, spread, last steps) were tried and dropped:
+  correlated 0.78–0.89 with the mean, no gain in combination (0.59–0.61).
+- **Windows: the best of a declared grid on the baseline 250**: gripper 30 steps, roll 100.
+- **Alarm: above the threshold that lets 20% of successful development first attempts alarm.**
+- **Metrics:** same-task AUROC; failures caught, false alarms and excess over chance (catch rate
+  minus false-alarm rate: what a random alarm firing as often would not catch), with 95% CIs.
+  The width baseline is context: every detector catch is earlier than width (median 18 steps on
+  shared catches) since width fires only once the fingers have closed.
+- **Success on init states 25–49:** for v1, the AUROC CI excludes 0.5 and the excess-over-chance
+  CI excludes 0. v2 is reported the same way as a secondary result. With about 80–90 failed
+  first attempts expected, a true AUROC of 0.62 is confirmed with roughly 60–80% probability.
+
+## Frozen detector
+
+`docs/results/baseline/block4/frozen_detector.json` (`scripts/block4_detector.py freeze`), from
+88 failed and 266 successful development first attempts: v1 alarms above gripper exp(H) 1.0203,
+v2 above a mean rank of 0.698. In-sample on development (`dev_eval/`): v1 catches 28 of 88 at
+53 of 266 false alarms against 17.5 for a random alarm (AUROC 0.62); v2 catches 28 (AUROC 0.65).
+
+Held-out run, init states 25–49 (250 episodes; about 500 pod-minutes, about $6 at
+$0.025/episode, sharded as in `docs/block1_pod_checklist.md`):
+
+```bash
+python scripts/run_eval.py --policy openvla --tasks 0:10 --init-states 25:50 --out outputs/heldout
+python scripts/merge_runs.py <shard>... --out outputs/heldout --tasks 0:10 --init-states 25:50
+bash scripts/block4_heldout_eval.sh outputs/heldout
+```
 
 ## Exploration log
 
