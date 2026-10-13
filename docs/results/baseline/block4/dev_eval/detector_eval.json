@@ -1,0 +1,49 @@
+{
+  "n_failure": 88,
+  "n_success": 266,
+  "frozen": "docs/results/baseline/block4/frozen_detector.json",
+  "width": {
+    "caught": 37,
+    "false_alarms": 3
+  },
+  "v1": {
+    "auroc": 0.6191607284243864,
+    "auroc_ci": [
+      0.5492817309676786,
+      0.6892033672651868
+    ],
+    "caught": 28,
+    "false_alarms": 53,
+    "false_alarm_rate": 0.19924812030075187,
+    "random_alarm_expected": 17.533834586466163,
+    "excess_over_chance": 0.11893369788106631,
+    "excess_ci": [
+      0.019587985170046257,
+      0.21602684100723074
+    ],
+    "width_also_catches": 13,
+    "width_delay_median": 18.0,
+    "width_never_catches": 15,
+    "passes": true
+  },
+  "v2": {
+    "auroc": 0.6547901821060966,
+    "auroc_ci": [
+      0.585361932397459,
+      0.7237173945345743
+    ],
+    "caught": 28,
+    "false_alarms": 53,
+    "false_alarm_rate": 0.19924812030075187,
+    "random_alarm_expected": 17.533834586466163,
+    "excess_over_chance": 0.11893369788106631,
+    "excess_ci": [
+      0.017790009455529117,
+      0.22026492188623184
+    ],
+    "width_also_catches": 16,
+    "width_delay_median": 18.0,
+    "width_never_catches": 12,
+    "passes": true
+  }
+}
