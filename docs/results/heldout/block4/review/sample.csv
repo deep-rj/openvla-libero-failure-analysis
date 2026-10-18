@@ -1,0 +1,16 @@
+stratum,episode,task,object,label,episode_success,command_step,end_step,v1
+caught,t00-i035,0,tomato_sauce_1,failure,0,209,260,1.0465
+caught,t01-i041,1,cream_cheese_1,failure,0,73,78,1.0224
+caught,t02-i031,2,moka_pot_1,failure,0,264,288,1.0955
+caught,t07-i034,7,alphabet_soup_1,failure,0,63,70,1.0313
+caught,t08-i049,8,moka_pot_1,failure,0,374,530,1.0687
+missed,t00-i031,0,tomato_sauce_1,failure,1,199,258,1.0002
+missed,t02-i034,2,moka_pot_1,failure,0,185,199,1.0001
+missed,t07-i026,7,alphabet_soup_1,failure,0,130,382,1.0000
+missed,t08-i031,8,moka_pot_1,failure,0,316,530,1.0009
+missed,t09-i029,9,white_yellow_mug_1,failure,0,377,530,1.0000
+false_alarm,t01-i045,1,butter_1,success,1,191,250,1.0220
+false_alarm,t04-i046,4,porcelain_mug_1,success,1,56,131,1.0337
+false_alarm,t06-i047,6,chocolate_pudding_1,success,1,226,265,1.0331
+false_alarm,t07-i037,7,cream_cheese_1,success,1,216,274,1.0864
+false_alarm,t08-i044,8,moka_pot_2,success,0,154,312,1.0484

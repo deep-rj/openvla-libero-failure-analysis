@@ -1,0 +1,130 @@
+{
+  "rule": {
+    "empty_m": 0.003,
+    "open_m": 0.066,
+    "still_m": 0.001,
+    "min_settled": 30,
+    "max_rise_m": 0.02
+  },
+  "stalls": [
+    {
+      "episode": "t02-i026",
+      "object": "moka_pot_1",
+      "alarm": false,
+      "settled_steps": 297,
+      "settled_width_m": 0.015447320788685017,
+      "rise_m": 0.0007013867798711937,
+      "object_dist_m": 0.08089535261971008
+    },
+    {
+      "episode": "t03-i028",
+      "object": "akita_black_bowl_1",
+      "alarm": false,
+      "settled_steps": 440,
+      "settled_width_m": 0.004810741101330999,
+      "rise_m": 0.003825898388374549,
+      "object_dist_m": 0.06005160462761025
+    },
+    {
+      "episode": "t06-i039",
+      "object": "chocolate_pudding_1",
+      "alarm": false,
+      "settled_steps": 342,
+      "settled_width_m": 0.04619544983885672,
+      "rise_m": 0.008730472186425364,
+      "object_dist_m": 0.0414807870318258
+    },
+    {
+      "episode": "t06-i040",
+      "object": "chocolate_pudding_1",
+      "alarm": true,
+      "settled_steps": 287,
+      "settled_width_m": 0.04583855806637745,
+      "rise_m": 0.0026783228121214364,
+      "object_dist_m": 0.018759753508459646
+    },
+    {
+      "episode": "t08-i031",
+      "object": "moka_pot_1",
+      "alarm": false,
+      "settled_steps": 203,
+      "settled_width_m": 0.0220608774283879,
+      "rise_m": 0.007223242889522585,
+      "object_dist_m": 0.07213795781035386
+    },
+    {
+      "episode": "t08-i032",
+      "object": "moka_pot_2",
+      "alarm": false,
+      "settled_steps": 414,
+      "settled_width_m": 0.014075972931326165,
+      "rise_m": 0.013478568048271744,
+      "object_dist_m": 0.08675288390214388
+    },
+    {
+      "episode": "t08-i040",
+      "object": "moka_pot_1",
+      "alarm": false,
+      "settled_steps": 105,
+      "settled_width_m": 0.06543196503751669,
+      "rise_m": 0.004159511668370919,
+      "object_dist_m": 0.05768376438274682
+    },
+    {
+      "episode": "t08-i043",
+      "object": "moka_pot_2",
+      "alarm": true,
+      "settled_steps": 370,
+      "settled_width_m": 0.025501339052798874,
+      "rise_m": 0.004176163662313215,
+      "object_dist_m": 0.08304963950356228
+    },
+    {
+      "episode": "t09-i029",
+      "object": "white_yellow_mug_1",
+      "alarm": false,
+      "settled_steps": 137,
+      "settled_width_m": 0.01863619570248264,
+      "rise_m": 0.0017645346469846723,
+      "object_dist_m": 0.08468044367767931
+    }
+  ],
+  "as_frozen": {
+    "n_failure": 110,
+    "n_success": 237,
+    "auroc": 0.5579050097592713,
+    "auroc_ci": [
+      0.48822381672274257,
+      0.6291126717062226
+    ],
+    "caught": 32,
+    "false_alarms": 42,
+    "excess_over_chance": 0.11369390103567317,
+    "excess_ci": [
+      0.021872529570819393,
+      0.2083865419468688
+    ],
+    "passes": false
+  },
+  "stalls_excluded": {
+    "n_failure": 101,
+    "n_success": 237,
+    "auroc": 0.5566901408450704,
+    "auroc_ci": [
+      0.4837811840983533,
+      0.6299374902632808
+    ],
+    "caught": 30,
+    "false_alarms": 42,
+    "excess_over_chance": 0.1198145130968793,
+    "excess_ci": [
+      0.016680344684272087,
+      0.2189600014647006
+    ],
+    "passes": false
+  },
+  "git": {
+    "sha": "a42b47d764243c1a812259fbaf6ed056a9b9574e",
+    "dirty": false
+  }
+}
