@@ -1,4 +1,4 @@
-"""Block 4 reference baseline on the baseline run: an empty close read from finger width alone.
+"""Detector reference baseline on the baseline run: an empty close read from finger width alone.
 
 At each closing gate anchor, the policy's close command nearest the anchor is the trigger; the
 baseline fires at the first step of that attempt, which ends when the fingers reopen, whose finger
@@ -107,7 +107,7 @@ def render(results: dict, params: detector.WidthBaseline, sha: str) -> str:
     r = results["unmatched"]
     a = results["auroc_min_width"]
     lines = [
-        "# Width baseline (Block 4 reference)",
+        "# Width baseline (detector reference)",
         "",
         f"Trigger: the close command nearest each closing gate anchor (within "
         f"{params.match_tol} steps). Fires at the first step of the attempt with finger width "

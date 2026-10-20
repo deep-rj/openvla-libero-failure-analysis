@@ -1,9 +1,9 @@
 # Labeling protocol
 
 Status: frozen for the held-out labels. The coding rules were revised on the 20 pilot labels,
-frozen at git tag `block2-freeze`, and amended once by the classifier rule session, frozen
-at `block2-classifier-freeze` (see "Freeze"). Any later change is logged as a decision, and the
-gate and Block 4 are re-run. The agent does not label.
+frozen at git tag `labeling-rules-freeze`, and amended once by the classifier rule session, frozen
+at `mechanism-classifier-freeze` (see "Freeze"). Any later change is logged as a decision, and the
+gate and detector are re-run. Hand labels are written by a person only.
 
 ## Independence from model outputs (hard rule)
 
@@ -28,7 +28,7 @@ world-state fields of a trace.
 failures round-robin across tasks with `random.Random(seed)`; fewer than 20 failures means all
 of them. It writes `labeling/label_selection.json` and an empty `labeling/labels_template.csv`,
 and never overwrites an existing label file. The pilot labels are the development set for the
-coding rules; agreement is measured on the remaining ~30 of Block 2's ~50.
+coding rules; agreement is measured on the remaining ~30 of the ~50 hand labels.
 
 This seed is the draw's own and has no relation to the run seed.
 
@@ -201,7 +201,7 @@ Categories (frozen after the pilot):
 | `control: grasp` | right intent, failed execution, from heading for the object until it is lifted and held (computed `phase` none) |
 | `control: transport` | from lift-off until the descent toward the target starts, including contact while moving into a receptacle (the microwave edge) (`phase` grasped) |
 | `control: place` | from the descent toward the target through release until the object settles (`phase` carried) |
-| `external` | a disturbance the policy did not cause (physics, a Block 3 perturbation); expected 0 on the baseline |
+| `external` | a disturbance the policy did not cause (physics, an injected perturbation); expected 0 on the baseline |
 | `inaction` | the arm stops for good with no unrecovered error before it: `stalled` runs to the cap, ignoring moves of up to 1 s inside it. Onset: the start of that stall (10 if it starts at the first policy step) |
 
 `perception` is not split by phase until a non-grasp case appears. Failing to recover after the
@@ -337,7 +337,7 @@ re-passed when a change affects them.
   - Known gaps, documented rather than ruled: no perception test for fixtures (no fixture error
     in the pilot); grasp-error onsets sit at the start, middle or bottom of the descent
     (`t00-i024` 15, `t08-i010` 80, `t08-i006` 110), a known source of onset spread.
-- Classifier rule session (2026-10-09), amending the `block2-freeze` rules while held-out
+- Classifier rule session (2026-10-09), amending the `labeling-rules-freeze` rules while held-out
   labeling is paused; held-out labels written before it are re-passed against it:
   - The grasp target is any part of the target object, not the part meant to be grasped.
     Successes grasp the porcelain mug by its wall (tasks 4, 6) and the white-yellow mug by
@@ -496,7 +496,7 @@ scored against the held-out labels. Rules approved so far:
 
 ## Freeze
 
-Rules, tags and detector definitions are frozen at git tag `block2-freeze` for the held-out
+Rules, tags and detector definitions are frozen at git tag `labeling-rules-freeze` for the held-out
 labels. Threshold sensitivity on the pilot 20 (each threshold at x0.5 and x1.5, all 120
 failures recomputed): the defaults agree with every pilot hand check. Three sit where either
 direction flips a pilot value and were confirmed as they are: `collision_disturbance` distance
@@ -506,7 +506,7 @@ margin on one side.
 The classifier rule session (see "Rule changes") amended the hand-labeling rules: grasp target,
 between the fingers at pad height through the close, `inaction`, per-subgoal recovery. Flags,
 milestones and thresholds are unchanged. Rules, tags and the classifier are frozen at
-`block2-classifier-freeze`; held-out labels written before it are re-passed against it.
+`mechanism-classifier-freeze`; held-out labels written before it are re-passed against it.
 
 Not validated on the pilot (no firings in the 20): `wrong_object`, `wrong_target`,
 `regression`, `order_violation`, `regrasp_count`, `oscillation`, `gripper_chatter`,

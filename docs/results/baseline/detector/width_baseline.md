@@ -1,4 +1,4 @@
-# Width baseline (Block 4 reference)
+# Width baseline (detector reference)
 
 Trigger: the close command nearest each closing gate anchor (within 10 steps). Fires at the first step of the attempt with finger width below the threshold; the attempt ends when the width exceeds its narrowest since the command by more than 5 mm. Chosen threshold 3 mm. No close command near the anchor: 1 failures, 4 successes. Harness `3ed94dc`.
 

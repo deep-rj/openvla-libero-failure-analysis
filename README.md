@@ -58,13 +58,13 @@ pre-registered primary.
   command. On 15 reviewed videos, caught failures and false alarms look the same, and the signal
   does not follow the failure mechanism.
 
-Full writeup: `docs/block4_findings.md`. Results: `docs/results/heldout/detector/`.
+Full writeup: `docs/detector_findings.md`. Results: `docs/results/heldout/detector/`.
 
 ### Baseline
 
 130/250 = 52.0% success (Wilson 95% interval 45.8–58.1%), 10 tasks × 25 init states, seed 0; the
 OpenVLA paper reports 53.7 ± 1.3% for this checkpoint. Details: `docs/results/baseline/`,
-`docs/block1_findings.md`.
+`docs/baseline_findings.md`.
 
 ### Failure taxonomy
 
@@ -134,14 +134,14 @@ CPU.
 **The detector result, from committed files** (laptop, seconds):
 
 ```bash
-python scripts/block4_detector.py metrics \
+python scripts/run_detector.py metrics \
   --scores docs/results/heldout/detector/scores.csv \
-  --frozen docs/results/baseline/detector/frozen_detector.json --out /tmp/block4
+  --frozen docs/results/baseline/detector/frozen_detector.json --out /tmp/detector
 ```
 
 This reproduces `docs/results/heldout/detector/detector_eval.json` exactly.
 
-**From the held-out traces** (raw traces are not in git): `bash scripts/block4_heldout_eval.sh
+**From the held-out traces** (raw traces are not in git): `bash scripts/detector_heldout_eval.sh
 <run_dir>` extracts world state, labels attempts, scores and evaluates. `scripts/make_demo_clip.py`
 renders the clip above from the same traces.
 
@@ -151,7 +151,7 @@ one command per pod, then one local merge.
 ```bash
 python scripts/run_eval.py --policy openvla --tasks 0:10 --init-states 25:30 --seed 0  # per pod
 python scripts/merge_runs.py <shard dirs> --out outputs/heldout --tasks 0:10 --init-states 25:50
-bash scripts/block4_heldout_eval.sh outputs/heldout
+bash scripts/detector_heldout_eval.sh outputs/heldout
 ```
 
 A rerun may not match episode for episode: a second seed flipped 5 of 10 outcomes at matched init
@@ -296,7 +296,7 @@ which is the `unnorm_key` the scripts use.
 which copies `outputs/` to a new snapshot `$OUTPUTS_ARCHIVE_DIR/<UTC time>-<git sha>-<pod id>/`
 and verifies the `MANIFEST.sha256` it writes there. Snapshots are never overwritten. Run
 `bash scripts/archive_outputs.sh [run_dir]` by hand before tearing down a pod if anything else
-wrote there (the Stage A and baseline drivers don't call it). Files are written locally and
+wrote there (the validation and baseline drivers don't call it). Files are written locally and
 copied afterwards, rather than written straight to the volume, because object storage
 handles HDF5's incremental writes and file locks, and appends to the manifest, badly.
 

@@ -1,4 +1,4 @@
-"""Grasp attempts and their outcomes, for Block 4 labels and evaluation.
+"""Grasp attempts and their outcomes, for detector labels and evaluation.
 
 An attempt is a close command at a goal object while no goal object is held; it runs until the
 fingers reopen (`detector.attempt_end`). It succeeds if a hold begins before then and does not

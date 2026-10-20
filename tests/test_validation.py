@@ -1,12 +1,12 @@
 import numpy as np
 import pytest
 
-from harness import stage_a
+from harness import validation
 
 
 def test_identical_action_sequences_are_reported_as_bitwise_identical():
     a = np.random.default_rng(0).normal(size=(20, 7))
-    result = stage_a.compare_actions(a, a.copy())
+    result = validation.compare_actions(a, a.copy())
     assert result == {"identical": True, "first_divergent_step": None, "max_abs_diff": 0.0}
 
 
@@ -15,7 +15,7 @@ def test_the_first_divergent_step_and_size_of_the_difference_are_reported():
     b = a.copy()
     b[7, 2] = 1e-3
     b[12, 0] = 5e-3
-    result = stage_a.compare_actions(a, b)
+    result = validation.compare_actions(a, b)
     assert result["identical"] is False
     assert result["first_divergent_step"] == 7
     assert result["max_abs_diff"] == pytest.approx(5e-3)
@@ -23,7 +23,7 @@ def test_the_first_divergent_step_and_size_of_the_difference_are_reported():
 
 def test_a_shorter_episode_diverges_where_it_ends():
     a = np.zeros((20, 7))
-    result = stage_a.compare_actions(a, a[:15])
+    result = validation.compare_actions(a, a[:15])
     assert result["identical"] is False
     assert result["first_divergent_step"] == 15
 
@@ -33,7 +33,7 @@ def test_top2_margin_is_the_gap_between_the_two_largest_logits_per_dim():
     logits[:, 10] = 5.0
     logits[:, 20] = 4.0
     logits[3, 30] = 4.75
-    margins = stage_a.top2_margin(logits)
+    margins = validation.top2_margin(logits)
     assert margins.shape == (7,)
     assert margins[0] == pytest.approx(1.0)
     assert margins[3] == pytest.approx(0.25)
@@ -44,7 +44,7 @@ def _rows(n=4, steps=300, s_per_step=0.27):
 
 
 def test_cost_projection_scales_measured_episode_time_to_the_baseline():
-    report = stage_a.cost_report(
+    report = validation.cost_report(
         _rows(), episode_bytes=[2.0e6] * 4, baseline_episodes=250, dollars_per_hour=0.75
     )
     per_episode = 300 * 0.27
@@ -57,13 +57,13 @@ def test_cost_projection_scales_measured_episode_time_to_the_baseline():
 
 @pytest.mark.parametrize("size", [0.5e6, 6e6])
 def test_episode_sizes_far_from_the_two_megabyte_budget_are_flagged(size):
-    report = stage_a.cost_report(_rows(), [size] * 4, 250, 0.75)
+    report = validation.cost_report(_rows(), [size] * 4, 250, 0.75)
     assert report["size_far_from_budget"] is True
 
 
 def test_the_markdown_report_states_the_numbers_a_reader_needs():
-    report = stage_a.cost_report(_rows(), [2.0e6] * 4, 250, 0.75)
-    text = stage_a.render_markdown(
+    report = validation.cost_report(_rows(), [2.0e6] * 4, 250, 0.75)
+    text = validation.render_markdown(
         {"t1": {"identical": True, "first_divergent_step": None, "max_abs_diff": 0.0}},
         {"t2": []},
         report,
@@ -74,8 +74,8 @@ def test_the_markdown_report_states_the_numbers_a_reader_needs():
     assert f"{report['projected_dollars']:.2f}" in text
 
 
-def test_cli_defaults_match_the_spec_stage_a():
-    cfg = stage_a.parse_args(["--out", "runs/a"])
+def test_cli_defaults_match_the_spec_validation_run():
+    cfg = validation.parse_args(["--out", "runs/a"])
     assert cfg.tasks == [0, 7, 3, 9]
     assert cfg.episodes_per_task == 2
     assert cfg.determinism_task == 0
@@ -87,7 +87,7 @@ def test_cli_defaults_match_the_spec_stage_a():
 
 
 def test_cli_flags_select_the_real_policy_with_parity_checking():
-    cfg = stage_a.parse_args(
+    cfg = validation.parse_args(
         ["--out", "runs/a", "--policy", "openvla", "--parity", "--dollars-per-hour", "0.69"]
     )
     assert cfg.policy == "openvla"

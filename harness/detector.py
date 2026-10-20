@@ -1,4 +1,4 @@
-"""Block 4 detector: deployable triggers and reference baselines.
+"""Failure detector: deployable triggers and reference baselines.
 
 Inputs are limited to what a real robot has: the policy's outputs and proprioception. World
 state is used only for labels and evaluation, never here. Pure functions.

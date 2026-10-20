@@ -1,11 +1,20 @@
-# Block 1 — pod checklist
+# Pod runbook: validation run and baseline
 
-Everything a coding agent must implement, run or validate on the pod.
-`docs/archive/block1_spec.md` is the source of truth for the tests; the schema is in
-`docs/block1_schema.md` and the labeling and blinding rules in `docs/labeling_protocol.md`.
-This file only lists
-what needs a GPU, the real checkpoint, or the pod environment. Findings behind these
-items are in `docs/block1_findings.md`.
+What needs a GPU, the real checkpoint, or the pod environment. The schema is in
+`docs/trace_schema.md` and the labeling and blinding rules in `docs/labeling_protocol.md`.
+Findings behind these items are in `docs/baseline_findings.md`.
+
+## Validation checks
+
+Run before the baseline, so that the logged traces can be trusted.
+
+| ID | Check | Passes when |
+|---|---|---|
+| T1 | Determinism | Two logger-off episodes with the same seed give bitwise-identical actions |
+| T2 | Logger non-interference | Logger on and logger off give bitwise-identical actions |
+| T3 | Decode consistency, every step | Chosen token equals the argmax of the full logit head; the clip rule holds; the decode matches openvla's `predict_action`; the logged executed action equals what `env.step` received |
+| T4 | State restore | A logged mid-episode `sim_state` restored into a fresh env reproduces named state; observations agree with `qpos` |
+| T5 | Time alignment | The first non-wait `step_idx` equals the wait count (10); model fields are sentinels on wait steps; a forced-truncation episode ends without `done` |
 
 ## Before the pod
 
@@ -42,15 +51,15 @@ Expected sha256 of the hub files at revision `47a0ec7fc4ec123775a391911046cf33cf
 - [ ] Record the resolved hub commits (code repo, checkpoint), GPU type and library
       versions in episode metadata.
 
-## Stage A (unattended)
+## Validation run (unattended)
 
 ```bash
-python scripts/run_stage_a.py --out outputs/stage_a --policy openvla --parity
+python scripts/run_validation.py --out outputs/validation --policy openvla --parity
 ```
 
 Loads the checkpoint once and reuses it for every run. `--parity` adds a run that computes
 both the logged and the vendored action at every step (twice the inference cost) and
-lists any policy step where they differ. Writes `stage_a_report.md` and `.json`.
+lists any policy step where they differ. Writes `validation_report.md` and `.json`.
 
 Tasks 0, 7, 3, 9 with 2 episodes each, plus one forced-truncation episode
 (`EVAL_MAX_STEPS` ≈ 60). Order: T1, T2, T3, T5, then the cost report.
@@ -72,7 +81,7 @@ Tasks 0, 7, 3, 9 with 2 episodes each, plus one forced-truncation episode
 - [ ] `bash scripts/archive_outputs.sh`; confirm the files are on the global volume
       before teardown. Push the report and any summary CSV; raw traces stay gitignored.
 
-T4 (static restore and the obs-vs-`qpos` check) runs locally on the pulled Stage A files:
+T4 (static restore and the obs-vs-`qpos` check) runs locally on the pulled validation-run files:
 `python scripts/check_restore.py <run>/logged/episodes/<id>.h5` (try one fixture episode, task 3 or 9).
 
 ## Baseline (fresh pod, only after a go)
@@ -122,10 +131,10 @@ directory records each shard's environment in `merged_from.json` and gets its
 `summary.md/json` (success rate with n and Wilson interval, s/episode) from the merge itself.
 
 Cross-pod determinism, free from the baseline: the shard covering init states 0 and 1 reruns
-the eight Stage A episodes on a different host.
+the eight validation-run episodes on a different host.
 
 ```bash
-python scripts/compare_runs.py <stage_a>/logged outputs/baseline
+python scripts/compare_runs.py <validation>/logged outputs/baseline
 ```
 
 Report the result either way: bitwise agreement, or the first divergent action, logit and state
@@ -141,13 +150,13 @@ python scripts/compare_runs.py outputs/baseline outputs/seed1_i00   # matched by
 ```
 
 Outcome flips and first-divergence steps against seed 0 give the seed-to-seed noise floor
-(`docs/block1_findings.md`, "The env seed is not inert").
+(`docs/baseline_findings.md`, "The env seed is not inert").
 
 After the baseline (all local, on the pulled or archived run directory):
 
 ```bash
 python scripts/summarize_run.py <run>                 # only to re-summarize; runs and merges write it
-python scripts/pilot_report.py <run> --stage-a <stage_a>/stage_a_report.json   # pooled stats only
+python scripts/pilot_report.py <run> --validation-report <validation>/validation_report.json   # pooled stats only
 python scripts/select_labeling.py <run> --n 20 --seed 0  # blind draw + empty label CSV
 ```
 

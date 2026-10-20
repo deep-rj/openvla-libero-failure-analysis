@@ -1,6 +1,6 @@
 # v1 by failure mechanism (development, in-sample)
 
-A failed first attempt takes its episode's Block 2 mechanism when the mechanism's onset is within the tolerance of the close command. AUROC is same-task against successful first attempts, 95% CI. Flat: v1 below 1.001.
+A failed first attempt takes its episode's failure mechanism when the mechanism's onset is within the tolerance of the close command. AUROC is same-task against successful first attempts, 95% CI. Flat: v1 below 1.001.
 
 Onset within ±10 steps:
 

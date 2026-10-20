@@ -1,4 +1,4 @@
-# Window sweep, first attempts (Block 4)
+# Window sweep, first attempts
 
 Window mean of exp(H) before the close command: gripper on all steps (v1), roll on steps where the no-motion bin is not in the top two (v2). Failed and slipped first attempts against successful ones. Same-task AUROC, 99.17% CIs, bootstrap over episodes within (task, episode outcome), 2000 draws, seed 0. Short: windows cut by the episode start. Harness `aac0fe3`.
 

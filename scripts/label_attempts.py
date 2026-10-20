@@ -91,7 +91,7 @@ def check_anchors(rows: list[dict], anchors_csv: Path, tol: int) -> Counter:
 def render(rows: list[dict], check: Counter | None, sha: str) -> str:
     counts = Counter((r["episode_success"], r["outcome"]) for r in rows)
     lines = [
-        "# Grasp attempts (Block 4 labels)",
+        "# Grasp attempts",
         "",
         "An attempt is a close command within "
         f"{attempts.DEFAULT_PARAMS.near_m * 100:.0f} cm of a goal object while none is held, "

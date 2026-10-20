@@ -13,7 +13,7 @@ from harness import pilot_report  # noqa: E402
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("run_dir", type=Path)
-    parser.add_argument("--stage-a", type=Path, help="stage_a_report.json to list anomalies from")
+    parser.add_argument("--validation-report", type=Path, help="validation_report.json to list anomalies from")
     parser.add_argument(
         "--only-selected", action="store_true", help="pool only the episodes in labeling/"
     )
@@ -23,7 +23,7 @@ def main() -> None:
     if args.only_selected:
         record = json.loads((args.run_dir / "labeling" / "label_selection.json").read_text())
         ids = set(record["episode_ids"])
-    report = pilot_report.write_outputs(args.run_dir, args.stage_a, ids)
+    report = pilot_report.write_outputs(args.run_dir, args.validation_report, ids)
     print(pilot_report.render_markdown(report))
 
 

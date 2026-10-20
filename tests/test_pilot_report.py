@@ -163,7 +163,7 @@ def test_the_report_is_pooled_only_and_names_no_episode(tmp_path):
     assert pr.render_markdown(report).startswith("# Pilot report")
 
 
-def test_stage_a_anomalies_are_passed_through_when_given(tmp_path):
+def test_validation_anomalies_are_passed_through_when_given(tmp_path):
     from factories import make_episode
 
     from harness import manifest, schema
@@ -179,9 +179,9 @@ def test_stage_a_anomalies_are_passed_through_when_given(tmp_path):
             "git_sha": "x", "seconds_per_step": 0.25,
         },
     )  # fmt: skip
-    stage_a = {"t1": {"identical": True}, "t3": ["e1: step 3 clipped_flag"], "t5": []}
+    validation = {"t1": {"identical": True}, "t3": ["e1: step 3 clipped_flag"], "t5": []}
 
-    report = pr.build_report(tmp_path, stage_a_report=stage_a)
+    report = pr.build_report(tmp_path, validation_report=validation)
     assert report["anomalies"]["t3"] == ["e1: step 3 clipped_flag"]
     assert report["anomalies"]["t1"] == {"identical": True}
 

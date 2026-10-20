@@ -1,4 +1,4 @@
-"""Held-out review of the Block 4 detector: a grasp-then-stall rule for a sensitivity analysis, and
+"""Held-out review of the failure detector: a grasp-then-stall rule for a sensitivity analysis, and
 the steps that drive a window mean. Pure functions."""
 
 from dataclasses import dataclass

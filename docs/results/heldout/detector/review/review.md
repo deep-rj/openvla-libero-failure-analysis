@@ -1,14 +1,14 @@
 # Held-out review of the frozen detector (v1)
 
 The evaluation (`../detector_eval.md`) checked on video and in the traces before it is read.
-Scripts: `scripts/block4_review.py`; pure functions in `harness/review.py`.
+Scripts: `scripts/detector_review.py`; pure functions in `harness/review.py`.
 
 ## Label check on video
 
 Five first attempts per stratum, distinct tasks, seed 0 (`sample.csv`): caught failures, missed
 failures, and successes that alarmed. Each was watched for the attempt label, the close command's
 placement, the width baseline's firing, and anything visible in the 30 steps before the close.
-Traces: `outputs/heldout/review/stratum_{a,b,c}.png` (`block4_review.py plot`).
+Traces: `outputs/heldout/review/stratum_{a,b,c}.png` (`detector_review.py plot`).
 
 | stratum | episode | label | notes |
 |---|---|---|---|

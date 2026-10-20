@@ -1,4 +1,4 @@
-"""Exploratory Block 4 feature on the baseline: far-bin mass, the probability a step puts on bins
+"""Exploratory detector feature on the baseline: far-bin mass, the probability a step puts on bins
 at least 10 away from its top bin (a genuinely different action), per dim, over the pre-grasp
 window; on all steps and on steps where the no-motion bin is not in the top two. Also whether it
 separates beyond exp(H): its AUROC after removing its linear dependence on window exp(H).
@@ -185,7 +185,7 @@ def render(results: dict, sha: str) -> str:
         return f"{r['auroc']:.2f}{mark}"
 
     lines = [
-        "# Far-bin mass (exploratory, Block 4)",
+        "# Far-bin mass (exploratory)",
         "",
         f"Probability on bins at least {FAR_BINS} from the top bin, window mean. Same-task "
         f"AUROC, failures above successes, {sg.EXPLORATORY_LEVEL:.2%} CIs, bootstrap over "

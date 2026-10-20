@@ -144,7 +144,7 @@ def analyse(groups: dict[str, list[dict]]) -> dict:
 
 def render(results: dict, sha: str) -> str:
     lines = [
-        "# Attempt-level separability (exploratory, Block 4)",
+        "# Attempt-level separability (exploratory)",
         "",
         f"Window mean of exp(H) over the {WINDOW} policy steps before each attempt's close "
         f"command. Failed and slipped attempts against successful ones, aborted excluded. "

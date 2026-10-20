@@ -1,4 +1,4 @@
-# Attempt-level separability (exploratory, Block 4)
+# Attempt-level separability (exploratory)
 
 Window mean of exp(H) over the 50 policy steps before each attempt's close command. Failed and slipped attempts against successful ones, aborted excluded. Same-task AUROC, failures above successes, 99.17% CIs, bootstrap over episodes within (task, episode outcome), 2000 draws, seed 0. Harness `aac0fe3`.
 

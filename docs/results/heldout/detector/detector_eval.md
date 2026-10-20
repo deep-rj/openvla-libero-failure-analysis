@@ -1,4 +1,4 @@
-# Detector evaluation (Block 4)
+# Detector evaluation
 
 First attempts: 110 failed or slipped, 237 successful. Frozen `docs/results/baseline/detector/frozen_detector.json` (harness `539f610`): gripper window 30, roll window 100, budget 20%. Same-task AUROC and excess over chance (catch rate minus false-alarm rate) with 95% CIs, bootstrap over episodes within (task, episode outcome), 2000 draws, seed 0. Pass: both CIs exclude chance. Evaluated at harness `cf6b134`.
 

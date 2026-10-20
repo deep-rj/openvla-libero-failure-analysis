@@ -146,7 +146,7 @@ def summarize_pooled(metrics: dict) -> dict:
     return {"per_dim": {d: _per_dim(metrics, d) for d in range(metrics["exp_h"].shape[1])}}
 
 
-def build_report(run_dir, stage_a_report: dict | None = None, episode_ids=None) -> dict:
+def build_report(run_dir, validation_report: dict | None = None, episode_ids=None) -> dict:
     """Pools every logged episode of a run (or only `episode_ids`) into one report."""
     run_dir = Path(run_dir)
     rows = manifest.read_rows(run_dir / "manifest.csv")
@@ -175,7 +175,7 @@ def build_report(run_dir, stage_a_report: dict | None = None, episode_ids=None) 
         n_steps += int(acting.sum())
 
     successes = sum(r["success"] for r in rows)
-    stage_a = stage_a_report or {}
+    validation = validation_report or {}
     return {
         "n_episodes": len(metrics),
         "n_steps_pooled": n_steps,
@@ -191,7 +191,7 @@ def build_report(run_dir, stage_a_report: dict | None = None, episode_ids=None) 
             "quantiles": list(QUANTILES),
         },
         "pooled": summarize_pooled(pool(metrics)),
-        "anomalies": {k: stage_a[k] for k in _ANOMALY_KEYS if k in stage_a},
+        "anomalies": {k: validation[k] for k in _ANOMALY_KEYS if k in validation},
     }
 
 
@@ -251,7 +251,7 @@ def render_markdown(report: dict) -> str:
         for cutoff, counts in s["near_tie_bin_distance"].items():
             row = " | ".join(str(counts[name]) for name in DISTANCE_CLASSES)
             lines.append(f"| {d} | {cutoff} | {row} |")
-    lines += ["", "## Stage A anomalies", ""]
+    lines += ["", "## Validation-run anomalies", ""]
     anomalies = report["anomalies"]
     if not anomalies:
         lines.append("- none supplied")
@@ -260,10 +260,10 @@ def render_markdown(report: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def write_outputs(run_dir, stage_a_report_path=None, episode_ids=None) -> dict:
+def write_outputs(run_dir, validation_report_path=None, episode_ids=None) -> dict:
     run_dir = Path(run_dir)
-    stage_a = json.loads(Path(stage_a_report_path).read_text()) if stage_a_report_path else None
-    report = build_report(run_dir, stage_a, episode_ids)
+    validation = json.loads(Path(validation_report_path).read_text()) if validation_report_path else None
+    report = build_report(run_dir, validation, episode_ids)
     (run_dir / "pilot_report.json").write_text(json.dumps(report, indent=2))
     (run_dir / "pilot_report.md").write_text(render_markdown(report))
     return report

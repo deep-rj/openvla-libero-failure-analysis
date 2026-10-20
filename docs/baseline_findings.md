@@ -1,8 +1,8 @@
-# Block 1 findings — §2 verifications
+# Baseline findings
 
 Environment: transformers 4.40.1, torch 2.2.0, LIBERO and openvla siblings at the
 pinned commits. Checked on the laptop (CPU, no checkpoint weights). Items marked
-**pod** need the real checkpoint and are confirmed by Stage A.
+**pod** need the real checkpoint and are confirmed by the validation run.
 
 ## 2.1 Raw logits vs processed scores
 
@@ -91,9 +91,9 @@ pinned commits. Checked on the laptop (CPU, no checkpoint weights). Items marked
   so the logging path must not call it; T2 compares actions bitwise.
 - Free-joint `qpos` stores quaternions as wxyz; obs expose xyzw.
 
-## Stage A results (RTX 4090, 2026-10-02)
+## Validation run results (RTX 4090, 2026-10-02)
 
-Run: `scripts/run_stage_a.py --policy openvla --parity` at harness `749cf54`, clean tree.
+Run: `scripts/run_validation.py --policy openvla --parity` at harness `749cf54`, clean tree.
 
 - **Checks.** T1 (two logger-off episodes) and T2 (logger on vs off) are bitwise identical.
   T3, T5 and the 30-step parity run against the vendored `predict_action` report no
@@ -123,7 +123,7 @@ Run: `scripts/run_stage_a.py --policy openvla --parity` at harness `749cf54`, cl
   and at step 260, where the drawer joint is mid-travel. Task 9 was not pulled.
 - **Host.** The pod's main thread was pinned at 100% CPU while the GPU sat at about 60%
   utilization (a 10.2-CPU cgroup quota on an AMD EPYC 7K62). Throttling counters were not
-  collected; see STATUS.md.
+  collected.
 
 ## The env seed is not inert (laptop replay, 2026-10-05)
 
@@ -136,7 +136,7 @@ overwritten. Replaying fixed actions in a fresh env per seed (CPU, osmesa) shows
   reproducibility and says nothing about changing the seed.
 - **Different seeds differ from step 0.** With 30 random actions on task 0, about 100 of 123
   `sim_state` columns differ by up to about 6e-14 after the first step.
-- **The difference amplifies.** Replaying the Stage A actions open-loop (256-pixel cameras),
+- **The difference amplifies.** Replaying the validation-run actions open-loop (256-pixel cameras),
   task 0 init 0 ends with state differences of order 1 for seed 1 versus 0, but about 4e-5
   for seed 2; task 3 init 0 reaches order 1 for both seeds. Frames differ in 200–211 of 290
   frames on task 0 and in every one of 531 frames on task 3, including the first frame.
@@ -145,8 +145,8 @@ overwritten. Replaying fixed actions in a fresh env per seed (CPU, osmesa) shows
 
 Consequence: the baseline is pinned to seed 0 and is reproducible, but its spread covers
 sampling over init states only, not seed-to-seed variation. A seed-1 rerun of the baseline
-episodes, counting outcome flips, would measure that noise floor; any Block 5 effect smaller
-than it cannot be attributed to the perturbation. Not run.
+episodes, counting outcome flips, would measure that noise floor; any perturbation effect
+smaller than it cannot be attributed to the perturbation. Not run.
 
 ## Baseline pod hosts (2026-10-05)
 
@@ -164,12 +164,12 @@ only the GPU name; the rest below was read off each pod by hand (`lscpu`, the cg
 | i20-24 | AMD EPYC 7402 (24-core) | 7.65 CPUs | 595.91.07 | pending |
 
 The 7.65 figure assumes the default 100 ms cgroup period; that pod's quota was read from the
-v1 file, which holds the quota only. The Stage A pod was an EPYC 7K62 with a 10.2-CPU quota; its
+v1 file, which holds the quota only. The validation-run pod was an EPYC 7K62 with a 10.2-CPU quota; its
 driver version was not recorded.
 
 **Speed and throttling (partial, mid-run).** On matched 520-step episodes the Zen 3 pod (EPYC
 75F3, 13.6 CPUs) ran at 0.245–0.255 s/step, against 0.278–0.298 on the Zen 2 pods (7.65 and
-10.2 CPUs) and 0.273–0.274 on Stage A. The 7.65-CPU pod was not slower than the 10.2-CPU pods.
+10.2 CPUs) and 0.273–0.274 on the validation run. The 7.65-CPU pod was not slower than the 10.2-CPU pods.
 The cgroup counters read 60 s apart agree: 11 of 600 periods throttled on a 10.2-CPU pod
 (1.8%; 1.7% since start) and 4 of 600 on the 7.65-CPU pod (0.7%; 0.5% since start). Throttling
 is rare, so the quota is not what limits the step time; per-core speed is the likelier limit.
@@ -193,8 +193,8 @@ partial chunk (41 episodes) and two rerun shards (4 + 5 episodes). `merge_runs.p
 
 - **Success rate:** 130/250 = 52.0%, Wilson 95% interval 45.8% to 58.1%. Terminated by success
   130, by the step cap 120. The interval covers sampling over init states only (seed pinned).
-- **Throughput:** 110.3 s per episode, 0.277 s per policy step (the Stage A value), 399 mean policy
-  steps. About 7.7 GPU-hours for the 250 episodes, against 8.5 projected from Stage A's 444 steps.
+- **Throughput:** 110.3 s per episode, 0.277 s per policy step (the validation-run value), 399 mean policy
+  steps. About 7.7 GPU-hours for the 250 episodes, against 8.5 projected from the validation run's 444 steps.
 - **Per task (n = 25 each):**
 
 | Task | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
@@ -207,8 +207,8 @@ partial chunk (41 episodes) and two rerun shards (4 + 5 episodes). `merge_runs.p
   Dims 0–2 have a median exp(H) of 1.3–1.7 and q95 of 4.4–6.3. Top-2 margins of at most 1 ulp
   occur in 5.8–7.7% of steps on dims 0–2 and 2.7–4.1% on dims 3–5; 51–58% of steps on dims 0–2
   are within 16 ulps. On dim 0 at the 1-ulp cutoff, 38% of near ties are 10 or more bins apart.
-- **Cross-host determinism.** Stage A against the baseline shard that reran its eight episodes:
-  8 of 8 identical in actions, logits and simulator state. Stage A against a rerun of four of them
+- **Cross-host determinism.** The validation run against the baseline shard that reran its eight episodes:
+  8 of 8 identical in actions, logits and simulator state. The validation run against a rerun of four of them
   on an EPYC 7402 pod (different driver): 4 of 4 identical. Every CPU in that comparison is Zen 2;
   the one Zen 3 pod (EPYC 75F3) lost its GPU, and its 41 episodes have not been checked against
   another generation.
@@ -248,13 +248,13 @@ Kill conditions were written after the pilot report had been read, not before.
 
 | # | Premise | Kill condition | Result |
 |---|---|---|---|
-| 1 | The chosen token is the decoded token | T3: `chosen ≠ argmax_full`, decode mismatch, or executed ≠ sent | 0 violations, all 250 episodes (Stage A covered 9) |
+| 1 | The chosen token is the decoded token | T3: `chosen ≠ argmax_full`, decode mismatch, or executed ≠ sent | 0 violations, all 250 episodes (the validation run covered 9) |
 | 2 | The slice holds the probability mass | `lse_slice − lse_full > 1e-5` | 0; max excess 3.7e-6 |
 | 3 | Logits are the model's bf16 values, stored losslessly as fp16 | Any logged slice logit not exactly bf16 (fp16 subnormals excluded) | 0 of ~178M logits |
 | 4 | Entropy is computed correctly | exp(H) outside [1, 255] | 0; max 30.6 (dim 0), 2.32 (gripper) |
 | 5 | Entropy and margins come from one distribution | exp(H) < 1 + e^(−δ) for a bin margin of δ nats | 0 |
 | 6 | The edge-bin merge is correct | Token margin ≠ bin margin where both edge tokens are > ln 2 below the second token | 0; covers 98.7–99.3% of steps on dims 0–5, 5.8% on the gripper |
-| 7 | Determinism and logger non-interference (T1, T2) | Any differing action | Stage A only; Zen 2 hosts only |
+| 7 | Determinism and logger non-interference (T1, T2) | Any differing action | Validation run only; Zen 2 hosts only |
 | 8 | Wait-step alignment (T5) | First non-wait step ≠ 10, or model output on a wait step | 0 violations, all 250 episodes |
 
 Tolerances (1e-5 absolute on lse, 1e-5 relative on exp(H)) sit above fp32/fp64 summation error
@@ -305,9 +305,9 @@ AUROC 95% CI.
   exp(H) > 1.05. Falsified if the CI excludes 0.5.
 
 Parked: out-of-slice emission as a failure signature is absent under clean conditions (argmax
-never leaves the slice); whether it appears under perturbation is a Block 3 question. A
+never leaves the slice); whether it appears under perturbation is untested. A
 physical-unit distance class may be added as an exploratory cut beside the pre-registered
 adjacent / 2–9 / ≥10 classes, never in place of them.
 
-**Decision: go** (2026-10-06). Every kill condition passes. Row 7 rests on Stage A and on Zen 2
+**Decision: go** (2026-10-06). Every kill condition passes. Row 7 rests on the validation run and on Zen 2
 hosts only.

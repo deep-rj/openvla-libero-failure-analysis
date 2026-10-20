@@ -1,6 +1,6 @@
 # Separability gate
 
-The check before Block 4 (`PLAN.md`): does any internal signal of the policy differ between
+The check before building the detector: does any internal signal of the policy differ between
 failed and successful rollouts **before** the moment a grasp fails? If nothing does, the project
 falls back to the descriptive study (taxonomy plus robustness sweep).
 
@@ -44,7 +44,7 @@ CIs come from a percentile bootstrap over episodes, resampled within (task, outc
 **Curves** (descriptive, not tested): per-step exp(H) per dim, from −50 to +20 steps around the
 anchor, as a mean and interquartile band per outcome.
 
-## Changes to the 2026-10-06 predictions (`block1_findings.md`)
+## Changes to the 2026-10-06 predictions (`baseline_findings.md`)
 
 - **P1 amended.** It was a per-episode gripper near-tie count within 5 cm of the target. It
   becomes the windowed gripper exp(H) above. Reason: blind pooled counts showed 69% of windows
@@ -105,7 +105,7 @@ block stands out. That reads as a
 small, persistent offset over the approach rather than a warning that builds before the grasp.
 All of this was found after looking at the data and is a lead, not evidence.
 
-**Decision: go to Block 4, with modest expectations.** Block 4 tests whether combining dims,
+**Decision: go to the detector, with modest expectations.** The detector study tests whether combining dims,
 longer context and the no-motion filter yields a usable detector. Signals are explored on the
 baseline 250 episodes; the frozen detector is evaluated once on init states 25–49 (250 new
 episodes, ~8.5 GPU-h).

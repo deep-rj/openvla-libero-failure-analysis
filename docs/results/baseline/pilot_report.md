@@ -91,7 +91,7 @@ Pooled over 99634 non-wait steps from 250 episodes; per action dimension; no spl
 | 6 | 4 | 0 | 0 | 1604 |
 | 6 | 16 | 5 | 0 | 6882 |
 
-## Stage A anomalies
+## Validation-run anomalies
 
 - t1: {"identical": true, "first_divergent_step": null, "max_abs_diff": 0.0}
 - t2: {"identical": true, "first_divergent_step": null, "max_abs_diff": 0.0}

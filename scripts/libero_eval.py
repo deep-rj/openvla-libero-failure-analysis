@@ -124,11 +124,8 @@ def tf_placement(tf_device):
 
 
 # %%
-# TEMPORARY: profiling instrumentation for the Phase 0 timing pass. Remove once
-# profile data is captured -- see "0d. The instrumentation is temporary" in
-# docs/archive/plan_parallel_eval_harness.md for the removal checklist. Synchronizing around
-# GPU stages defeats CPU/GPU overlap, so this must not survive into the parallel
-# harness. The PIN_THREADS block above is NOT part of this and should stay.
+# Profiling instrumentation. Synchronizing around GPU stages defeats CPU/GPU overlap, so
+# timings from it are per-stage costs, not throughput. The PIN_THREADS block above is separate.
 class StageTimer:
     """Records per-call wall time for named stages, and for substages nested in them.
 

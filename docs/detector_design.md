@@ -1,7 +1,7 @@
-# Block 4: failure detector
+# Failure detector: design
 
-Predict terminal failure from the policy's internal signals early enough to act (`PLAN.md`).
-Started 2026-10-12, after the separability gate (`docs/separability_gate.md`) and before Block 3.
+Predict terminal failure from the policy's internal signals early enough to act.
+Started 2026-10-12, after the separability gate (`docs/separability_gate.md`).
 
 **Protocol.** Signals are explored on the baseline 250 episodes; every number from them is a
 development number. The detector (features, window, thresholds, operating point) is frozen
@@ -62,18 +62,18 @@ before init states 25–49 are run, and is evaluated on them once.
 
 ## Frozen detector
 
-`docs/results/baseline/detector/frozen_detector.json` (`scripts/block4_detector.py freeze`), from
+`docs/results/baseline/detector/frozen_detector.json` (`scripts/run_detector.py freeze`), from
 88 failed and 266 successful development first attempts: v1 alarms above gripper exp(H) 1.0203,
 v2 above a mean rank of 0.698. In-sample on development (`dev_eval/`): v1 catches 28 of 88 at
 53 of 266 false alarms against 17.5 for a random alarm (AUROC 0.62); v2 catches 28 (AUROC 0.65).
 
 Held-out run, init states 25–49 (250 episodes; about 500 pod-minutes, about $6 at
-$0.025/episode, sharded as in `docs/block1_pod_checklist.md`):
+$0.025/episode, sharded as in `docs/pod_runbook.md`):
 
 ```bash
 python scripts/run_eval.py --policy openvla --tasks 0:10 --init-states 25:50 --out outputs/heldout
 python scripts/merge_runs.py <shard>... --out outputs/heldout --tasks 0:10 --init-states 25:50
-bash scripts/block4_heldout_eval.sh outputs/heldout
+bash scripts/detector_heldout_eval.sh outputs/heldout
 ```
 
 ## Exploration log
@@ -99,11 +99,11 @@ version.
   its linear dependence on window exp(H), no dim separates (0.43–0.61). At this n, far-apart
   doubt adds nothing measurable beyond entropy.
 
-![Far-bin mass per step](results/baseline/block4/far_bins_curves.png)
+![Far-bin mass per step](results/baseline/detector/far_bins_curves.png)
 
 ### Width baseline (2026-10-13)
 
-An empty close read from finger width alone (`scripts/block4_width_baseline.py`,
+An empty close read from finger width alone (`scripts/width_baseline.py`,
 `docs/results/baseline/detector/width_baseline.md`): at the close command nearest each closing
 anchor, fire at the first step of the attempt whose width (`gripper_qpos` q0 − q1) is below the
 threshold. 60 failures and 198 successes have a command within 10 steps of the anchor. On held
@@ -128,7 +128,7 @@ with step k's observation preceding action k.
 
 ### Attempt labels (2026-10-13)
 
-Every attempt in the baseline 250 (`scripts/block4_attempts.py`,
+Every attempt in the baseline 250 (`scripts/label_attempts.py`,
 `docs/results/baseline/detector/attempts.csv`), checked against the gate anchors through the attempt
 nearest each closing anchor.
 
@@ -139,7 +139,7 @@ nearest each closing anchor.
 
 ### Attempt-level separability (2026-10-13)
 
-The gate's exp(H) test with attempts as units (`scripts/block4_attempt_separability.py`,
+The gate's exp(H) test with attempts as units (`scripts/attempt_separability.py`,
 `docs/results/baseline/detector/attempt_separability.md`): window mean over the 50 policy steps
 before the close command, failed and slipped attempts against successful ones, bootstrap over
 episodes within (task, episode outcome).
@@ -165,7 +165,7 @@ episodes within (task, episode outcome).
 ### Window sweep, first attempts (2026-10-13)
 
 All failed and slipped first attempts (88) against successful ones (266)
-(`scripts/block4_window_sweep.py`, `docs/results/baseline/detector/window_sweep.md`).
+(`scripts/detector_window_sweep.py`, `docs/results/baseline/detector/window_sweep.md`).
 
 - Gripper exp(H) is flat from 10 to 50 steps (0.60–0.62) and peaks at 30 (0.62, 0.52 to 0.72):
   its signal sits in the last steps before the close. Frozen window: 30.

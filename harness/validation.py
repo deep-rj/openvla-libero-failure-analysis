@@ -1,4 +1,4 @@
-"""Stage A: determinism (T1), non-interference (T2), consistency (T3, T5) and the cost report."""
+"""Validation run: determinism (T1), non-interference (T2), consistency (T3, T5) and the cost report."""
 
 import argparse
 import json
@@ -11,7 +11,7 @@ from harness import checks, runner, schema
 from harness.cli import _indices
 from harness.rollout import NUM_STEPS_WAIT, EpisodeSpec
 
-# The spec budgets about 2 MB per episode and asks to flag sizes far from it.
+# The logging design budgets about 2 MB per episode and asks to flag sizes far from it.
 _SIZE_BUDGET_BYTES = (1.0e6, 4.0e6)
 
 
@@ -36,7 +36,7 @@ def top2_margin(slice_logits: np.ndarray) -> np.ndarray:
 
 
 def cost_report(rows, episode_bytes, baseline_episodes: int, dollars_per_hour: float) -> dict:
-    """Projects baseline cost from the measured Stage A episodes."""
+    """Projects baseline cost from the measured validation episodes."""
     steps = np.array([r["num_steps"] for r in rows], dtype=float)
     per_step = np.array([r["seconds_per_step"] for r in rows], dtype=float)
     episode_seconds = steps * per_step
@@ -58,7 +58,7 @@ def cost_report(rows, episode_bytes, baseline_episodes: int, dollars_per_hour: f
 
 
 def render_markdown(sections: dict, checks: dict, cost: dict) -> str:
-    lines = ["# Stage A report", ""]
+    lines = ["# Validation report", ""]
     for name, values in sections.items():
         lines += [f"## {name.upper()}", *(f"- {k}: {v}" for k, v in values.items()), ""]
     for name, problems in checks.items():
@@ -81,7 +81,7 @@ def render_markdown(sections: dict, checks: dict, cost: dict) -> str:
 
 
 @dataclass
-class StageAConfig:
+class ValidationConfig:
     out_dir: Path
     tasks: list[int] = field(default_factory=lambda: [0, 7, 3, 9])
     episodes_per_task: int = 2
@@ -121,8 +121,8 @@ def _write_report(cfg, report, checks_by_name):
             sections[name] = report[name]
     text = render_markdown(sections, checks_by_name, report.get("cost", _NO_COST))
     out = Path(cfg.out_dir)
-    (out / "stage_a_report.md").write_text(text)
-    (out / "stage_a_report.json").write_text(json.dumps(report, indent=2, default=float))
+    (out / "validation_report.md").write_text(text)
+    (out / "validation_report.json").write_text(json.dumps(report, indent=2, default=float))
 
 
 _NO_COST = {
@@ -137,10 +137,10 @@ _NO_COST = {
 }
 
 
-def run_stage_a(cfg: StageAConfig, policy_factory=None) -> dict:
+def run_validation(cfg: ValidationConfig, policy_factory=None) -> dict:
     """Runs T1, T2, T3, T5 and the cost measurement; stops after T1 if it diverges."""
     if cfg.determinism_task not in cfg.tasks:
-        raise ValueError("determinism_task must be one of the Stage A tasks")
+        raise ValueError("determinism_task must be one of the validation tasks")
     det = EpisodeSpec("libero_10", cfg.determinism_task, 0, cfg.seed).episode_id
     task = [cfg.determinism_task]
 
@@ -200,8 +200,8 @@ def run_stage_a(cfg: StageAConfig, policy_factory=None) -> dict:
     return report
 
 
-def parse_args(argv=None) -> StageAConfig:
-    parser = argparse.ArgumentParser(description="Run Stage A: T1, T2, T3, T5 and the cost report.")
+def parse_args(argv=None) -> ValidationConfig:
+    parser = argparse.ArgumentParser(description="Run the validation checks: T1, T2, T3, T5 and the cost report.")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--tasks", type=_indices, default=[0, 7, 3, 9])
     parser.add_argument("--episodes-per-task", type=int, default=2)
@@ -215,7 +215,7 @@ def parse_args(argv=None) -> StageAConfig:
     parser.add_argument("--dollars-per-hour", type=float, default=0.75)
     parser.add_argument("--allow-dirty", action="store_true")
     args = parser.parse_args(argv)
-    return StageAConfig(
+    return ValidationConfig(
         out_dir=args.out,
         tasks=args.tasks,
         episodes_per_task=args.episodes_per_task,
@@ -240,7 +240,7 @@ def main(argv=None) -> None:
             runner.RunConfig(out_dir=cfg.out_dir, tasks=[], init_states=[], policy="openvla")
         )
         factory = lambda _cfg: loaded  # noqa: E731
-    report = run_stage_a(cfg, factory)
+    report = run_validation(cfg, factory)
     problems = report.get("t3", []) + report.get("t5", []) + report.get("t3_parity", [])
     passed = report["t1"]["identical"] and report.get("t2", {}).get("identical") and not problems
-    print(f"Stage A {'PASS' if passed else 'FAIL'}; report in {cfg.out_dir / 'stage_a_report.md'}")
+    print(f"Validation {'PASS' if passed else 'FAIL'}; report in {cfg.out_dir / 'validation_report.md'}")

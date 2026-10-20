@@ -1,4 +1,4 @@
-"""Held-out review of the frozen Block 4 detector (v1).
+"""Held-out review of the frozen failure detector (v1).
 
 sample    <run> --attempts <csv> --frozen <json> --out <csv>
           five first attempts per stratum (caught, missed, false alarm), distinct tasks, seed 0
@@ -7,7 +7,7 @@ plot      <run> --attempts <csv> --frozen <json> --episodes t00-i035 ... --out <
 stall     <run> --attempts <csv> --frozen <json> --out <dir>
           v1 rescored with grasp-then-stall failures excluded (`harness.review.is_stall`)
 mechanism <dev run> --attempts <csv> --frozen <json> --mechanisms <csv> --out <dir>
-          v1 on development first attempts split by the episode's Block 2 mechanism
+          v1 on development first attempts split by the episode's failure mechanism
 """
 
 import argparse
@@ -23,9 +23,9 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import block4_window_sweep as ws
+import detector_window_sweep as ws
 import separability_gate as sg
-from block4_detector import LEVEL, N_BOOT, _excess, _units, _width_delays, features
+from run_detector import LEVEL, N_BOOT, _excess, _units, _width_delays, features
 
 from harness import detector, gate, mechanism, metadata, milestones, review, world_extract
 
@@ -243,7 +243,7 @@ def mechanism_split(args) -> None:
     lines = [
         "# v1 by failure mechanism (development, in-sample)",
         "",
-        "A failed first attempt takes its episode's Block 2 mechanism when the mechanism's onset "
+        "A failed first attempt takes its episode's failure mechanism when the mechanism's onset "
         "is within the tolerance of the close command. AUROC is same-task against successful "
         f"first attempts, 95% CI. Flat: v1 below {FLAT}.",
     ]

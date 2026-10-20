@@ -1,4 +1,4 @@
-"""Block 4 evaluation metrics from per-attempt detector scores, so the held-out result is
+"""Detector evaluation metrics from per-attempt detector scores, so the held-out result is
 recomputable from a committed scores file without the raw traces."""
 
 import csv

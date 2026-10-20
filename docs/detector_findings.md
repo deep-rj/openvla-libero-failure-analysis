@@ -1,4 +1,4 @@
-# Block 4 findings: failure prediction from gripper-token entropy
+# Detector findings: failure prediction from gripper-token entropy
 
 **Verdict.** Gripper-token entropy over the 30 policy steps before the first close on each goal
 object did not meet the pre-registered criterion on held-out init states 25–49: AUROC 0.56 (95% CI
@@ -6,7 +6,7 @@ object did not meet the pre-registered criterion on held-out init states 25–49
 
 ## The test
 
-- **Detector** (`docs/block4_detector.md`): at each first close command on a goal object, v1 takes
+- **Detector** (`docs/detector_design.md`): at each first close command on a goal object, v1 takes
   the mean of exp(H) of the gripper token over the preceding 30 policy steps and alarms above the
   level that 20% of successful development first attempts exceed. Inputs are policy outputs only.
 - **Target**: whether that grasp attempt fails (no hold, or a slip), whether or not the episode

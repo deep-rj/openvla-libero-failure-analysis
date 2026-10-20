@@ -15,7 +15,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import block4_window_sweep as ws
+import detector_window_sweep as ws
 
 from harness import detector
 

@@ -1,4 +1,4 @@
-"""Block 4 detector, frozen on the baseline run and evaluated once on held-out init states.
+"""Failure detector, frozen on the baseline run and evaluated once on held-out init states.
 
 v1 (primary): mean gripper exp(H) over the policy steps before each first attempt's close
 command. v2 (secondary): mean percentile rank of v1 and stop-filtered roll exp(H) against
@@ -24,7 +24,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import block4_window_sweep as ws
+import detector_window_sweep as ws
 import separability_gate as sg
 
 from harness import detector, detector_eval, metadata, milestones, schema
@@ -147,7 +147,7 @@ def metrics(args) -> None:
 def render(results: dict, frozen: dict, sha: str) -> str:
     spec = frozen["spec"]
     lines = [
-        "# Detector evaluation (Block 4)",
+        "# Detector evaluation",
         "",
         f"First attempts: {results['n_failure']} failed or slipped, {results['n_success']} "
         f"successful. Frozen `{results['frozen']}` (harness `{frozen['git']['sha'][:7]}`): "

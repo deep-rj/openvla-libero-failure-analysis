@@ -1,4 +1,4 @@
-"""Window selection for the Block 4 detector on first attempts: same-task AUROC of the window mean
+"""Window selection for the failure detector on first attempts: same-task AUROC of the window mean
 of gripper exp(H) (v1) and of stop-filtered roll exp(H) (v2) before the close command, over a
 declared grid. Failed and slipped first attempts against successful ones; the best window per
 feature is the one frozen.
@@ -107,7 +107,7 @@ def sweep(rows: list[dict], series: dict) -> dict:
 
 def render(results: dict, sha: str) -> str:
     lines = [
-        "# Window sweep, first attempts (Block 4)",
+        "# Window sweep, first attempts",
         "",
         f"Window mean of exp(H) before the close command: gripper on all steps (v1), roll on steps "
         f"where the no-motion bin is not in the top two (v2). Failed and slipped first attempts "
