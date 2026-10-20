@@ -1,6 +1,6 @@
 # Separability gate
 
-Units: 70 failures, 202 success grasps. Same-task AUROC is decisive; pooled is reported beside it. Bootstrap over episodes within (task, outcome), 10000 draws, seed 0. Harness `91848ce`.
+Units: 70 failures, 202 success grasps. Same-task AUROC is decisive; pooled is reported beside it. Bootstrap over episodes within (task, outcome), 10000 draws, seed 0. Harness `143729b`.
 
 | Metric | CI level | Same-task AUROC [CI] | Pooled AUROC [CI] |
 |---|---|---|---|

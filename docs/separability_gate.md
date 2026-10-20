@@ -69,7 +69,7 @@ python scripts/gate_anchors.py outputs/baseline \
 python scripts/separability_gate.py outputs/baseline --out outputs/baseline/gate
 ```
 
-## Result (2026-10-12, freeze `f117928`)
+## Result (2026-10-12, freeze `03583b2`)
 
 70 failures, 202 success grasps. Files: `docs/results/baseline/gate/` (`gate_report.md`,
 `gate_results.json`, `anchors.csv`, `curves.png`).

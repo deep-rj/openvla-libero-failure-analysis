@@ -1,6 +1,6 @@
 # Far-bin mass (exploratory, Block 4)
 
-Probability on bins at least 10 from the top bin, window mean. Same-task AUROC, failures above successes, 99.17% CIs, bootstrap over episodes, 2000 draws, seed 0. Beyond exp(H): far-bin mass minus its least-squares line on the window's exp(H). Harness `91848ce`.
+Probability on bins at least 10 from the top bin, window mean. Same-task AUROC, failures above successes, 99.17% CIs, bootstrap over episodes, 2000 draws, seed 0. Beyond exp(H): far-bin mass minus its least-squares line on the window's exp(H). Harness `143729b`.
 
 **all steps**
 

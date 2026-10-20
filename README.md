@@ -58,7 +58,7 @@ pre-registered primary.
   command. On 15 reviewed videos, caught failures and false alarms look the same, and the signal
   does not follow the failure mechanism.
 
-Full writeup: `docs/block4_findings.md`. Results: `docs/results/heldout/block4/`.
+Full writeup: `docs/block4_findings.md`. Results: `docs/results/heldout/detector/`.
 
 ### Baseline
 
@@ -135,11 +135,11 @@ CPU.
 
 ```bash
 python scripts/block4_detector.py metrics \
-  --scores docs/results/heldout/block4/scores.csv \
-  --frozen docs/results/baseline/block4/frozen_detector.json --out /tmp/block4
+  --scores docs/results/heldout/detector/scores.csv \
+  --frozen docs/results/baseline/detector/frozen_detector.json --out /tmp/block4
 ```
 
-This reproduces `docs/results/heldout/block4/detector_eval.json` exactly.
+This reproduces `docs/results/heldout/detector/detector_eval.json` exactly.
 
 **From the held-out traces** (raw traces are not in git): `bash scripts/block4_heldout_eval.sh
 <run_dir>` extracts world state, labels attempts, scores and evaluates. `scripts/make_demo_clip.py`

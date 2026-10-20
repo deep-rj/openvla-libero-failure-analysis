@@ -1,6 +1,6 @@
 # No-motion check (exploratory, after the gate)
 
-No-motion bins (x..yaw): [115, 121, 114, 104, 122, 116]. Same-task AUROC, failures above successes, 99.17% CI, bootstrap over episodes, 10000 draws, seed 0; (n failures/successes with qualifying steps). Harness `91848ce`.
+No-motion bins (x..yaw): [115, 121, 114, 104, 122, 116]. Same-task AUROC, failures above successes, 99.17% CI, bootstrap over episodes, 10000 draws, seed 0; (n failures/successes with qualifying steps). Harness `143729b`.
 
 | Dim | stop chosen share | stop runner-up share | exp(H), stop in top two | exp(H), stop not in top two |
 |---|---|---|---|---|

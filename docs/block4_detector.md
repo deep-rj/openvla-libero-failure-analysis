@@ -62,7 +62,7 @@ before init states 25–49 are run, and is evaluated on them once.
 
 ## Frozen detector
 
-`docs/results/baseline/block4/frozen_detector.json` (`scripts/block4_detector.py freeze`), from
+`docs/results/baseline/detector/frozen_detector.json` (`scripts/block4_detector.py freeze`), from
 88 failed and 266 successful development first attempts: v1 alarms above gripper exp(H) 1.0203,
 v2 above a mean rank of 0.698. In-sample on development (`dev_eval/`): v1 catches 28 of 88 at
 53 of 266 false alarms against 17.5 for a random alarm (AUROC 0.62); v2 catches 28 (AUROC 0.65).
@@ -87,7 +87,7 @@ Same anchors and units as the gate, after its anchor fix
 The probability a step puts on bins at least 10 from its top bin: a genuinely different action
 (10 bins ≈ 3 mm per step on x). Window mean over the last 40, 50 and 75 pre-grasp steps, on all
 steps and on steps where the no-motion bin is not in the top two (`scripts/gate_far_bins.py`,
-`docs/results/baseline/block4/far_bins.md`). 2,000 draws; 39 tests, each with a beyond-exp(H)
+`docs/results/baseline/detector/far_bins.md`). 2,000 draws; 39 tests, each with a beyond-exp(H)
 version.
 
 - It separates about as well as exp(H): x 0.63–0.64, pitch 0.64–0.67 (all steps); roll
@@ -104,7 +104,7 @@ version.
 ### Width baseline (2026-10-13)
 
 An empty close read from finger width alone (`scripts/block4_width_baseline.py`,
-`docs/results/baseline/block4/width_baseline.md`): at the close command nearest each closing
+`docs/results/baseline/detector/width_baseline.md`): at the close command nearest each closing
 anchor, fire at the first step of the attempt whose width (`gripper_qpos` q0 − q1) is below the
 threshold. 60 failures and 198 successes have a command within 10 steps of the anchor. On held
 closes from open, width is flat into the command step and narrows from the next step, consistent
@@ -129,7 +129,7 @@ with step k's observation preceding action k.
 ### Attempt labels (2026-10-13)
 
 Every attempt in the baseline 250 (`scripts/block4_attempts.py`,
-`docs/results/baseline/block4/attempts.csv`), checked against the gate anchors through the attempt
+`docs/results/baseline/detector/attempts.csv`), checked against the gate anchors through the attempt
 nearest each closing anchor.
 
 - Failure anchors (61): 46 failed, 9 slips, 5 aborted, 1 with no attempt, none successful.
@@ -140,7 +140,7 @@ nearest each closing anchor.
 ### Attempt-level separability (2026-10-13)
 
 The gate's exp(H) test with attempts as units (`scripts/block4_attempt_separability.py`,
-`docs/results/baseline/block4/attempt_separability.md`): window mean over the 50 policy steps
+`docs/results/baseline/detector/attempt_separability.md`): window mean over the 50 policy steps
 before the close command, failed and slipped attempts against successful ones, bootstrap over
 episodes within (task, episode outcome).
 
@@ -165,7 +165,7 @@ episodes within (task, episode outcome).
 ### Window sweep, first attempts (2026-10-13)
 
 All failed and slipped first attempts (88) against successful ones (266)
-(`scripts/block4_window_sweep.py`, `docs/results/baseline/block4/window_sweep.md`).
+(`scripts/block4_window_sweep.py`, `docs/results/baseline/detector/window_sweep.md`).
 
 - Gripper exp(H) is flat from 10 to 50 steps (0.60–0.62) and peaks at 30 (0.62, 0.52 to 0.72):
   its signal sits in the last steps before the close. Frozen window: 30.

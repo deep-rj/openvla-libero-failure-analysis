@@ -1,6 +1,6 @@
 # Window sweep (exploratory, after the gate)
 
-Same-task AUROC [99.17% CI], bootstrap over episodes, 2000 draws, seed 0. Blocks need 5 non-wait steps. Harness `91848ce`.
+Same-task AUROC [99.17% CI], bootstrap over episodes, 2000 draws, seed 0. Blocks need 5 non-wait steps. Harness `143729b`.
 
 **cumulative, all steps**
 

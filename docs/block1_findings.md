@@ -93,7 +93,7 @@ pinned commits. Checked on the laptop (CPU, no checkpoint weights). Items marked
 
 ## Stage A results (RTX 4090, 2026-10-02)
 
-Run: `scripts/run_stage_a.py --policy openvla --parity` at harness `2326ab0`, clean tree.
+Run: `scripts/run_stage_a.py --policy openvla --parity` at harness `749cf54`, clean tree.
 
 - **Checks.** T1 (two logger-off episodes) and T2 (logger on vs off) are bitwise identical.
   T3, T5 and the 30-step parity run against the vendored `predict_action` report no
@@ -150,7 +150,7 @@ than it cannot be attributed to the perturbation. Not run.
 
 ## Baseline pod hosts (2026-10-05)
 
-Five RTX 4090 pods from the same template ran the sharded baseline at harness `adbd165`. Pods
+Five RTX 4090 pods from the same template ran the sharded baseline at harness `6ee2214`. Pods
 are ephemeral, so a later pod may land on any of these host types. The run metadata records
 only the GPU name; the rest below was read off each pod by hand (`lscpu`, the cgroup quota,
 `nvidia-smi`). Chunk-to-pod mapping assumes the pods were listed in chunk order.
@@ -186,7 +186,7 @@ are rerun as separate shards. The job had no stall watchdog.
 
 ## Baseline results (2026-10-05)
 
-250 episodes (10 tasks × init states 0–24), seed 0, logger and video on, harness `adbd165`, five
+250 episodes (10 tasks × init states 0–24), seed 0, logger and video on, harness `6ee2214`, five
 RTX 4090 pods. The merged run is `outputs/baseline` (gitignored): four 50-episode chunks, pod 4's
 partial chunk (41 episodes) and two rerun shards (4 + 5 episodes). `merge_runs.py` reported 0 of
 250 missing. Its summary files are committed in `docs/results/baseline/`.

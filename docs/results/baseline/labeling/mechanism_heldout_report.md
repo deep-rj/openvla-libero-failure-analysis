@@ -1,7 +1,7 @@
 # Mechanism classifier: held-out report
 
-Classifier frozen at `block2-classifier-freeze-2` (`77742fe`), scored once against the 30
-held-out hand labels (`heldout_labels.csv`, committed in `aaaf029`). Predictions written by
+Classifier frozen at `block2-classifier-freeze-2` (`c8ebd45`), scored once against the 30
+held-out hand labels (`heldout_labels.csv`, committed in `6a79f8d`). Predictions written by
 `mechanism_run.classify_run` on the held-out IDs.
 
 - Agreement: 20/29 decided (69%).

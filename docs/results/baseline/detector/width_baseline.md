@@ -1,6 +1,6 @@
 # Width baseline (Block 4 reference)
 
-Trigger: the close command nearest each closing gate anchor (within 10 steps). Fires at the first step of the attempt with finger width below the threshold; the attempt ends when the width exceeds its narrowest since the command by more than 5 mm. Chosen threshold 3 mm. No close command near the anchor: 1 failures, 4 successes. Harness `f1e4e0b`.
+Trigger: the close command nearest each closing gate anchor (within 10 steps). Fires at the first step of the attempt with finger width below the threshold; the attempt ends when the width exceeds its narrowest since the command by more than 5 mm. Chosen threshold 3 mm. No close command near the anchor: 1 failures, 4 successes. Harness `3ed94dc`.
 
 | Threshold | failures fired | successes fired | median delay (steps): failures | successes |
 |---|---|---|---|---|

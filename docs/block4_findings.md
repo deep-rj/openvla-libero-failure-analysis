@@ -38,7 +38,7 @@ episode outcome).
 ## Is the measurement sound
 
 Fifteen held-out first attempts (five caught, five missed, five false alarms, distinct tasks) were
-checked on video against their labels and traces (`docs/results/heldout/block4/review/review.md`).
+checked on video against their labels and traces (`docs/results/heldout/detector/review/review.md`).
 
 - One label is wrong (about 7%; Wilson 95% about 1% to 30%): a successful grasp split by a brief
   finger reopen. Two missed failures are correct grasps followed by a stall, failures only because a
@@ -66,7 +66,7 @@ checked on video against their labels and traces (`docs/results/heldout/block4/r
 - **Not a perception signal.** On development data, failures whose initiating event is the arm off
   target at the grasp are no flatter than other failures (46% flat, AUROC 0.61, 0.49 to 0.71);
   control-grasp failures are less flat (17%, n = 12) but the intervals overlap, and at a tighter
-  onset match the two are 0.63 and 0.64 (`docs/results/heldout/block4/review/mechanism_split.md`).
+  onset match the two are 0.63 and 0.64 (`docs/results/heldout/detector/review/mechanism_split.md`).
   The weak signal does not follow the failure mechanism.
 - **Not a test of entropy in general.** Motion-dimension entropy within retries (z and pitch,
   0.68–0.70 in development) was out of scope, as were every-step alerting and hidden states.

@@ -4,9 +4,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 RUN=$1
-OUT=${2:-docs/results/heldout/block4}
+OUT=${2:-docs/results/heldout/detector}
 PY=${PYTHON:-python}
-FROZEN=docs/results/baseline/block4/frozen_detector.json
+FROZEN=docs/results/baseline/detector/frozen_detector.json
 
 mkdir -p "$OUT"
 "$PY" scripts/extract_world.py "$RUN" --jobs 3

@@ -1,6 +1,6 @@
 # Motion check (exploratory, after the gate)
 
-Same-task AUROC, failures above successes; bootstrap over episodes within (task, outcome), 10000 draws, seed 0. Speed is the end effector's from world state over the same pre-grasp window. Harness `91848ce`.
+Same-task AUROC, failures above successes; bootstrap over episodes within (task, outcome), 10000 draws, seed 0. Speed is the end effector's from world state over the same pre-grasp window. Harness `143729b`.
 
 | Arm speed in the window | AUROC [95% CI] |
 |---|---|
