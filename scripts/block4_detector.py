@@ -7,6 +7,10 @@ share of successful development first attempts alarm.
 
   freeze   <dev run> --attempts <csv> --out <frozen.json>
   evaluate <run> --attempts <csv> --frozen <frozen.json> --out <dir>
+  metrics  --scores <scores.csv> --frozen <frozen.json> --out <dir>
+
+`evaluate` writes per-attempt scores to <dir>/scores.csv; `metrics` recomputes the evaluation
+from that file alone, without the raw traces.
 """
 
 import argparse
@@ -23,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import block4_window_sweep as ws
 import separability_gate as sg
 
-from harness import detector, gate, metadata, milestones, schema
+from harness import detector, detector_eval, metadata, milestones, schema
 
 LEVEL = 0.95
 N_BOOT = 2000
@@ -75,19 +79,6 @@ def freeze(args) -> None:
           f"{frozen['v2_threshold']:.4f}, from {frozen['dev']}")  # fmt: skip
 
 
-def _units(rows, values, failed) -> list[gate.Unit]:
-    return [
-        gate.Unit(r["episode_id"], int(r["task_id"]), r["object"], "failure" if f else "success", v)
-        for r, v, f in zip(rows, values, failed, strict=True)
-    ]
-
-
-def _excess(units) -> float:
-    f = [u.value for u in units if u.group == "failure"]
-    s = [u.value for u in units if u.group == "success"]
-    return float(np.mean(f) - np.mean(s))
-
-
 def _width_delays(run_dir: Path, rows: list[dict]) -> list[int | None]:
     out, widths = [], {}
     for r in rows:
@@ -101,59 +92,56 @@ def _width_delays(run_dir: Path, rows: list[dict]) -> list[int | None]:
     return out
 
 
-def evaluate(args) -> None:
-    frozen = json.loads(args.frozen.read_text())
+def score(run_dir: Path, attempts: Path, frozen: dict) -> list[detector_eval.AttemptScore]:
     spec = detector.DetectorSpec(**frozen["spec"])
     g_ref, r_ref = np.array(frozen["gripper_reference"]), np.array(frozen["roll_reference"])
-    rows = ws.first_attempts(args.attempts)
-    feats = features(args.run_dir, rows, frozen["roll_zero_bin"], spec)
+    rows = ws.first_attempts(attempts)
+    feats = features(run_dir, rows, frozen["roll_zero_bin"], spec)
     kept = [(r, f) for r, f in zip(rows, feats, strict=True) if f[0] is not None]
     rows = [r for r, _ in kept]
-    failed = np.array([r["outcome"] != "success" for r in rows])
-    outcome = {r["episode_id"]: r["episode_success"] for r in rows}
-    scores = {
-        "v1": np.array([f[0] for _, f in kept]),
-        "v2": np.array([detector.v2_score(g, roll, g_ref, r_ref) for _, (g, roll) in kept]),
-    }
-    delays = _width_delays(args.run_dir, rows)
-    width_fires = np.array([d is not None for d in delays])
+    delays = _width_delays(run_dir, rows)
+    return [
+        detector_eval.AttemptScore(
+            episode_id=r["episode_id"],
+            task_id=int(r["task_id"]),
+            object=r["object"],
+            episode_success=r["episode_success"],
+            failed=r["outcome"] != "success",
+            v1=float(g),
+            v2=detector.v2_score(g, roll, g_ref, r_ref),
+            width_delay=d,
+        )
+        for (r, (g, roll)), d in zip(kept, delays, strict=True)
+    ]
+
+
+def _write_results(scores, frozen: dict, frozen_path: Path, out: Path) -> None:
+    thresholds = {name: frozen[f"{name}_threshold"] for name in ("v1", "v2")}
+    metrics = detector_eval.evaluate(scores, thresholds, LEVEL, N_BOOT, sg.SEED)
     results = {
-        "n_failure": int(failed.sum()),
-        "n_success": int((~failed).sum()),
-        "frozen": str(args.frozen),
-        "width": {
-            "caught": int(width_fires[failed].sum()),
-            "false_alarms": int(width_fires[~failed].sum()),
-        },
+        "n_failure": metrics.pop("n_failure"),
+        "n_success": metrics.pop("n_success"),
+        "frozen": str(frozen_path),
+        **metrics,
     }
-    for name, score in scores.items():
-        alarm = score > frozen[f"{name}_threshold"]
-        units = _units(rows, score.tolist(), failed)
-        alarm_units = _units(rows, alarm.astype(float).tolist(), failed)
-        lo, hi = gate.bootstrap_ci(units, gate.same_task_auroc, LEVEL, N_BOOT, sg.SEED, outcome.get)
-        elo, ehi = gate.bootstrap_ci(alarm_units, _excess, LEVEL, N_BOOT, sg.SEED, outcome.get)
-        caught = alarm & failed
-        also = [delays[i] for i in np.flatnonzero(caught & width_fires)]
-        fa_rate = float(alarm[~failed].mean())
-        results[name] = {
-            "auroc": gate.same_task_auroc(units),
-            "auroc_ci": [lo, hi],
-            "caught": int(caught.sum()),
-            "false_alarms": int((alarm & ~failed).sum()),
-            "false_alarm_rate": fa_rate,
-            "random_alarm_expected": fa_rate * int(failed.sum()),
-            "excess_over_chance": detector.excess_over_chance(alarm, failed),
-            "excess_ci": [elo, ehi],
-            "width_also_catches": len(also),
-            "width_delay_median": float(np.median(also)) if also else None,
-            "width_never_catches": int((caught & ~width_fires).sum()),
-            "passes": bool(lo > 0.5 and elo > 0),
-        }
     sha = metadata.git_state(sg.REPO)["sha"] or ""
-    args.out.mkdir(parents=True, exist_ok=True)
-    (args.out / "detector_eval.json").write_text(json.dumps(results, indent=2) + "\n")
-    (args.out / "detector_eval.md").write_text(render(results, frozen, sha))
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "detector_eval.json").write_text(json.dumps(results, indent=2) + "\n")
+    (out / "detector_eval.md").write_text(render(results, frozen, sha))
     print(render(results, frozen, sha))
+
+
+def evaluate(args) -> None:
+    frozen = json.loads(args.frozen.read_text())
+    scores = score(args.run_dir, args.attempts, frozen)
+    args.out.mkdir(parents=True, exist_ok=True)
+    detector_eval.write_scores(args.out / "scores.csv", scores)
+    _write_results(scores, frozen, args.frozen, args.out)
+
+
+def metrics(args) -> None:
+    frozen = json.loads(args.frozen.read_text())
+    _write_results(detector_eval.read_scores(args.scores), frozen, args.frozen, args.out)
 
 
 def render(results: dict, frozen: dict, sha: str) -> str:
@@ -206,8 +194,12 @@ def main() -> None:
     e.add_argument("--attempts", type=Path, required=True)
     e.add_argument("--frozen", type=Path, required=True)
     e.add_argument("--out", type=Path, required=True)
+    m = sub.add_parser("metrics")
+    m.add_argument("--scores", type=Path, required=True)
+    m.add_argument("--frozen", type=Path, required=True)
+    m.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
-    {"freeze": freeze, "evaluate": evaluate}[args.command](args)
+    {"freeze": freeze, "evaluate": evaluate, "metrics": metrics}[args.command](args)
 
 
 if __name__ == "__main__":
