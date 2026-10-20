@@ -1,6 +1,6 @@
 #!/bin/bash
 # Builds the openvla env on a fresh machine: sibling repos, conda env from
-# requirements-lock.txt, LIBERO config, checkpoint, and flash-attn on GPU.
+# requirements-lock.txt, LIBERO config, and on GPU the checkpoint and flash-attn.
 # Idempotent. Prints each step's wall time and saves the summary under outputs/.
 # Run with bash, then `source setup_env.sh`.
 set -euo pipefail
@@ -128,7 +128,7 @@ export PIP_CACHE_DIR="$HOME/.cache/pip"
 
 timed "install deps" install_deps
 timed "seed LIBERO config" seed_libero_config
-timed "prefetch checkpoint" prefetch_checkpoint
+has_gpu && timed "prefetch checkpoint" prefetch_checkpoint
 has_gpu && timed "flash-attn" install_flash_attn
 
 mkdir -p "$REPO_DIR/outputs"

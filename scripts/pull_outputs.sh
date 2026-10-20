@@ -1,18 +1,17 @@
 #!/bin/bash
-# Pulls archived run directories from a RunPod global volume to outputs/<run>/ over SSH.
-# A global volume is only reachable from a pod with it attached, so start a cheap pod
-# first and pass its public IP and exposed SSH port (basic proxy SSH can't carry rsync).
+# Pulls archived run directories from a remote host to outputs/<run>/ with rsync over SSH.
+# The remote root is the directory archive_outputs.sh wrote to ($OUTPUTS_ARCHIVE_DIR there).
 #
-#   pull_outputs.sh -H <ip> -p <port> --list
-#   pull_outputs.sh -H <ip> -p <port> <run> [--only GLOB]... [--no-video] [--dry-run]
+#   pull_outputs.sh -H <host> -p <port> -r <remote_root> --list
+#   pull_outputs.sh -H <host> -p <port> -r <remote_root> <run> [--only GLOB]... [--no-video] [--dry-run]
 #
-# Host, port and volume mount point also come from PULL_HOST, PULL_PORT, REMOTE_ROOT.
+# Host, port, remote root and user also come from PULL_HOST, PULL_PORT, REMOTE_ROOT, PULL_USER.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 host="${PULL_HOST:-}"
 port="${PULL_PORT:-22}"
-remote_root="${REMOTE_ROOT:-/workspace/libero-eval-harness-workspace/outputs}"
+remote_root="${REMOTE_ROOT:-}"
 user="${PULL_USER:-root}"
 list=0
 dry_run=0
@@ -26,6 +25,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     -H|--host) host="${2:?missing value}"; shift 2 ;;
     -p|--port) port="${2:?missing value}"; shift 2 ;;
+    -r|--remote-root) remote_root="${2:?missing value}"; shift 2 ;;
     --list) list=1; shift ;;
     --only) only+=("${2:?missing value}"); shift 2 ;;
     --no-video) no_video=1; shift ;;
@@ -36,13 +36,14 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-[ -n "$host" ] || { echo "ERROR: pass -H <ip> or set PULL_HOST." >&2; usage; }
+[ -n "$host" ] || { echo "ERROR: pass -H <host> or set PULL_HOST." >&2; usage; }
+[ -n "$remote_root" ] || { echo "ERROR: pass -r <remote_root> or set REMOTE_ROOT." >&2; usage; }
 
 ssh_cmd=(ssh -p "$port" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15)
 target="$user@$host"
 
 if ! "${ssh_cmd[@]}" "$target" "test -d '$remote_root'"; then
-  echo "ERROR: $remote_root not found on $host; is the global volume attached?" >&2
+  echo "ERROR: $remote_root not found on $host; is the archive volume mounted?" >&2
   exit 1
 fi
 

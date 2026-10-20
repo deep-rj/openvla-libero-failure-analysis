@@ -1,16 +1,12 @@
 #!/bin/bash
-# =============================================================================
-# setup_env.sh — Physical AI Spine Project (OpenVLA on LIBERO)
-# Per-shell pod setup, run after provision.sh: MuJoCo rendering libs, the
-# openvla env's vars, and the VS Code tunnel. Shell and git config are machine
-# setup and not handled here.
-# =============================================================================
+# Per-shell setup, sourced after provision.sh: MuJoCo rendering libs and the openvla env's
+# vars. SETUP_VSCODE_TUNNEL=1 also starts a VS Code tunnel for remote editing.
 
 # Derived from this file's location so a clone under any directory name works.
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 export REPO_DIR
 
-# Same search order as the machine's shell rc.
+# Same search order as provision.sh.
 CONDA_BIN="${CONDA_EXE:-}"
 [ -x "$CONDA_BIN" ] || CONDA_BIN="$HOME/miniforge3/bin/conda"
 [ -x "$CONDA_BIN" ] || CONDA_BIN="$HOME/miniconda3/bin/conda"
@@ -64,26 +60,28 @@ else
     echo "NOTE: conda env 'openvla' not found; run provision.sh, then re-source this file."
 fi
 
-# --- VS Code Tunnel (spawn only — login is manual, do NOT auto-answer prompts) ---
+# --- VS Code Tunnel, opt-in (spawn only — login is manual, do NOT auto-answer prompts) ---
 VSCODE_CLI="$HOME/.local/bin/code"
-if [ ! -x "$VSCODE_CLI" ]; then
-    mkdir -p "$(dirname "$VSCODE_CLI")"
-    curl -fsSL 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' -o /tmp/vscode_cli.tar.gz \
-        && tar -xzf /tmp/vscode_cli.tar.gz -C "$(dirname "$VSCODE_CLI")"
-    rm -f /tmp/vscode_cli.tar.gz
-fi
-if [ -x "$VSCODE_CLI" ]; then
-    if tmux has-session -t vscode-tunnel 2>/dev/null; then
-        echo "VS Code tunnel session already running/waiting."
-    else
-        tmux new-session -d -s vscode-tunnel "\"$VSCODE_CLI\" tunnel --accept-server-license-terms"
-        echo "VS Code tunnel session spawned."
+if [ "${SETUP_VSCODE_TUNNEL:-0}" = 1 ]; then
+    if [ ! -x "$VSCODE_CLI" ]; then
+        mkdir -p "$(dirname "$VSCODE_CLI")"
+        curl -fsSL 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' -o /tmp/vscode_cli.tar.gz \
+            && tar -xzf /tmp/vscode_cli.tar.gz -C "$(dirname "$VSCODE_CLI")"
+        rm -f /tmp/vscode_cli.tar.gz
     fi
-    echo ""
-    echo "  >>> ACTION REQUIRED: tmux attach -t vscode-tunnel"
-    echo "  >>> Select GitHub when prompted, then complete the device-code login."
-else
-    echo "WARNING: could not install the VS Code CLI at $VSCODE_CLI; skipping tunnel."
+    if [ -x "$VSCODE_CLI" ]; then
+        if tmux has-session -t vscode-tunnel 2>/dev/null; then
+            echo "VS Code tunnel session already running/waiting."
+        else
+            tmux new-session -d -s vscode-tunnel "\"$VSCODE_CLI\" tunnel --accept-server-license-terms"
+            echo "VS Code tunnel session spawned."
+        fi
+        echo ""
+        echo "  >>> ACTION REQUIRED: tmux attach -t vscode-tunnel"
+        echo "  >>> Select GitHub when prompted, then complete the device-code login."
+    else
+        echo "WARNING: could not install the VS Code CLI at $VSCODE_CLI; skipping tunnel."
+    fi
 fi
 
 echo ""
@@ -92,6 +90,4 @@ command -v conda > /dev/null && conda --version || echo "WARNING: conda not on P
 [ -x "$CONDA_BIN" ] && "$CONDA_BIN" env config vars list -n openvla 2>/dev/null
 
 echo ""
-echo "Next steps:"
-echo "  1. tmux attach -t vscode-tunnel   (select GitHub, log in)"
-echo "  2. conda activate openvla"
+echo "Next step: conda activate openvla"

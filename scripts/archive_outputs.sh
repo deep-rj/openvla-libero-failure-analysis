@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copies a run directory (default: outputs/) to an immutable snapshot
-# $OUTPUTS_ARCHIVE_DIR/<UTC time>-<git sha>-<pod id>/ (e.g. on a RunPod global volume) so
+# $OUTPUTS_ARCHIVE_DIR/<UTC time>-<git sha>-<pod id>/ (e.g. a network or object-storage volume) so
 # raw traces survive pod teardown, then writes and verifies MANIFEST.sha256 beside it.
 # No-op when OUTPUTS_ARCHIVE_DIR is unset.
 #   archive_outputs.sh [run_dir]

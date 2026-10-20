@@ -27,8 +27,7 @@ Run before the baseline, so that the logged traces can be trusted.
 
 ## Pod setup (RTX 4090 only)
 
-- [ ] `bash provision.sh && source setup_env.sh && conda activate openvla`; the
-      VS Code Tunnel login is manual.
+- [ ] `bash provision.sh && source setup_env.sh && conda activate openvla` (`docs/setup.md`).
 - [ ] `python --version` is 3.10.20 and `torch.cuda.is_available()` is True.
 
 ## Load-time guards (first thing the run does; hard-fail on any mismatch)
@@ -78,7 +77,7 @@ Tasks 0, 7, 3, 9 with 2 episodes each, plus one forced-truncation episode
       `step_idx` only.
 - [ ] Cost report: measured s/step (un-instrumented), projected GPU-hours and dollars
       for the 250-episode baseline, bytes per episode (flag if far from ~2 MB).
-- [ ] `bash scripts/archive_outputs.sh`; confirm the files are on the global volume
+- [ ] `bash scripts/archive_outputs.sh`; confirm the files are in `$OUTPUTS_ARCHIVE_DIR`
       before teardown. Push the report and any summary CSV; raw traces stay gitignored.
 
 T4 (static restore and the obs-vs-`qpos` check) runs locally on the pulled validation-run files:
@@ -95,7 +94,7 @@ tree unless `--allow-dirty` is passed.
 
 - [ ] 10 tasks × init states 0–24, logger and video on, one pass.
 - [ ] `episode_id` deterministic, so sharded pods cannot collide; per-pod manifest.
-- [ ] Archive to the global volume; push per-episode summary CSVs.
+- [ ] Archive to `$OUTPUTS_ARCHIVE_DIR`; push per-episode summary CSVs.
 
 ### Sharded baseline (several pods)
 
