@@ -13,6 +13,13 @@ gripper token flips, and those look the same before failures and successes.
 The pass criterion was set before testing, and the held-out episodes were used once, so the result
 could not be adjusted after the fact.
 
+![The same task and object twice: a grasp whose box slips out mid-lift and a clean grasp, each with its gripper uncertainty trace; both spike to near a coin flip before the close and both raise the alarm](docs/media/demo_same_task.gif)
+
+*Same task, same box: a grasp that fails (top) and one that succeeds (bottom), aligned on the
+close command, at half speed. The detector scores the 30 steps before the close. Both spike to near
+a coin flip inside that window, and both raise the alarm. In the failure, the trace stays at
+"certain" while the box slips out.*
+
 ## What's here
 
 - **A reproduced baseline.** `openvla/openvla-7b-finetuned-libero-10`, used as released with no
@@ -135,7 +142,8 @@ python scripts/block4_detector.py metrics \
 This reproduces `docs/results/heldout/block4/detector_eval.json` exactly.
 
 **From the held-out traces** (raw traces are not in git): `bash scripts/block4_heldout_eval.sh
-<run_dir>` extracts world state, labels attempts, scores and evaluates.
+<run_dir>` extracts world state, labels attempts, scores and evaluates. `scripts/make_demo_clip.py`
+renders the clip above from the same traces.
 
 **From scratch** (GPU pods, about 8 GPU-hours on an RTX 4090 at ~417 policy steps per episode):
 one command per pod, then one local merge.
