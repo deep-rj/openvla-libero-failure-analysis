@@ -1,4 +1,4 @@
-# libero-eval-harness-workspace
+# OpenVLA failure analysis on LIBERO-Long
 
 Can a robot policy's own uncertainty warn that a grasp is about to fail? This project tests that
 for OpenVLA, a vision-language-action model, on LIBERO-Long, a benchmark of multi-step household
@@ -30,6 +30,8 @@ a coin flip inside that window, and both raise the alarm. In the failure, the tr
   hand labels on 20 of 29 decided cases.
 - **A pre-registered detector test.** The detector and its pass criterion were frozen before the
   held-out run; the result is recomputable from committed files with one command, no GPU needed.
+
+This is an independent evaluation, not affiliated with the OpenVLA or LIBERO authors.
 
 ## Results
 
@@ -168,6 +170,8 @@ states, and GPU numerics differ across GPU models. `--policy stub` runs the same
 - **The attempt boundary is the labeler's weak point.** One-step close commands can split or merge
   attempts; 1 of 15 reviewed held-out labels was wrong.
 - **Scope.** Simulation only, one policy, one embodiment, one task suite.
+- **No robustness study.** A planned robustness study (perturbations, cross-suite transfer) was
+  not run: with the detector at chance-adjacent AUROC, there was no detector worth stress-testing.
 
 ## Repo layout
 
@@ -181,6 +185,7 @@ states, and GPU numerics differ across GPU models. `--policy stub` runs the same
 ├── setup_env.sh          # per-shell setup: rendering backend, env vars, VS Code tunnel
 ├── requirements-lock.txt # exact pip versions of the verified env
 ├── constraints.txt       # pip constraints applied via PIP_CONSTRAINT
+├── LICENSE
 └── README.md
 ```
 
@@ -206,8 +211,7 @@ volume (object storage) at the end of each eval run.
   - Container disk **≥ 60GB**: about 8.5GB of env plus the 15GB checkpoint plus outputs.
   - A global volume attached, with `OUTPUTS_ARCHIVE_DIR` set to a directory on it.
     It's safe to leave unset, but then outputs aren't archived.
-- **GPU:** RTX 4090 only, so numerics stay comparable across runs (see
-  `docs/archive/plan_parallel_eval_harness.md`, Pod configuration). Filter listings on vCPU as well,
+- **GPU:** RTX 4090 only, so numerics stay comparable across runs. Filter listings on vCPU as well,
   about 32 for 8 env workers. Whatever the GPU, it must be pre-Blackwell (compute
   capability < 10): torch 2.2.0+cu121 has no kernels for sm_100/sm_120, and
   `provision.sh` checks this first and stops.
@@ -227,8 +231,8 @@ over an existing local CPU env; it would replace that torch build. Keep `~/.cond
 
 ```bash
 mkdir -p ~/work && cd ~/work
-git clone https://github.com/deep-rj/libero-eval-harness-workspace.git
-cd libero-eval-harness-workspace
+git clone https://github.com/deep-rj/openvla-libero-failure-analysis.git
+cd openvla-libero-failure-analysis
 bash provision.sh
 source setup_env.sh   # must be sourced, not run with `bash`, to affect the current shell
 conda activate openvla
@@ -263,9 +267,6 @@ every `conda activate openvla`:
 It also installs system rendering libraries if they're missing, and spawns a VS Code
 Tunnel session with the standalone CLI at `~/.local/bin/code`. The tunnel login is manual
 on every pod.
-
-The `SessionStart` hook that rewrites and pushes `STATUS.md` skips itself on RunPod pods
-(`RUNPOD_POD_ID` is set), so it doesn't conflict with the same hook on another machine.
 
 ### Validate
 

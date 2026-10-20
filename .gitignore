@@ -229,7 +229,6 @@ __marimo__/
 wandb/
 outputs/
 logs/
-drills/
 *.mp4
 *.png
 !docs/results/**/*.png
