@@ -19,7 +19,8 @@ object did not meet the pre-registered criterion on held-out init states 25–49
 
 ## Result
 
-110 failed and 237 successful first attempts; 95% CIs bootstrapped over episodes within (task,
+110 failed and 237 successful first attempts; AUROC is same-task (failure-success pairs within a
+(task, object) stratum, ties counted half); 95% CIs bootstrapped over episodes within (task,
 episode outcome).
 
 | | AUROC | caught | false alarms | excess over chance | pass |

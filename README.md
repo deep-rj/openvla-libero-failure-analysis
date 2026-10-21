@@ -50,8 +50,9 @@ simulator state. Pre-registered pass: the AUROC CI excludes 0.5 and the excess-o
 | v2 (secondary), held-out | 0.57 (0.50 to 0.64) | 34 of 110 | 44 of 237 (19%) | 0.12 (0.03 to 0.22) | marginal |
 
 Development: init states 0–24; held-out: init states 25–49, evaluated once with no refit. 95% CIs
-bootstrap over episodes within (task, episode outcome). v2 adds roll-dimension entropy; its AUROC
-lower bound is 0.501, so `detector_eval.json` marks it as passing, but the verdict rests on the
+bootstrap over episodes within (task, episode outcome). AUROC is same-task: failure-success pairs
+are formed within a (task, object) stratum only, ties counted half. v2 adds roll-dimension
+entropy; its AUROC lower bound is 0.501, so `detector_eval.json` marks it as passing, but the verdict rests on the
 pre-registered primary.
 
 - **The gripper action is effectively binary.** Its probability sits on two tokens: exp(H) is 1
