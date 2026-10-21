@@ -41,7 +41,8 @@ Traces: `outputs/heldout/review/stratum_{a,b,c}.png` (`detector_review.py plot`)
 ## What drives an alarm
 
 In the 10 alarmed traces gripper exp(H) is 1.000 except for 1–5 steps, nearly all within 12 steps
-of the close command. The gripper is effectively a two-token choice, so exp(H) lies in [1, 2], and one step at
+of the close command. The gripper is effectively a two-token choice, so exp(H) is at most 2.01 on
+all but 8 of 203,788 logged gripper steps (maximum 2.32), and one step at
 exp(H) ≥ 1.61 (about 18% on the other token) clears the threshold on its own. Caught failures and
 false alarms have the same pattern and nothing visible before the close; misses have no such step in
 the window, or have it on the command step, which the window excludes (t09-i029).

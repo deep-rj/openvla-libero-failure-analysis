@@ -52,8 +52,9 @@ checked on video against their labels and traces (`docs/results/heldout/detector
 ## What the signal is
 
 - **The gripper action is effectively binary.** OpenVLA emits one of 256 bins per action dimension,
-  but the gripper was trained on {0, 1} and its probability sits on two tokens, so exp(H) lies in
-  [1, 2]: 1 when certain, 2 at a coin flip.
+  but the gripper was trained on {0, 1} and its probability sits on two tokens, so exp(H) is 1
+  when certain and 2 at a coin flip, and is at most 2.01 on all but 8 of 203,788 logged gripper
+  steps (maximum 2.32).
 - **Half of all attempts are flat.** v1 is below 1.001 for 50% of failed and 56% of successful
   first attempts: no step in the window departs from a certain gripper token.
 - **Alarms come from a few steps at the switch.** In every reviewed trace the score comes from 1–5

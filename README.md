@@ -54,8 +54,9 @@ bootstrap over episodes within (task, episode outcome). v2 adds roll-dimension e
 lower bound is 0.501, so `detector_eval.json` marks it as passing, but the verdict rests on the
 pre-registered primary.
 
-- **The gripper action is effectively binary.** Its probability sits on two tokens, so exp(H) lies
-  in [1, 2]. Half of all attempts never leave 1: no step in the window is uncertain.
+- **The gripper action is effectively binary.** Its probability sits on two tokens: exp(H) is 1
+  when certain and 2 at a coin flip, and is at most 2.01 on all but 8 of 203,788 logged gripper
+  steps (maximum 2.32). Half of all attempts never leave 1: no step in the window is uncertain.
 - **Alarms come from 1–5 uncertain steps at the switch,** nearly all within 12 steps of the close
   command. On 15 reviewed videos, caught failures and false alarms look the same, and the signal
   does not follow the failure mechanism.
